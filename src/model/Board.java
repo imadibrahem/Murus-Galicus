@@ -36,4 +36,6 @@ public abstract class Board {
     public abstract boolean isInCheck(boolean isBlue);
 
     public abstract boolean isInLosingPos(boolean isBlue);
+
+    public abstract String generateFEN();
 }

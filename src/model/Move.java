@@ -1,24 +1,76 @@
 package model;
 
-public interface Move {
+import java.util.Objects;
+
+public class Move {
+
+    private final short value;
+
+    public Move(short value) {
+        this.value = value;
+    }
+
     @Override
-    String toString() ;
+    public String toString() {
+        // TODO: 10/19/2024
+        return "";
+    }
 
-    short getTargetRow();
+    public short getTargetRow() {
+        // TODO: 10/19/2024
+        return 0;
+    }
 
-    short getTargetCol();
+    public short getTargetCol() {
+        // TODO: 10/19/2024
+        return 0;
+    }
 
-    short getValue();
+    public short getValue() {
+        // TODO: 10/19/2024
+        return 0;
+    }
 
-    boolean isTargetEmpty();
+    public boolean isTargetEmpty() {
+        // TODO: 10/19/2024
+        return false;
+    }
 
-    boolean isTargetFriendly();
+    public boolean isTargetFriendly() {
+        // TODO: 10/19/2024
+        return false;
+    }
 
-    boolean isTargetEnemy();
+    public boolean isTargetEnemy() {
+        // TODO: 10/19/2024
+        return false;
+    }
 
-    byte getInitial();
+    public byte getInitial() {
+        // TODO: 10/19/2024
+        return 0;
+    }
 
-    byte getTarget();
+    public byte getTarget() {
+        // TODO: 10/19/2024
+        return 0;
+    }
 
-    byte getTargetType();
+    public byte getTargetType() {
+        // TODO: 10/19/2024
+        return 0;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Move that = (Move) o;
+        return value == that.value;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(value);
+    }
 }
