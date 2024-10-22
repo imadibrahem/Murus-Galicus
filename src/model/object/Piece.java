@@ -33,7 +33,6 @@ public class Piece {
 
     public void setTopped(boolean topped) {
         isTopped = topped;
-        setSymbol();
     }
 
     public Square getSquare() {

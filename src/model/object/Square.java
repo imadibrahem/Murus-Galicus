@@ -5,14 +5,16 @@ public class Square {
     private final ObjectBoard board;
     private int row;
     private int col;
-    private final byte location;
+    private final int location;
     private Piece piece;
+    private Piece upperPiece;
     private String name;
 
-    public Square(ObjectBoard board, byte location) {
+    public Square(ObjectBoard board, int location) {
         this.board = board;
         this.location = location;
         this.piece = null;
+        this.upperPiece = null;
         setRow();
         setCol();
         setName();
@@ -34,14 +36,18 @@ public class Square {
         return piece;
     }
     
-    public byte getLocation() {
+    public int getLocation() {
         return location;
     }
     
     public String getName() {
         return name;
     }
-    
+
+    public Piece getUpperPiece() {
+        return upperPiece;
+    }
+
     public void emptySquare(){
         this.piece = null;
     }
@@ -60,6 +66,10 @@ public class Square {
     
     public void setPiece(Piece piece) {
         this.piece = piece;
+    }
+
+    public void setUpperPiece(Piece upperPiece) {
+        this.upperPiece = upperPiece;
     }
 
     public static void main (String[] args){

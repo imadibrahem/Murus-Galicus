@@ -15,6 +15,9 @@ public class ObjectBoard extends Board {
         this.squares = new Square[56];
         this.blueArmy = new Army(true);
         this.redArmy = new Army(false);
+        for (int i = 0; i < 56; i++){
+            squares[i] = new Square(this, i);
+        }
     }
 
     @Override
@@ -24,6 +27,57 @@ public class ObjectBoard extends Board {
 
     @Override
     public void build(String FEN) {
+        int squareCol;
+        int squareLoc;
+        Square square;
+        String [] rows = FEN.split("[/\\s]+");
+        for (int r = 0; r < 8; r++){
+            squareCol = 0;
+            for (int c = 0; c < rows[r].length(); c++){
+                if (Character.isDigit(rows[r].charAt(c))){
+                    squareCol += Character.getNumericValue(rows[r].charAt(c));
+                }
+                else {
+                    squareCol++;
+                    squareLoc = (r * 8) + (squareCol - 1);
+                    square = this.squares[squareLoc];
+                    Piece piece;
+                    if (rows[r].charAt(c) == 'w'){
+                        piece = this.redArmy.getSacrificedPieces().remove(0);
+                        this.redArmy.getWalls().add(piece);
+                    }
+                    else if (rows[r].charAt(c) == 'W'){
+                        piece = this.blueArmy.getSacrificedPieces().remove(0);
+                        this.blueArmy.getWalls().add(piece);
+                    }
+                    else if (rows[r].charAt(c) == 't'){
+                        piece = this.redArmy.getSacrificedPieces().remove(0);
+                        this.redArmy.getTowers().add(piece);
+                        piece.setTower(true);
+                        piece.setSquare(square);
+                        square.setUpperPiece(piece);
+                        piece = this.redArmy.getSacrificedPieces().remove(0);
+                        this.redArmy.getTopped().add(piece);
+                        piece.setTopped(true);
+                    }
+                    else{
+                        piece = this.blueArmy.getSacrificedPieces().remove(0);
+                        this.blueArmy.getTowers().add(piece);
+                        piece.setTower(true);
+                        piece.setSquare(square);
+                        square.setUpperPiece(piece);
+                        piece = this.blueArmy.getSacrificedPieces().remove(0);
+                        this.blueArmy.getTopped().add(piece);
+                        piece.setTopped(true);
+                    }
+                    piece.setSquare(square);
+                    square.setPiece(piece);
+
+                }
+
+            }
+
+        }
 
     }
 
