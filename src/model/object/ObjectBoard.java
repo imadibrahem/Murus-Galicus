@@ -27,11 +27,13 @@ public class ObjectBoard extends Board {
 
     @Override
     public void build(String FEN) {
+        cleanBoard();
         int squareCol;
         int squareLoc;
         Square square;
         String [] rows = FEN.split("[/\\s]+");
-        for (int r = 0; r < 8; r++){
+
+        for (int r = 0; r < 7; r++){
             squareCol = 0;
             for (int c = 0; c < rows[r].length(); c++){
                 if (Character.isDigit(rows[r].charAt(c))){
@@ -93,51 +95,58 @@ public class ObjectBoard extends Board {
 
     @Override
     public void cleanBoard() {
-
+        redArmy.withdrawFromBoard();
+        blueArmy.withdrawFromBoard();
     }
 
     @Override
     public List<Move> computeAllMoves(boolean isBlue) {
+        Army army = isBlue ? blueArmy : redArmy;
         return null;
     }
 
     @Override
-    public List<Move> generateCapturingMoves(boolean isBlue) {
+    public List<Move> generateSacrificingMoves(boolean isBlue) {
+        Army army = isBlue ? blueArmy : redArmy;
+        return null;
+    }
+
+    @Override
+    public List<Move> generateQuietMoves(boolean isBlue) {
+        return null;
+    }
+
+    @Override
+    public List<Move> generateMixedMoves(boolean isBlue) {
         return null;
     }
 
     @Override
     public int distances(boolean isBlue) {
+        Army army = isBlue ? blueArmy : redArmy;
         return 0;
     }
 
     @Override
     public int cols(boolean isBlue) {
+        Army army = isBlue ? blueArmy : redArmy;
         return 0;
     }
 
     @Override
     public int wallsNumber(boolean isBlue) {
-        return 0;
+        Army army = isBlue ? blueArmy : redArmy;
+        return army.getWalls().size();
     }
 
     @Override
     public int towersNumber(boolean isBlue) {
-        return 0;
+        Army army = isBlue ? blueArmy : redArmy;
+        return army.getTowers().size();
     }
 
     @Override
     public int gameState(boolean isBlue) {
-        return 0;
-    }
-
-    @Override
-    public long getWalls(boolean isBlue) {
-        return 0;
-    }
-
-    @Override
-    public long getTowers(boolean isBlue) {
         return 0;
     }
 
@@ -154,5 +163,9 @@ public class ObjectBoard extends Board {
     @Override
     public String generateFEN() {
         return null;
+    }
+
+    public Square[] getSquares() {
+        return squares;
     }
 }

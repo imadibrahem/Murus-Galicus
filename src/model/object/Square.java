@@ -1,5 +1,7 @@
 package model.object;
 
+import model.Board;
+
 public class Square {
 
     private final ObjectBoard board;
@@ -48,20 +50,16 @@ public class Square {
         return upperPiece;
     }
 
-    public void emptySquare(){
-        this.piece = null;
-    }
-
     public void setCol() {
-        this.col = location - ((row - 1) * 8) ;
+        this.col = location - ((row - 1) * 8) + 1;
     }
 
     public void setRow() {
-        this.row = ((location + 1) / 8) + 1;
+        this.row = (location / 8) + 1 ;
     }
 
     public void setName() {
-        this.name = ((char) row + 48) + "" + ((char) col + 64);
+        this.name =  ((char) ('A' + (col - 1))) + Integer.toString(row);
     }
     
     public void setPiece(Piece piece) {
@@ -73,8 +71,14 @@ public class Square {
     }
 
     public static void main (String[] args){
-        System.out.println((char) 65);
-        System.out.println((char) 48);
+        ObjectBoard board = new ObjectBoard();
+        for (Square square : board.getSquares()){
+            System.out.println(square.getLocation());
+            System.out.println(square.getRow());
+            System.out.println(square.getCol());
+            System.out.println(square.getName());
+            System.out.println("/////////////////////////////////");
+        }
     }
 
 }

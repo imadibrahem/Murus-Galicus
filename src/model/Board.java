@@ -17,7 +17,11 @@ public abstract class Board {
 
     public abstract List<Move> computeAllMoves(boolean isBlue);
 
-    public abstract List<Move> generateCapturingMoves(boolean isBlue);
+    public abstract List<Move> generateSacrificingMoves(boolean isBlue);
+
+    public abstract List<Move> generateQuietMoves(boolean isBlue);
+
+    public abstract List<Move> generateMixedMoves(boolean isBlue);
 
     public abstract int distances(boolean isBlue);
 
@@ -28,10 +32,6 @@ public abstract class Board {
     public abstract int towersNumber(boolean isBlue);
 
     public abstract int gameState(boolean isBlue);
-
-    public abstract long getWalls(boolean isBlue);
-
-    public abstract long getTowers(boolean isBlue);
 
     public abstract boolean isInCheck(boolean isBlue);
 

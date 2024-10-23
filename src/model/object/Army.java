@@ -39,8 +39,41 @@ public class Army {
     public List<Piece> getSacrificedPieces() {
         return sacrificedPieces;
     }
+
     public void withdrawFromBoard() {
-        // TODO: 10/22/2024  
-        
+        withdrawTowers();
+        withdrawWalls();
     }
+
+    public void withdrawTowers(){
+        Piece piece;
+        Square square;
+        for (Piece upperPiece : towers){
+            square = upperPiece.getSquare();
+            piece = square.getPiece();
+            upperPiece.setTower(false);
+            upperPiece.setSquare(null);
+            piece.setTopped(false);
+            piece.setSquare(null);
+            square.setPiece(null);
+            square.setUpperPiece(null);
+            sacrificedPieces.add(upperPiece);
+            sacrificedPieces.add(piece);
+            towers.remove(upperPiece);
+            topped.remove(piece);
+        }
+    }
+
+    public void withdrawWalls(){
+        Square square;
+        for (Piece piece : walls){
+            square = piece.getSquare();
+            piece.setSquare(null);
+            square.setPiece(null);
+            sacrificedPieces.add(piece);
+            walls.remove(piece);
+        }
+    }
+
+
 }

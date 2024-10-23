@@ -1,5 +1,7 @@
 package model.object;
 
+import model.Move;
+
 public class Piece {
     private final boolean isBlue;
     private boolean isTower;
@@ -50,6 +52,76 @@ public class Piece {
     public void setSymbol() {
         this.symbol = isTower? 't' : 'w';
         if (isBlue) this.symbol = Character.toUpperCase(this.symbol);
+    }
+
+    public Move quietFront(){
+        if (isBlue){
+
+        }
+        else {
+            
+        }
+        return null;
+    }
+
+    public Move quietFrontRight(){
+        return null;
+    }
+
+    public Move quietRight(){
+        return null;
+    }
+
+    public Move quietBackRight(){
+        return null;
+    }
+
+    public Move quietBack(){
+        return null;
+    }
+
+    public Move quietBackLeft(){
+        return null;
+    }
+
+    public Move quietLeft(){
+        return null;
+    }
+
+    public Move quietFrontLeft(){
+        return null;
+    }
+
+    public Move sacrificingFront(){
+        return null;
+    }
+
+    public Move sacrificingFrontRight(){
+        return null;
+    }
+
+    public Move sacrificingRight(){
+        return null;
+    }
+
+    public Move sacrificingBackRight(){
+        return null;
+    }
+
+    public Move sacrificingBack(){
+        return null;
+    }
+
+    public Move sacrificingBackLeft(){
+        return null;
+    }
+
+    public Move sacrificingLeft(){
+        return null;
+    }
+
+    public Move sacrificingFrontLeft(){
+        return null;
     }
 
 }
