@@ -54,74 +54,54 @@ public class Piece {
         if (isBlue) this.symbol = Character.toUpperCase(this.symbol);
     }
 
-    public Move quietFront(){
-        if (isBlue){
-
+    public Move quietMove(int direction){
+        Square[] targets = square.doubleMoveSquares(direction, isBlue);
+        if (targets[1] != null && targets[0].getPiece() == null && targets[1].getPiece() == null){
+            int location = isBlue ? square.getLocation() : 55 - square.getLocation();
+            return new Move((short) (location << 6 | direction << 3));
         }
-        else {
-            
+        return null;
+    }
+
+    public Move friendOnNearMove(int direction){
+        Square[] targets = square.doubleMoveSquares(direction, isBlue);
+        if (targets[1] != null && targets[0].getPiece() != null && targets[1].getPiece() == null
+                && targets[0].getPiece().isBlue() == isBlue){
+            int location = isBlue ? square.getLocation() : 55 - square.getLocation();
+            return new Move((short) (location << 6 | direction << 3 | 1));
         }
         return null;
     }
 
-    public Move quietFrontRight(){
+    public Move friendOnFarMove(int direction){
+        Square[] targets = square.doubleMoveSquares(direction, isBlue);
+        if (targets[1] != null && targets[0].getPiece() == null && targets[1].getPiece() != null
+                && targets[1].getPiece().isBlue() == isBlue){
+            int location = isBlue ? square.getLocation() : 55 - square.getLocation();
+            return new Move((short) (location << 6 | direction << 3 | 2));
+        }
         return null;
     }
 
-    public Move quietRight(){
+    public Move friendOnBothMove(int direction){
+        Square[] targets = square.doubleMoveSquares(direction, isBlue);
+        if (targets[1] != null && targets[0].getPiece() != null && targets[1].getPiece() != null
+                && targets[0].getPiece().isBlue() == isBlue && targets[1].getPiece().isBlue() == isBlue){
+            int location = isBlue ? square.getLocation() : 55 - square.getLocation();
+            return new Move((short) (location << 6 | direction << 3 | 3));
+        }
         return null;
     }
 
-    public Move quietBackRight(){
+    public Move sacrificingMove(int direction){
+        Square target = square.singleMoveSquare(direction, isBlue);
+        if (target != null && target.getPiece() != null && target.getPiece().isBlue() != isBlue){
+            int location = isBlue ? square.getLocation() : 55 - square.getLocation();
+            return new Move((short) (location << 6 | direction << 3 | 4));
+        }
         return null;
     }
 
-    public Move quietBack(){
-        return null;
-    }
 
-    public Move quietBackLeft(){
-        return null;
-    }
-
-    public Move quietLeft(){
-        return null;
-    }
-
-    public Move quietFrontLeft(){
-        return null;
-    }
-
-    public Move sacrificingFront(){
-        return null;
-    }
-
-    public Move sacrificingFrontRight(){
-        return null;
-    }
-
-    public Move sacrificingRight(){
-        return null;
-    }
-
-    public Move sacrificingBackRight(){
-        return null;
-    }
-
-    public Move sacrificingBack(){
-        return null;
-    }
-
-    public Move sacrificingBackLeft(){
-        return null;
-    }
-
-    public Move sacrificingLeft(){
-        return null;
-    }
-
-    public Move sacrificingFrontLeft(){
-        return null;
-    }
 
 }

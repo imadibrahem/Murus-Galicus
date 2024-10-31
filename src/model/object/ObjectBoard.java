@@ -15,7 +15,7 @@ public class ObjectBoard extends Board {
         this.squares = new Square[56];
         this.blueArmy = new Army(true);
         this.redArmy = new Army(false);
-        for (int i = 0; i < 56; i++){
+        for (short i = 0; i < 56; i++){
             squares[i] = new Square(this, i);
         }
     }
