@@ -9,9 +9,11 @@ public abstract class Board {
 
     public abstract void build(String FEN);
 
-    public abstract void makeMove(Move move);
+    public abstract String generateFEN();
 
-    public abstract void unmakeMove(Move move);
+    public abstract void makeMove(Move move, boolean isBlue);
+
+    public abstract void unmakeMove(Move move, boolean isBlue);
 
     public abstract void cleanBoard();
 
@@ -37,5 +39,4 @@ public abstract class Board {
 
     public abstract boolean isInLosingPos(boolean isBlue);
 
-    public abstract String generateFEN();
 }

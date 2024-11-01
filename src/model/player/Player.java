@@ -29,10 +29,10 @@ public abstract class Player {
     public abstract Move decideMove();
 
     public void makeMove(Move move){
-        board.makeMove(move);
+        board.makeMove(move, isBlue);
     }
 
     public void unmakeMove(Move move){
-        board.unmakeMove(move);
+        board.unmakeMove(move, isBlue);
     }
 }

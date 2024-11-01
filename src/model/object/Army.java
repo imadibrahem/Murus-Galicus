@@ -57,11 +57,12 @@ public class Army {
             piece.setSquare(null);
             square.setPiece(null);
             square.setUpperPiece(null);
-            sacrificedPieces.add(upperPiece);
-            sacrificedPieces.add(piece);
-            towers.remove(upperPiece);
-            topped.remove(piece);
         }
+        sacrificedPieces.addAll(towers);
+        sacrificedPieces.addAll(topped);
+        towers.clear();
+        topped.clear();
+
     }
 
     public void withdrawWalls(){
@@ -70,9 +71,9 @@ public class Army {
             square = piece.getSquare();
             piece.setSquare(null);
             square.setPiece(null);
-            sacrificedPieces.add(piece);
-            walls.remove(piece);
         }
+        sacrificedPieces.addAll(walls);
+        walls.clear();
     }
 
 

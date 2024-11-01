@@ -95,13 +95,17 @@ public class Piece {
 
     public Move sacrificingMove(int direction){
         Square target = square.singleMoveSquare(direction, isBlue);
-        if (target != null && target.getPiece() != null && target.getPiece().isBlue() != isBlue){
+        if (target != null && target.getPiece() != null && target.getPiece().isBlue() != isBlue
+                && target.getUpperPiece() == null){
             int location = isBlue ? square.getLocation() : 55 - square.getLocation();
             return new Move((short) (location << 6 | direction << 3 | 4));
         }
         return null;
     }
 
-
-
+    @Override
+    public String toString() {
+        String loc = square == null ? "" : " ["+square.getLocation()+"]";
+        return symbol + loc;
+    }
 }

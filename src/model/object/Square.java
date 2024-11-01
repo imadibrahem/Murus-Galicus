@@ -102,7 +102,11 @@ public class Square {
 
     public static void main (String[] args){
         ObjectBoard board = new ObjectBoard();
-        for (Square square : board.getSquares()){
+        for (int i = 1; i < 9; i++){
+            System.out.println(i + "->" + ((i + 5) % 9));
+        }
+
+            for (Square square : board.getSquares()){
             System.out.println("Location: " + square.getLocation());
             System.out.println("Row:      " + square.getRow());
             System.out.println("Column:   " + square.getCol());
@@ -143,6 +147,33 @@ public class Square {
             System.out.println("Red : " + initial.getLocation() + " -> " + i +" : "+ red);
             System.out.println("/////////////////////");
         }
+        board.build("1tttttt1/t5ww/8/8/8/8/TTTTTTTT");
+        System.out.println(board.generateFEN());
+
+        System.out.println(board.getArmy(true).getTowers());
+        System.out.println(board.getArmy(true).getTopped());
+        System.out.println(board.getArmy(true).getWalls());
+        System.out.println(board.getArmy(true).getSacrificedPieces());
+
+        System.out.println(board.getArmy(false).getTowers());
+        System.out.println(board.getArmy(false).getTopped());
+        System.out.println(board.getArmy(false).getWalls());
+        System.out.println(board.getArmy(false).getSacrificedPieces());
+
+        board.cleanBoard();
+
+        System.out.println(board.getArmy(true).getTowers());
+        System.out.println(board.getArmy(true).getTopped());
+        System.out.println(board.getArmy(true).getWalls());
+        System.out.println(board.getArmy(true).getSacrificedPieces());
+
+        System.out.println(board.getArmy(false).getTowers());
+        System.out.println(board.getArmy(false).getTopped());
+        System.out.println(board.getArmy(false).getWalls());
+        System.out.println(board.getArmy(false).getSacrificedPieces());
+
+        System.out.println(board.generateFEN());
+
 
 
     }
