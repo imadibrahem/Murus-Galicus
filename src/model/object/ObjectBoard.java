@@ -107,6 +107,11 @@ public class ObjectBoard extends Board {
     }
 
     @Override
+    public void updateFen(Move move) {
+        // TODO: 11/1/2024
+    }
+
+    @Override
     public void makeMove(Move move, boolean isBlue) {
         Square initial = squares[move.getInitialLocation(isBlue)];
         Square targetNear = initial.singleMoveSquare(move.getDirection(), isBlue);

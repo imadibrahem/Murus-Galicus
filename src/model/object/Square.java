@@ -1,5 +1,7 @@
 package model.object;
 
+import view.DisplayFrame;
+
 public class Square {
 
     private final ObjectBoard board;
@@ -173,6 +175,8 @@ public class Square {
         System.out.println(board.getArmy(false).getSacrificedPieces());
 
         System.out.println(board.generateFEN());
+
+        DisplayFrame frame = new DisplayFrame();
 
 
 

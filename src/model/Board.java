@@ -11,6 +11,8 @@ public abstract class Board {
 
     public abstract String generateFEN();
 
+    public abstract void updateFen(Move move);
+
     public abstract void makeMove(Move move, boolean isBlue);
 
     public abstract void unmakeMove(Move move, boolean isBlue);
