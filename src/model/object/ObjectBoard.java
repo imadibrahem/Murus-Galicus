@@ -10,14 +10,17 @@ public class ObjectBoard extends Board {
     private final Square[] squares;
     private final Army blueArmy;
     private final Army redArmy;
+    private String FEN;
 
-    public ObjectBoard() {
+    public ObjectBoard(String FEN) {
         this.squares = new Square[56];
         this.blueArmy = new Army(true);
         this.redArmy = new Army(false);
+        this.FEN = FEN;
         for (short i = 0; i < 56; i++){
             squares[i] = new Square(this, i);
         }
+        build(FEN);
     }
 
     @Override
@@ -106,10 +109,6 @@ public class ObjectBoard extends Board {
         return result;
     }
 
-    @Override
-    public void updateFen(Move move) {
-        // TODO: 11/1/2024
-    }
 
     @Override
     public void makeMove(Move move, boolean isBlue) {
@@ -161,6 +160,7 @@ public class ObjectBoard extends Board {
                 getArmy(isBlue).getWalls().remove(target);
                 getArmy(isBlue).getTopped().add(target);
             }
+            initial.setPiece(null);
         }
     }
 

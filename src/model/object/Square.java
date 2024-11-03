@@ -1,5 +1,6 @@
 package model.object;
 
+import model.Move;
 import view.DisplayFrame;
 
 public class Square {
@@ -70,8 +71,7 @@ public class Square {
         this.upperPiece = upperPiece;
     }
 
-    public Square singleMoveSquare(int direction, boolean isBlue){
-
+    public int singleMoveLocation(int direction, boolean isBlue){
         int squareLoc = -1;
         boolean rightValid = !((isBlue && (location + 1) % 8 == 0) || (!isBlue && (location % 8 == 0)));
         boolean leftValid = !((!isBlue && (location + 1) % 8 == 0) || (isBlue && (location % 8 == 0)));
@@ -92,6 +92,11 @@ public class Square {
 
         else if (direction == 8 && leftValid) squareLoc = isBlue ? location - 9 : location + 9;
 
+        return squareLoc;
+    }
+
+    public Square singleMoveSquare(int direction, boolean isBlue){
+        int squareLoc = singleMoveLocation(direction, isBlue);
         return (squareLoc > -1 && squareLoc < 56) ?  board.getSquares()[squareLoc] :  null;
     }
 
@@ -103,7 +108,7 @@ public class Square {
     }
 
     public static void main (String[] args){
-        ObjectBoard board = new ObjectBoard();
+        ObjectBoard board = new ObjectBoard("1tttttt1/t5ww/8/8/8/8/TTTTTTTT");
         for (int i = 1; i < 9; i++){
             System.out.println(i + "->" + ((i + 5) % 9));
         }
@@ -149,7 +154,6 @@ public class Square {
             System.out.println("Red : " + initial.getLocation() + " -> " + i +" : "+ red);
             System.out.println("/////////////////////");
         }
-        board.build("1tttttt1/t5ww/8/8/8/8/TTTTTTTT");
         System.out.println(board.generateFEN());
 
         System.out.println(board.getArmy(true).getTowers());
@@ -175,8 +179,33 @@ public class Square {
         System.out.println(board.getArmy(false).getSacrificedPieces());
 
         System.out.println(board.generateFEN());
+        String f = "1tttttt1/t5ww/8/8/8/8/TTTTTTTT";
+        board.build(f);
+        f = board.generateFEN();
+        System.out.println(f);
+        System.out.println(board.getSquares()[48].getPiece().getSymbol());
+        DisplayFrame frame = new DisplayFrame(f);
+        System.out.println(board.getArmy(true).getTowers());
+        System.out.println(board.getArmy(true).getTopped());
+        System.out.println(board.getArmy(true).getWalls());
+        System.out.println(board.getArmy(true).getSacrificedPieces());
+        Move m = board.getArmy(true).getTowers().get(0).quietMove(1);
+        board.makeMove(m, true);
+        f = board.generateFEN();
+        System.out.println(f);
+        System.out.println(board.getArmy(true).getTowers());
+        System.out.println(board.getArmy(true).getTopped());
+        System.out.println(board.getArmy(true).getWalls());
+        System.out.println(board.getArmy(true).getSacrificedPieces());
 
-        DisplayFrame frame = new DisplayFrame();
+        frame.getDisplayBoard().updateBoard(f);
+        board.unmakeMove(m, true);
+        f = board.generateFEN();
+        frame.getDisplayBoard().updateBoard(f);
+
+        System.out.println(f);
+
+
 
 
 
