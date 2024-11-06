@@ -3,19 +3,50 @@ package model.player;
 import model.Board;
 import model.Move;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public abstract class Player {
     private boolean isBlue;
+    private final boolean isEvaluationBlue;
     private final Board board;
+    private boolean isOn = false;
     protected int winScore;
     protected int loseScore = -winScore;
+    Map<Integer, Integer> directionMap = new HashMap<>();
+
 
     public Player(boolean isBlue,Board board) {
         this.isBlue = isBlue;
         this.board = board;
+        this.isEvaluationBlue = isBlue;
+        directionMap.put(-9, 8);
+        directionMap.put(-8, 1);
+        directionMap.put(-7, 2);
+        directionMap.put(-1, 7);
+        directionMap.put(7, 6);
+        directionMap.put(8, 5);
+        directionMap.put(9, 4);
     }
 
     public boolean isBlue() {
         return isBlue;
+    }
+
+    public boolean isEvaluationBlue() {
+        return isEvaluationBlue;
+    }
+
+    public boolean isOn() {
+        return isOn;
+    }
+
+    public int getWinScore() {
+        return winScore;
+    }
+
+    public int getLoseScore() {
+        return loseScore;
     }
 
     public Board getBoard() {
@@ -26,6 +57,13 @@ public abstract class Player {
         isBlue = !isBlue;
     }
 
+    public void setOn(boolean on) {
+        isOn = on;
+    }
+    public void switchTurn(){
+        isOn = !isOn;
+    }
+
     public abstract Move decideMove();
 
     public void makeMove(Move move){
@@ -34,5 +72,23 @@ public abstract class Player {
 
     public void unmakeMove(Move move){
         board.unmakeMove(move, isBlue);
+    }
+
+    public Move recieveCords(int initial , int targetNear, int targetFar){
+        int location = this.isEvaluationBlue() ? initial : 55 - initial;
+        int distance = isEvaluationBlue() ? targetNear - initial :initial - targetNear;
+        int direction = directionMap.get(distance);
+        int targetType;
+        if (targetFar < 0) targetType = 4;
+        else {
+            boolean friendlyNear = getBoard().isFriendlyPiece(isEvaluationBlue(), targetNear);
+            boolean friendlyFar = getBoard().isFriendlyPiece(isEvaluationBlue(), targetFar);
+            if (!friendlyNear && !friendlyFar) targetType = 0;
+            else if (friendlyNear && friendlyFar) targetType = 3;
+            else if (friendlyNear) targetType = 1;
+            else targetType = 2;
+        }
+        return new Move((short) (location << 7 | direction << 3 | targetType));
+
     }
 }

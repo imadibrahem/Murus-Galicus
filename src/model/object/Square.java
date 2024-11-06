@@ -1,7 +1,10 @@
 package model.object;
 
 import model.Move;
+import model.player.Player;
+import model.player.User;
 import view.DisplayFrame;
+import view.UserInput;
 
 public class Square {
 
@@ -121,7 +124,7 @@ public class Square {
             System.out.println("/////////////////////");
         }
 
-        Square initial = board.getSquares()[30];
+        Square initial = board.getSquares()[54];
         Square resultBlue;
         Square resultRed;
         String blue;
@@ -185,6 +188,7 @@ public class Square {
         System.out.println(f);
         System.out.println(board.getSquares()[48].getPiece().getSymbol());
         DisplayFrame frame = new DisplayFrame(f);
+
         System.out.println(board.getArmy(true).getTowers());
         System.out.println(board.getArmy(true).getTopped());
         System.out.println(board.getArmy(true).getWalls());
@@ -193,6 +197,8 @@ public class Square {
         board.makeMove(m, true);
         f = board.generateFEN();
         System.out.println(f);
+        frame.getDisplayBoard().updateBoard(f);
+
         System.out.println(board.getArmy(true).getTowers());
         System.out.println(board.getArmy(true).getTopped());
         System.out.println(board.getArmy(true).getWalls());
@@ -202,8 +208,16 @@ public class Square {
         board.unmakeMove(m, true);
         f = board.generateFEN();
         frame.getDisplayBoard().updateBoard(f);
-
+        UserInput input = new UserInput(frame.getDisplayBoard());
+        Player user = new User(true,board, input);
+        input.setPlayer(user);
+        user.setOn(true);
+        user.makeMove(user.decideMove());
+        f = board.generateFEN();
+        frame.getDisplayBoard().updateBoard(f);
         System.out.println(f);
+
+
 
 
 

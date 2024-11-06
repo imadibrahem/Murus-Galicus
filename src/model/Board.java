@@ -5,8 +5,6 @@ import java.util.List;
 public abstract class Board {
     public Board() {}
 
-    public abstract void display();
-
     public abstract void build(String FEN);
 
     public abstract String generateFEN();
@@ -38,5 +36,13 @@ public abstract class Board {
     public abstract boolean isInCheck(boolean isBlue);
 
     public abstract boolean isInLosingPos(boolean isBlue);
+
+    public abstract boolean isFriendlyTower(boolean isBlue, int location);
+
+    public abstract boolean isFriendlyPiece(boolean isBlue, int location);
+
+    public abstract List<Short> normalMovesLocations (boolean isBlue, int location);
+
+    public abstract List<Short> sacrificingMovesLocations (boolean isBlue, int location);
 
 }

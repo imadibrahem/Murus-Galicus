@@ -3,6 +3,7 @@ package model.object;
 import model.Board;
 import model.Move;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ObjectBoard extends Board {
@@ -21,11 +22,6 @@ public class ObjectBoard extends Board {
             squares[i] = new Square(this, i);
         }
         build(FEN);
-    }
-
-    @Override
-    public void display() {
-
     }
 
     @Override
@@ -234,7 +230,14 @@ public class ObjectBoard extends Board {
 
     @Override
     public List<Move> computeAllMoves(boolean isBlue) {
-        Army army = isBlue ? blueArmy : redArmy;
+        // TODO: 11/5/2024 CHANGE LATER!!
+        List<Piece> towers = getArmy(isBlue).getTowers();
+        List<Move> moves = new ArrayList<>();
+        for (Piece tower : towers){
+            for (int direction = 1; direction < 9; direction++){
+
+            }
+        }
         return null;
     }
 
@@ -270,14 +273,12 @@ public class ObjectBoard extends Board {
 
     @Override
     public int wallsNumber(boolean isBlue) {
-        Army army = isBlue ? blueArmy : redArmy;
-        return army.getWalls().size();
+        return getArmy(isBlue).getWalls().size();
     }
 
     @Override
     public int towersNumber(boolean isBlue) {
-        Army army = isBlue ? blueArmy : redArmy;
-        return army.getTowers().size();
+        return getArmy(isBlue).getTowers().size();
     }
 
     @Override
@@ -296,6 +297,47 @@ public class ObjectBoard extends Board {
     public boolean isInLosingPos(boolean isBlue) {
         // TODO: 10/31/2024  
         return false;
+    }
+
+    public boolean isFriendlyTower(boolean isBlue, int location) {
+       return squares[location].getUpperPiece() != null && squares[location].getUpperPiece().isBlue() == isBlue;
+    }
+
+    @Override
+    public boolean isFriendlyPiece(boolean isBlue, int location) {
+        return squares[location].getPiece() != null && squares[location].getPiece().isBlue() == isBlue;
+    }
+
+    @Override
+    public List<Short> normalMovesLocations(boolean isBlue, int location) {
+        List<Short> normalMovesLocations = new ArrayList<>();
+        if (this.isFriendlyTower(isBlue, location)){
+            Piece piece = squares[location].getUpperPiece();
+            for (int i = 1; i < 9; i++){
+                if (piece.quietMove(i) != null||piece.friendOnNearMove(i)!= null||piece.friendOnFarMove(i) != null||piece.friendOnBothMove(i) != null){
+                    Square[] doubleMoveSquares = squares[location].doubleMoveSquares(i,isBlue);
+                    normalMovesLocations.add(doubleMoveSquares[0].getLocation());
+                    normalMovesLocations.add(doubleMoveSquares[1].getLocation());
+
+                }
+            }
+        }
+        return normalMovesLocations;
+    }
+
+    @Override
+    public List<Short> sacrificingMovesLocations(boolean isBlue, int location) {
+        List<Short> sacrificingMovesLocations = new ArrayList<>();
+        if (this.isFriendlyTower(isBlue, location)){
+            Piece piece = squares[location].getUpperPiece();
+            for (int i = 1; i < 9; i++){
+                if (piece.sacrificingMove(i) != null){
+                    sacrificingMovesLocations.add(squares[location].singleMoveSquare(i, isBlue).getLocation());
+                }
+            }
+        }
+
+        return sacrificingMovesLocations;
     }
 
     public Square[] getSquares() {

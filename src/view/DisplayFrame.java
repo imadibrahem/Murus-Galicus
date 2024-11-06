@@ -3,20 +3,23 @@ package view;
 import javax.swing.*;
 import java.awt.*;
 
-public class DisplayFrame {
-    protected JFrame frame = new JFrame();
+public class DisplayFrame extends JFrame{
     DisplayBoard displayBoard;
+    UserInput userInput;
 
     public DisplayFrame(String FEN) {
-        frame.getContentPane().setBackground(Color.darkGray);
-        this.frame.setLayout(new GridBagLayout());
-        this.frame.setMinimumSize(new Dimension(1000,1000));
-        this.frame.setLocationRelativeTo(null);
-        frame.setTitle("Murus Gallicus");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        getContentPane().setBackground(Color.darkGray);
+        setLayout(new GridBagLayout());
+        //this.frame.setLayout(null);
+        setMinimumSize(new Dimension(1000,1000));
+        setTitle("Murus Gallicus");
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         displayBoard = new DisplayBoard(FEN);
-        frame.add(displayBoard);
-        frame.setVisible(true);
+       // userInput = new UserInput(displayBoard);
+        add(displayBoard);
+        pack();
+        setLocationRelativeTo(null);
+        setVisible(true);
     }
 
     public DisplayBoard getDisplayBoard() {

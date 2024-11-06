@@ -21,11 +21,11 @@ public class Move {
     }
 
     public int getDirection() {
-        return (value >> 3) & 7;
+        return (value >> 3) & 15;
     }
 
     public int getInitialLocation(boolean isBlue) {
-        return isBlue ? value >> 6 : 55 - (value >> 6);
+        return isBlue ? (value >> 7)  : 55 - (value >> 7);
     }
 
     public int getInitialRow(boolean isBlue) {
