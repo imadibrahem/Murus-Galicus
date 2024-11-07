@@ -38,7 +38,9 @@ public class UserInput implements MouseListener, MouseMotionListener {
     }
 
     public void setPlayer(Player player) {
+
         this.player = player;
+        isChoosing = true;
     }
 
     public boolean isChoosing() {
@@ -63,115 +65,123 @@ public class UserInput implements MouseListener, MouseMotionListener {
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        int squareLocation = (e.getX() / displayBoard.tileSize) + ((e.getY() / displayBoard.tileSize) * 8);
-        if (isInitialChosen && isChoosing){
-            for (short sacrificing : sacrificingMovesLocations)displayBoard.displaySquare[sacrificing].returnOldColor();
-            for (short normal : normalMovesLocations)displayBoard.displaySquare[normal].returnOldColor();
-            displayBoard.displaySquare[initial].returnOldColor();
-            isInitialChosen = false;
-            displayBoard.repaint();
-            if (sacrificingMovesLocations.contains((short)squareLocation) || normalMovesLocations.contains((short)squareLocation)){
-                if (nearDistances.contains(squareLocation - initial)) {
-                    targetNear = squareLocation;
-                    targetFar = targetNear + squareLocation - initial;
+        if (player.isOn()){
+            int squareLocation = (e.getX() / displayBoard.tileSize) + ((e.getY() / displayBoard.tileSize) * 8);
+            if (isInitialChosen && isChoosing){
+                for (short sacrificing : sacrificingMovesLocations)displayBoard.displaySquare[sacrificing].returnOldColor();
+                for (short normal : normalMovesLocations)displayBoard.displaySquare[normal].returnOldColor();
+                displayBoard.displaySquare[initial].returnOldColor();
+                isInitialChosen = false;
+                displayBoard.repaint();
+                if (sacrificingMovesLocations.contains((short)squareLocation) || normalMovesLocations.contains((short)squareLocation)){
+                    if (nearDistances.contains(squareLocation - initial)) {
+                        targetNear = squareLocation;
+                        targetFar = targetNear + squareLocation - initial;
+                    }
+                    else{
+                        targetFar = squareLocation;
+                        targetNear = initial + ((squareLocation - initial) / 2);
+                    }
+                    isChoosing = false;
                 }
-                else{
-                    targetFar = squareLocation;
-                    targetNear = initial + ((squareLocation - initial) / 2);
-                }
-                isChoosing = false;
-            }
-            sacrificingMovesLocations.clear();
-            normalMovesLocations.clear();
+                sacrificingMovesLocations.clear();
+                normalMovesLocations.clear();
 
-        }
-        if (isChoosing && player.getBoard().isFriendlyTower(player.isEvaluationBlue(), squareLocation)){
-            displayBoard.displaySquare[squareLocation].changeColor(Color.CYAN);
-            sacrificingMovesLocations = player.getBoard().sacrificingMovesLocations(player.isEvaluationBlue(), squareLocation);
-            normalMovesLocations = player.getBoard().normalMovesLocations(player.isEvaluationBlue(), squareLocation);
-            for (short sacrificing : sacrificingMovesLocations)displayBoard.displaySquare[sacrificing].changeColor(Color.RED);
-            for (short normal : normalMovesLocations)displayBoard.displaySquare[normal].changeColor(Color.GREEN);
-            initial = squareLocation;
-            targetNear = -1;
-            targetFar = -1;
-            isInitialChosen = true;
+            }
+            if (isChoosing && player.getBoard().isFriendlyTower(player.isEvaluationBlue(), squareLocation)){
+                displayBoard.displaySquare[squareLocation].changeColor(Color.CYAN);
+                sacrificingMovesLocations = player.getBoard().sacrificingMovesLocations(player.isEvaluationBlue(), squareLocation);
+                normalMovesLocations = player.getBoard().normalMovesLocations(player.isEvaluationBlue(), squareLocation);
+                for (short sacrificing : sacrificingMovesLocations)displayBoard.displaySquare[sacrificing].changeColor(Color.RED);
+                for (short normal : normalMovesLocations)displayBoard.displaySquare[normal].changeColor(Color.GREEN);
+                initial = squareLocation;
+                targetNear = -1;
+                targetFar = -1;
+                isInitialChosen = true;
+            }
+
         }
     }
 
     @Override
     public void mousePressed(MouseEvent e) {
-        int squareLocation = (e.getX() / displayBoard.tileSize) + ((e.getY() / displayBoard.tileSize) * 8);
-        if (isInitialChosen && isChoosing){
-            for (short sacrificing : sacrificingMovesLocations)displayBoard.displaySquare[sacrificing].returnOldColor();
-            for (short normal : normalMovesLocations)displayBoard.displaySquare[normal].returnOldColor();
-            displayBoard.displaySquare[initial].returnOldColor();
-            isInitialChosen = false;
-            displayBoard.repaint();
-            if (sacrificingMovesLocations.contains((short)squareLocation) || normalMovesLocations.contains((short)squareLocation)){
-                if (nearDistances.contains(squareLocation - initial)) {
-                    targetNear = squareLocation;
-                    targetFar = targetNear + squareLocation - initial;
+        if (player.isOn()){
+            int squareLocation = (e.getX() / displayBoard.tileSize) + ((e.getY() / displayBoard.tileSize) * 8);
+            if (isInitialChosen && isChoosing){
+                for (short sacrificing : sacrificingMovesLocations)displayBoard.displaySquare[sacrificing].returnOldColor();
+                for (short normal : normalMovesLocations)displayBoard.displaySquare[normal].returnOldColor();
+                displayBoard.displaySquare[initial].returnOldColor();
+                isInitialChosen = false;
+                displayBoard.repaint();
+                if (sacrificingMovesLocations.contains((short)squareLocation) || normalMovesLocations.contains((short)squareLocation)){
+                    if (nearDistances.contains(squareLocation - initial)) {
+                        targetNear = squareLocation;
+                        targetFar = targetNear + squareLocation - initial;
+                    }
+                    else{
+                        targetFar = squareLocation;
+                        targetNear = initial + ((squareLocation - initial) / 2);
+                    }
+                    isChoosing = false;
                 }
-                else{
-                    targetFar = squareLocation;
-                    targetNear = initial + ((squareLocation - initial) / 2);
-                }
-                isChoosing = false;
-            }
-            sacrificingMovesLocations.clear();
-            normalMovesLocations.clear();
+                sacrificingMovesLocations.clear();
+                normalMovesLocations.clear();
 
+            }
+            if (isChoosing && player.getBoard().isFriendlyTower(player.isEvaluationBlue(), squareLocation)){
+                displayBoard.displaySquare[squareLocation].changeColor(Color.CYAN);
+                sacrificingMovesLocations = player.getBoard().sacrificingMovesLocations(player.isEvaluationBlue(), squareLocation);
+                normalMovesLocations = player.getBoard().normalMovesLocations(player.isEvaluationBlue(), squareLocation);
+                for (short sacrificing : sacrificingMovesLocations)displayBoard.displaySquare[sacrificing].changeColor(Color.RED);
+                for (short normal : normalMovesLocations)displayBoard.displaySquare[normal].changeColor(Color.GREEN);
+                initial = squareLocation;
+                targetNear = -1;
+                targetFar = -1;
+                isInitialChosen = true;
+            }
         }
-        if (isChoosing && player.getBoard().isFriendlyTower(player.isEvaluationBlue(), squareLocation)){
-            displayBoard.displaySquare[squareLocation].changeColor(Color.CYAN);
-            sacrificingMovesLocations = player.getBoard().sacrificingMovesLocations(player.isEvaluationBlue(), squareLocation);
-            normalMovesLocations = player.getBoard().normalMovesLocations(player.isEvaluationBlue(), squareLocation);
-            for (short sacrificing : sacrificingMovesLocations)displayBoard.displaySquare[sacrificing].changeColor(Color.RED);
-            for (short normal : normalMovesLocations)displayBoard.displaySquare[normal].changeColor(Color.GREEN);
-            initial = squareLocation;
-            targetNear = -1;
-            targetFar = -1;
-            isInitialChosen = true;
-        }
+
     }
 
     @Override
     public void mouseReleased(MouseEvent e) {
-        int squareLocation = (e.getX() / displayBoard.tileSize) + ((e.getY() / displayBoard.tileSize) * 8);
-        if (isInitialChosen && isChoosing){
-            for (short sacrificing : sacrificingMovesLocations)displayBoard.displaySquare[sacrificing].returnOldColor();
-            for (short normal : normalMovesLocations)displayBoard.displaySquare[normal].returnOldColor();
-            displayBoard.displaySquare[initial].returnOldColor();
-            isInitialChosen = false;
-            displayBoard.repaint();
-            if (sacrificingMovesLocations.contains((short)squareLocation) || normalMovesLocations.contains((short)squareLocation)){
-                if (nearDistances.contains(squareLocation - initial)) {
-                    targetNear = squareLocation;
-                    targetFar = targetNear + squareLocation - initial;
+        if (player.isOn()) {
+            int squareLocation = (e.getX() / displayBoard.tileSize) + ((e.getY() / displayBoard.tileSize) * 8);
+            if (isInitialChosen && isChoosing){
+                for (short sacrificing : sacrificingMovesLocations)displayBoard.displaySquare[sacrificing].returnOldColor();
+                for (short normal : normalMovesLocations)displayBoard.displaySquare[normal].returnOldColor();
+                displayBoard.displaySquare[initial].returnOldColor();
+                isInitialChosen = false;
+                displayBoard.repaint();
+                if (sacrificingMovesLocations.contains((short)squareLocation) || normalMovesLocations.contains((short)squareLocation)){
+                    if (nearDistances.contains(squareLocation - initial)) {
+                        targetNear = squareLocation;
+                        targetFar = targetNear + squareLocation - initial;
+                    }
+                    else{
+                        targetFar = squareLocation;
+                        targetNear = initial + ((squareLocation - initial) / 2);
+                    }
+                    isChoosing = false;
                 }
-                else{
-                    targetFar = squareLocation;
-                    targetNear = initial + ((squareLocation - initial) / 2);
-                }
-                isChoosing = false;
+
+                sacrificingMovesLocations.clear();
+                normalMovesLocations.clear();
+
             }
-
-            sacrificingMovesLocations.clear();
-            normalMovesLocations.clear();
-
         }
-
     }
+
     public Move decideMove() {
         while (isChoosing) {
             try {
-                Thread.sleep(10);
+                Thread.sleep(100);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
 
-        //System.out.println("DONE!!!!!" + getInitial() + " " + getTargetNear() + " " + getTargetFar());
+        System.out.println("DONE!!!!!" + getInitial() + " " + getTargetNear() + " " + getTargetFar());
         return player.recieveCords(initial, targetNear, targetFar);
     }
 

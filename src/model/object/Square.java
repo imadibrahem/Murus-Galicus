@@ -182,7 +182,7 @@ public class Square {
         System.out.println(board.getArmy(false).getSacrificedPieces());
 
         System.out.println(board.generateFEN());
-        String f = "1tttttt1/t5ww/8/8/8/8/TTTTTTTT";
+        String f = "ttttttt1/6ww/8/8/8/8/TTTTTTTT";
         board.build(f);
         f = board.generateFEN();
         System.out.println(f);
@@ -209,7 +209,7 @@ public class Square {
         f = board.generateFEN();
         frame.getDisplayBoard().updateBoard(f);
         UserInput input = new UserInput(frame.getDisplayBoard());
-        Player user = new User(true,board, input);
+        Player user = new User(false,board, input);
         input.setPlayer(user);
         user.setOn(true);
         user.makeMove(user.decideMove());

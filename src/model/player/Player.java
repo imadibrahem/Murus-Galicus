@@ -60,6 +60,7 @@ public abstract class Player {
     public void setOn(boolean on) {
         isOn = on;
     }
+
     public void switchTurn(){
         isOn = !isOn;
     }

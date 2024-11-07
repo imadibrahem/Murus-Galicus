@@ -17,26 +17,28 @@ public class DisplayBoard extends JPanel {
     public DisplayBoard(String FEN) {
         this.setPreferredSize(new Dimension(cols * tileSize, rows*tileSize));
         this.FEN = FEN;
-        this.setLayout(null);
+        //this.setLayout(null);
+        setLayout(new GridBagLayout());
         this.setBorder(border);
         displayPieces = new DisplayPieces(FEN);
-        this.add(displayPieces);
         displaySquare = new DisplaySquare[56];
+
         for (int r = 0; r < rows; r++){
             for (int c = 0; c < cols; c++){
-                displaySquare[(8 * r) + c] = new DisplaySquare((c * tileSize) + 1, (r * tileSize) + 1, tileSize, tileSize);
+                displaySquare[(8 * r) + c] = new DisplaySquare((c * tileSize) , (r * tileSize) , tileSize, tileSize);
                 this.add(displaySquare[(8 * r) + c]);
             }
         }
+
+
+        this.add(displayPieces);
+
     }
 
     public void paintComponent(Graphics g){
         Graphics2D g2d = (Graphics2D) g;
-        for (int s = 0; s < displaySquare.length; s++){
-            this.displaySquare[s].paintComponent(g2d);
-        }
+        for (int s = 0; s < displaySquare.length; s++) this.displaySquare[s].paintComponent(g2d);
         this.displayPieces.paintPieces(g2d);
-
     }
 
     public void updateBoard(String FEN){

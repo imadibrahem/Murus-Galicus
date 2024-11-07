@@ -56,10 +56,10 @@ public class DisplayPieces extends JPanel {
                 }
 
                 else {
-                    if (rows[r].charAt(c) == 'w') g2d.drawImage(redWall, squareCol * tileSize, r * tileSize, null);
-                    else if (rows[r].charAt(c) == 'W')g2d.drawImage(blueWall, squareCol * tileSize, r * tileSize, null);
-                    else if (rows[r].charAt(c) == 't')g2d.drawImage(redTower, squareCol * tileSize, r * tileSize,   null);
-                    else g2d.drawImage(blueTower, squareCol * tileSize, r * tileSize, null);
+                    if (rows[r].charAt(c) == 'w') g2d.drawImage(redWall, (squareCol * tileSize) + 1, (r * tileSize) + 1, null);
+                    else if (rows[r].charAt(c) == 'W') g2d.drawImage(blueWall, (squareCol * tileSize) + 1, (r * tileSize) + 1, null);
+                    else if (rows[r].charAt(c) == 't') g2d.drawImage(redTower, (squareCol * tileSize) + 1, (r * tileSize) + 1, null);
+                    else g2d.drawImage(blueTower, (squareCol * tileSize) + 1, (r * tileSize) + 1, null);
                     squareCol++;
 
                 }
@@ -69,6 +69,6 @@ public class DisplayPieces extends JPanel {
     }
     public void updateBoard(String FEN){
         this.FEN = FEN;
-        repaint();
+        //repaint();
     }
 }

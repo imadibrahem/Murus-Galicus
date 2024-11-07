@@ -10,7 +10,7 @@ public class DisplayFrame extends JFrame{
     public DisplayFrame(String FEN) {
         getContentPane().setBackground(Color.darkGray);
         setLayout(new GridBagLayout());
-        //this.frame.setLayout(null);
+        //this.setLayout(null);
         setMinimumSize(new Dimension(1000,1000));
         setTitle("Murus Gallicus");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
