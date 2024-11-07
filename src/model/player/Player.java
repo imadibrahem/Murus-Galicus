@@ -24,6 +24,7 @@ public abstract class Player {
         directionMap.put(-8, 1);
         directionMap.put(-7, 2);
         directionMap.put(-1, 7);
+        directionMap.put(1, 3);
         directionMap.put(7, 6);
         directionMap.put(8, 5);
         directionMap.put(9, 4);
@@ -78,6 +79,8 @@ public abstract class Player {
     public Move recieveCords(int initial , int targetNear, int targetFar){
         int location = this.isEvaluationBlue() ? initial : 55 - initial;
         int distance = isEvaluationBlue() ? targetNear - initial :initial - targetNear;
+        if (directionMap.get(distance) == null) System.out.println("Problem is with the distance: " + distance
+                + "initial is: " + initial + "near target is : " + targetNear + "far target is : " + targetFar);
         int direction = directionMap.get(distance);
         int targetType;
         if (targetFar < 0) targetType = 4;
