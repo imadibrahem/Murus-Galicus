@@ -66,15 +66,38 @@ public class Army {
     }
 
     public void withdrawWalls(){
-        Square square;
-        for (Piece piece : walls){
-            square = piece.getSquare();
-            piece.setSquare(null);
-            square.setPiece(null);
+        int l = -1;
+        String s = "";
+        String color = isBlue? " Blue " :  " Red ";
+        try {
+            Square square;
+            for (Piece piece : walls){
+                square = piece.getSquare();
+                s = "" + square.getLocation();
+                piece.setSquare(null);
+                square.setPiece(null);
+            }
+            sacrificedPieces.addAll(walls);
+            walls.clear();
         }
-        sacrificedPieces.addAll(walls);
-        walls.clear();
+        catch (NullPointerException e){
+
+            System.out.println("Problem is in the color" + color + "after : " + s);
+        }
     }
 
+    @Override
+    public String toString() {
+        String color = isBlue ? "Blue" : "Red";
+        System.out.println("*************************");
+        System.out.println("-------------------------");
 
+        return  "-------------------------\n"
+                +color + " Army: \n"+
+                "walls: " + walls + "\n" +
+                "towers :" + towers + "\n" +
+                "topped: " + topped + "\n" +
+                "sacrificedPieces: " + sacrificedPieces + "\n" +
+                "-------------------------\n";
+    }
 }

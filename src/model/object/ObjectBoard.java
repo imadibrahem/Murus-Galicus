@@ -108,13 +108,16 @@ public class ObjectBoard extends Board {
 
     @Override
     public void makeMove(Move move, boolean isBlue) {
+        boolean nearEmpty = false;
+        boolean farEmpty = false;
+
         Square initial = squares[move.getInitialLocation(isBlue)];
         Square targetNear = initial.singleMoveSquare(move.getDirection(), isBlue);
         Piece upper = initial.getUpperPiece();
         Piece lower = initial.getPiece();
         lower.setTopped(false);
-        initial.setUpperPiece(null);
         getArmy(isBlue).getTopped().remove(lower);
+        initial.setUpperPiece(null);
         if (move.isTargetEnemy()){
             Piece target = targetNear.getPiece();
             upper.setTower(false);
@@ -132,6 +135,7 @@ public class ObjectBoard extends Board {
             upper.setSquare(targetNear);
             lower.setSquare(targetFar);
             if (move.isTargetEmpty() || move.isTargetFarFriendly()){
+                nearEmpty = true;
                 upper.setTower(false);
                 targetNear.setPiece(upper);
                 getArmy(isBlue).getTowers().remove(upper);
@@ -143,20 +147,37 @@ public class ObjectBoard extends Board {
                 targetNear.setUpperPiece(upper);
                 getArmy(isBlue).getWalls().remove(target);
                 getArmy(isBlue).getTopped().add(target);
+                //getArmy(isBlue).getTowers().add(upper);
             }
             if (move.isTargetEmpty() || move.isTargetNearFriendly()){
+                farEmpty = true;
                 targetFar.setPiece(lower);
                 getArmy(isBlue).getWalls().add(lower);
             }
             else {
-                Piece target = targetNear.getUpperPiece();
+                Piece target = targetFar.getPiece();
                 target.setTopped(true);
+                lower.setTower(true);
                 targetFar.setUpperPiece(lower);
+                lower.setSquare(targetFar);
                 getArmy(isBlue).getTowers().add(lower);
+                getArmy(isBlue).getWalls().remove(lower);
                 getArmy(isBlue).getWalls().remove(target);
                 getArmy(isBlue).getTopped().add(target);
             }
             initial.setPiece(null);
+            int type = -1;
+            if (farEmpty&&nearEmpty) type = 0;
+            else if (!farEmpty&&!nearEmpty) type = 3;
+            else if (farEmpty) type = 1;
+            else type = 2;
+            //System.out.println("+++++++++++++++++++++++++");
+            //System.out.println("+++++++++++++++++++++++++");
+            //System.out.println("*************************");
+            System.out.println("make Move type was: " + type);
+            ///System.out.println("*************************");
+            //System.out.println("+++++++++++++++++++++++++");
+            //System.out.println("+++++++++++++++++++++++++");
         }
     }
 

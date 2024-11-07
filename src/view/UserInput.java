@@ -73,7 +73,7 @@ public class UserInput implements MouseListener, MouseMotionListener {
                 displayBoard.displaySquare[initial].returnOldColor();
                 isInitialChosen = false;
                 displayBoard.repaint();
-                if (sacrificingMovesLocations.contains((short)squareLocation) || normalMovesLocations.contains((short)squareLocation)){
+                if (normalMovesLocations.contains((short)squareLocation)){
                     if (nearDistances.contains(squareLocation - initial)) {
                         targetNear = squareLocation;
                         targetFar = targetNear + squareLocation - initial;
@@ -82,6 +82,12 @@ public class UserInput implements MouseListener, MouseMotionListener {
                         targetFar = squareLocation;
                         targetNear = initial + ((squareLocation - initial) / 2);
                     }
+                    isChoosing = false;
+                    //System.out.println("Input :: initial :" + initial + "");
+                }
+                else if (sacrificingMovesLocations.contains((short)squareLocation)){
+                    targetNear = squareLocation;
+                    targetFar = -1;
                     isChoosing = false;
                 }
                 sacrificingMovesLocations.clear();
@@ -113,7 +119,7 @@ public class UserInput implements MouseListener, MouseMotionListener {
                 displayBoard.displaySquare[initial].returnOldColor();
                 isInitialChosen = false;
                 displayBoard.repaint();
-                if (sacrificingMovesLocations.contains((short)squareLocation) || normalMovesLocations.contains((short)squareLocation)){
+                if (normalMovesLocations.contains((short)squareLocation)){
                     if (nearDistances.contains(squareLocation - initial)) {
                         targetNear = squareLocation;
                         targetFar = targetNear + squareLocation - initial;
@@ -123,7 +129,14 @@ public class UserInput implements MouseListener, MouseMotionListener {
                         targetNear = initial + ((squareLocation - initial) / 2);
                     }
                     isChoosing = false;
+                    //System.out.println("Input :: initial :" + initial + "");
                 }
+                else if (sacrificingMovesLocations.contains((short)squareLocation)){
+                    targetNear = squareLocation;
+                    targetFar = -1;
+                    isChoosing = false;
+                }
+
                 sacrificingMovesLocations.clear();
                 normalMovesLocations.clear();
 
@@ -153,7 +166,7 @@ public class UserInput implements MouseListener, MouseMotionListener {
                 displayBoard.displaySquare[initial].returnOldColor();
                 isInitialChosen = false;
                 displayBoard.repaint();
-                if (sacrificingMovesLocations.contains((short)squareLocation) || normalMovesLocations.contains((short)squareLocation)){
+                if (normalMovesLocations.contains((short)squareLocation)){
                     if (nearDistances.contains(squareLocation - initial)) {
                         targetNear = squareLocation;
                         targetFar = targetNear + squareLocation - initial;
@@ -162,6 +175,12 @@ public class UserInput implements MouseListener, MouseMotionListener {
                         targetFar = squareLocation;
                         targetNear = initial + ((squareLocation - initial) / 2);
                     }
+                    isChoosing = false;
+                    //System.out.println("Input :: initial :" + initial + "");
+                }
+                else if (sacrificingMovesLocations.contains((short)squareLocation)){
+                    targetNear = squareLocation;
+                    targetFar = -1;
                     isChoosing = false;
                 }
 
@@ -181,7 +200,7 @@ public class UserInput implements MouseListener, MouseMotionListener {
             }
         }
 
-        System.out.println("DONE!!!!!" + getInitial() + " " + getTargetNear() + " " + getTargetFar());
+       // System.out.println("DONE!!!!!" + getInitial() + " " + getTargetNear() + " " + getTargetFar());
         return player.recieveCords(initial, targetNear, targetFar);
     }
 

@@ -27,12 +27,10 @@ public class DisplayBoard extends JPanel {
             for (int c = 0; c < cols; c++){
                 displaySquare[(8 * r) + c] = new DisplaySquare((c * tileSize) , (r * tileSize) , tileSize, tileSize);
                 this.add(displaySquare[(8 * r) + c]);
+               // displaySquare[(8 * r) + c].setText(""+(8 * r) + c);
             }
         }
-
-
         this.add(displayPieces);
-
     }
 
     public void paintComponent(Graphics g){

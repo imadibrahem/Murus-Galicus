@@ -22,7 +22,34 @@ public class Game {
         userInput.setPlayer(blue);
 
         while (true){
-            playerOn.makeMove(playerOn.decideMove());
+            /*
+            System.out.println("*************************");
+            System.out.println("BLUE PLAYER BOARD :");
+            System.out.println(blueBoard.getArmy(true));
+            System.out.println(blueBoard.getArmy(false));
+            System.out.println("*************************");
+            System.out.println("*************************");
+
+             */
+            System.out.println("RED PLAYER BOARD :");
+            System.out.println(blueBoard.getArmy(true));
+            System.out.println(blueBoard.getArmy(false));
+            System.out.println("*************************");
+
+
+            Move move = playerOn.decideMove();
+            //System.out.println("+++++++++++++++++++++++++");
+            //System.out.println("+++++++++++++++++++++++++");
+            System.out.println("*************************");
+            System.out.println("Move type is: " + move.getTargetType());
+            String color = playerOn.isEvaluationBlue() ? " Blue " : " Red ";
+            System.out.println("Player" + color + "has moved from " + move.getInitialLocation(playerOn.isEvaluationBlue())
+                                +"th Square in the direction nr. " + move.getDirection());
+            System.out.println("*************************");
+            //System.out.println("+++++++++++++++++++++++++");
+            //System.out.println("+++++++++++++++++++++++++");
+
+            playerOn.makeMove(move);
             FEN = playerOn.getBoard().generateFEN();
             displayBoard.updateBoard(FEN);
             playerOn = playerOn.isEvaluationBlue()? red : blue;
