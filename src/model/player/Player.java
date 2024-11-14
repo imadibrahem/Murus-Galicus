@@ -1,7 +1,7 @@
 package model.player;
 
 import model.Board;
-import model.Move;
+import model.move.Move;
 
 import java.util.HashMap;
 import java.util.Map;

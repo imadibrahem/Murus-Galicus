@@ -1,4 +1,4 @@
-package model;
+package model.move;
 
 import java.util.Objects;
 
@@ -13,7 +13,7 @@ public class Move {
     @Override
     public String toString() {
         // TODO: 10/19/2024
-        return "";
+        return (value >> 7) + "=>" + getDirection() + "(" +getTargetType() + ") | ";
     }
 
     public short getValue() {

@@ -1,5 +1,8 @@
 package model;
 
+import model.move.Move;
+import model.move.MoveType;
+
 import java.util.List;
 
 public abstract class Board {
@@ -23,9 +26,13 @@ public abstract class Board {
 
     public abstract List<Move> generateMixedMoves(boolean isBlue);
 
-    public abstract int distances(boolean isBlue);
+    public abstract int towersDistances(boolean isBlue);
 
-    public abstract int cols(boolean isBlue);
+    public abstract int wallsDistances(boolean isBlue);
+
+    public abstract int towersColumns(boolean isBlue);
+
+    public abstract int wallsColumns(boolean isBlue);
 
     public abstract int wallsNumber(boolean isBlue);
 
@@ -41,8 +48,19 @@ public abstract class Board {
 
     public abstract boolean isFriendlyPiece(boolean isBlue, int location);
 
-    public abstract List<Short> normalMovesLocations (boolean isBlue, int location);
+    public abstract List<Short> normalMovesLocations (boolean isBlue, int location, int startDirection, boolean clockwise);
 
-    public abstract List<Short> sacrificingMovesLocations (boolean isBlue, int location);
+    public abstract List<Short> sacrificingMovesLocations (boolean isBlue, int location, int startDirection, boolean clockwise);
 
+    public abstract List<Move>  allTypeMovesPieceByPiece(boolean isBlue, MoveType[] moveTypes, int[] directions, boolean frontToBack);
+
+    public abstract List<Move> typeByTypeMovesPieceByPiece(boolean isBlue, MoveType[] moveTypes, int[] directions, boolean frontToBack);
+
+    public abstract List<Move> directionByDirectionMovesPieceByPiece(boolean isBlue, int[] directions, boolean frontToBack);
+
+    public abstract List<Move> allTypeMovesDirectionByDirection(boolean isBlue, int[] directions, boolean frontToBack);
+
+    public abstract List<Move> typeByTypeMovesDirectionByDirection(boolean isBlue, MoveType[] moveTypes, int[] directions, boolean frontToBack);
+
+    public abstract List<Move> directionByDirectionMovesTypeByType(boolean isBlue, MoveType[] moveTypes, int[] directions, boolean frontToBack);
 }

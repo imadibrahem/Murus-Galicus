@@ -1,6 +1,6 @@
 package model.object;
 
-import model.Move;
+import model.move.Move;
 
 public class Piece {
     private final boolean isBlue;
@@ -109,4 +109,6 @@ public class Piece {
         String loc = square == null ? "" : " ["+square.getLocation()+"]";
         return symbol + loc;
     }
+
 }
+

@@ -1,7 +1,8 @@
 package model.object;
 
 import model.Board;
-import model.Move;
+import model.move.Move;
+import model.move.MoveType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -166,7 +167,7 @@ public class ObjectBoard extends Board {
                 getArmy(isBlue).getTopped().add(target);
             }
             initial.setPiece(null);
-            int type = -1;
+            int type;
             if (farEmpty&&nearEmpty) type = 0;
             else if (!farEmpty&&!nearEmpty) type = 3;
             else if (farEmpty) type = 1;
@@ -251,45 +252,42 @@ public class ObjectBoard extends Board {
 
     @Override
     public List<Move> computeAllMoves(boolean isBlue) {
-        // TODO: 11/5/2024 CHANGE LATER!!
-        List<Piece> towers = getArmy(isBlue).getTowers();
-        List<Move> moves = new ArrayList<>();
-        for (Piece tower : towers){
-            for (int direction = 1; direction < 9; direction++){
-
-            }
-        }
-        return null;
+        return null;// TODO: 11/14/2024
     }
 
     @Override
     public List<Move> generateSacrificingMoves(boolean isBlue) {
-        Army army = isBlue ? blueArmy : redArmy;
-        return null;
+        return null;// TODO: 11/14/2024
     }
 
     @Override
     public List<Move> generateQuietMoves(boolean isBlue) {
-        return null;
+        return null;// TODO: 11/14/2024
     }
 
     @Override
     public List<Move> generateMixedMoves(boolean isBlue) {
-        return null;
+        return null;// TODO: 11/14/2024
     }
 
     @Override
-    public int distances(boolean isBlue) {
-        Army army = isBlue ? blueArmy : redArmy;
-        // TODO: 10/31/2024  
-        return 0;
+    public int towersDistances(boolean isBlue) {
+        return getArmy(isBlue).towersDistances();
     }
 
     @Override
-    public int cols(boolean isBlue) {
-        Army army = isBlue ? blueArmy : redArmy;
-        // TODO: 10/31/2024  
-        return 0;
+    public int wallsDistances(boolean isBlue) {
+        return getArmy(isBlue).wallsDistances();
+    }
+
+    @Override
+    public int towersColumns(boolean isBlue) {
+        return getArmy(isBlue).towersColumns();
+    }
+
+    @Override
+    public int wallsColumns(boolean isBlue) {
+        return getArmy(isBlue).wallsColumns();
     }
 
     @Override
@@ -330,36 +328,114 @@ public class ObjectBoard extends Board {
     }
 
     @Override
-    public List<Short> normalMovesLocations(boolean isBlue, int location) {
+    public List<Short> normalMovesLocations(boolean isBlue, int location, int startDirection, boolean clockwise) {
         List<Short> normalMovesLocations = new ArrayList<>();
+        int currentDirection = startDirection;
         if (this.isFriendlyTower(isBlue, location)){
             Piece piece = squares[location].getUpperPiece();
             for (int i = 1; i < 9; i++){
-                if (piece.quietMove(i) != null||piece.friendOnNearMove(i)!= null||piece.friendOnFarMove(i) != null||piece.friendOnBothMove(i) != null){
-                    Square[] doubleMoveSquares = squares[location].doubleMoveSquares(i,isBlue);
+                if (piece.quietMove(currentDirection) != null||piece.friendOnNearMove(currentDirection)!= null||piece.friendOnFarMove(currentDirection) != null||piece.friendOnBothMove(currentDirection) != null){
+                    Square[] doubleMoveSquares = squares[location].doubleMoveSquares(currentDirection,isBlue);
                     normalMovesLocations.add(doubleMoveSquares[0].getLocation());
                     normalMovesLocations.add(doubleMoveSquares[1].getLocation());
-
                 }
+                currentDirection = (currentDirection % 8) + 1;
             }
         }
         return normalMovesLocations;
     }
 
     @Override
-    public List<Short> sacrificingMovesLocations(boolean isBlue, int location) {
+    public List<Short> sacrificingMovesLocations(boolean isBlue, int location, int startDirection, boolean clockwise) {
         List<Short> sacrificingMovesLocations = new ArrayList<>();
+        int currentDirection = startDirection;
         if (this.isFriendlyTower(isBlue, location)){
             Piece piece = squares[location].getUpperPiece();
             for (int i = 1; i < 9; i++){
-                if (piece.sacrificingMove(i) != null){
-                    sacrificingMovesLocations.add(squares[location].singleMoveSquare(i, isBlue).getLocation());
+                if (piece.sacrificingMove(currentDirection) != null){
+                    sacrificingMovesLocations.add(squares[location].singleMoveSquare(currentDirection, isBlue).getLocation());
                 }
+                if (clockwise) currentDirection = (currentDirection % 8) + 1;
+                else currentDirection = (currentDirection - 6) % 8 + 1;
             }
         }
 
         return sacrificingMovesLocations;
     }
+
+    ////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////
+
+    @Override
+    public List<Move> allTypeMovesPieceByPiece (boolean isBlue, MoveType[] moveTypes, int[] directions, boolean frontToBack){
+        List<Move> allTypeMovesPieceByPiece = new ArrayList<>();
+        if (frontToBack) {
+            getArmy(isBlue).towersFromFrontToBack();
+        } else {
+            getArmy(isBlue).towersFromBackToFront();
+        }
+        for (Piece piece : getArmy(isBlue).getTowers()){
+            allTypeMovesPieceByPiece.addAll(allTypeMovesForOnePiece(moveTypes, piece.getSquare().getLocation(),directions));
+        }
+        return allTypeMovesPieceByPiece;
+
+    }
+
+    @Override
+    public List<Move> typeByTypeMovesPieceByPiece(boolean isBlue, MoveType[] moveTypes, int[] directions, boolean frontToBack){
+        List<Move> typeByTypeMovesPieceByPiece = new ArrayList<>();
+        for (MoveType moveType : moveTypes)typeByTypeMovesPieceByPiece.addAll(oneTypeMovesPieceByPiece(isBlue,moveType,directions,frontToBack));
+        return typeByTypeMovesPieceByPiece;
+    }
+
+    @Override
+    public List<Move> directionByDirectionMovesPieceByPiece(boolean isBlue, int[] directions, boolean frontToBack){
+        List<Move> directionByDirectionMovesPieceByPiece = new ArrayList<>();
+        if (frontToBack) {
+            getArmy(isBlue).towersFromFrontToBack();
+        } else {
+            getArmy(isBlue).towersFromBackToFront();
+        }
+        for (Piece piece : getArmy(isBlue).getTowers()){
+            directionByDirectionMovesPieceByPiece.addAll(directionByDirectionForOnePiece(piece.getSquare().getLocation(),directions));
+        }
+        return directionByDirectionMovesPieceByPiece;
+    }
+
+    @Override
+    public List<Move> allTypeMovesDirectionByDirection (boolean isBlue, int[] directions, boolean frontToBack){
+        List<Move> allTypeMovesDirectionByDirection = new ArrayList<>();
+        for (int direction : directions){
+            allTypeMovesDirectionByDirection.addAll(allTypeMovesForOneDirection(isBlue, direction, frontToBack));
+        }
+        return allTypeMovesDirectionByDirection;
+    }
+
+    @Override
+    public List<Move> typeByTypeMovesDirectionByDirection(boolean isBlue, MoveType[] moveTypes, int[] directions, boolean frontToBack){
+        List<Move> typeByTypeMovesDirectionByDirection = new ArrayList<>();
+        for (int direction : directions){
+            for (MoveType moveType : moveTypes){
+                typeByTypeMovesDirectionByDirection.addAll(oneTypeMovesForOneDirection(moveType,isBlue,direction,frontToBack));
+            }
+        }
+        return typeByTypeMovesDirectionByDirection;
+
+    }
+
+    @Override
+    public List<Move> directionByDirectionMovesTypeByType(boolean isBlue, MoveType[] moveTypes, int[] directions, boolean frontToBack){
+        List<Move> directionByDirectionMovesTypeByType = new ArrayList<>();
+        for (MoveType moveType : moveTypes){
+            for (int direction : directions){
+                directionByDirectionMovesTypeByType.addAll(oneTypeMovesForOneDirection(moveType,isBlue,direction,frontToBack));
+            }
+        }
+        return directionByDirectionMovesTypeByType;
+
+    }
+
+////////////////////////////////////////////////////////////////////////////////////
 
     public Square[] getSquares() {
         return squares;
@@ -368,4 +444,144 @@ public class ObjectBoard extends Board {
     public Army getArmy(boolean isBlue) {
         return isBlue ? blueArmy : redArmy;
     }
+
+
+    ///////////////////////////////////////////////////////////////////////////
+
+    ///////////////////////////////////////////////////////////////////////////
+
+    public List<Move> targetEmptyForOnePiece(int location, int[] directions) {
+        List<Move> targetEmptyForOnePiece = new ArrayList<>();
+        Piece piece = squares[location].getUpperPiece();
+        for (int direction : directions) {
+            if (piece.quietMove(direction) != null) targetEmptyForOnePiece.add(piece.quietMove(direction));
+        }
+        return targetEmptyForOnePiece;
+    }
+
+    public List<Move> friendOnNearMoveForOnePiece(int location, int[] directions) {
+        List<Move> friendOnNearMoveForOnePiece = new ArrayList<>();
+        Piece piece = squares[location].getUpperPiece();
+        for (int direction : directions) {
+            if (piece.friendOnNearMove(direction) != null)
+                friendOnNearMoveForOnePiece.add(piece.friendOnNearMove(direction));
+        }
+        return friendOnNearMoveForOnePiece;
+    }
+
+    public List<Move> friendOnFarMoveForOnePiece(int location, int[] directions) {
+        List<Move> friendOnNearMoveForOnePiece = new ArrayList<>();
+        Piece piece = squares[location].getUpperPiece();
+        for (int direction : directions) {
+            if (piece.friendOnNearMove(direction) != null)
+                friendOnNearMoveForOnePiece.add(piece.friendOnNearMove(direction));
+        }
+        return friendOnNearMoveForOnePiece;
+    }
+
+    public List<Move> friendOnBothMoveForOnePiece(int location, int[] directions) {
+        List<Move> friendOnBothMoveForOnePiece = new ArrayList<>();
+        Piece piece = squares[location].getUpperPiece();
+        for (int direction : directions) {
+            if (piece.friendOnBothMove(direction) != null)
+                friendOnBothMoveForOnePiece.add(piece.friendOnBothMove(direction));
+        }
+        return friendOnBothMoveForOnePiece;
+    }
+
+    public List<Move> sacrificingMovesForOnePiece(int location, int[] directions) {
+        List<Move> sacrificingMoves = new ArrayList<>();
+        Piece piece = squares[location].getUpperPiece();
+        for (int direction : directions) {
+            if (piece.sacrificingMove(direction) != null) sacrificingMoves.add(piece.sacrificingMove(direction));
+        }
+        return sacrificingMoves;
+    }
+    //////////////////////////////////////////////////////////////////////////
+
+    //////////////////////////////////////////////////////////////////////////
+
+    public List<Move> oneTypeMovesForOnePiece(MoveType moveType, int location, int[] directions) {
+        if (moveType == MoveType.QUIET) return targetEmptyForOnePiece(location, directions);
+        else if (moveType == MoveType.FRIEND_ON_NEAR) return friendOnNearMoveForOnePiece(location, directions);
+        else if (moveType == MoveType.FRIEND_ON_FAR) return friendOnFarMoveForOnePiece(location, directions);
+        else if (moveType == MoveType.FRIEND_ON_BOTH) return friendOnBothMoveForOnePiece(location, directions);
+        else return sacrificingMovesForOnePiece(location, directions);
+    }
+
+    public Move oneTypeMoveForOneDirection(MoveType moveType, int location, int direction){
+        Piece piece = squares[location].getUpperPiece();
+        if (moveType == MoveType.QUIET) return piece.quietMove(direction);
+        else if (moveType == MoveType.FRIEND_ON_NEAR) return piece.friendOnNearMove(direction);
+        else if (moveType == MoveType.FRIEND_ON_FAR) return piece.friendOnFarMove(direction);
+        else if (moveType == MoveType.FRIEND_ON_BOTH) return piece.friendOnBothMove(direction);
+        else return piece.sacrificingMove(direction);
+    }
+
+    public Move moveForOneDirection(int location, int direction){
+        Piece piece = squares[location].getUpperPiece();
+        if (piece.quietMove(direction) != null) return piece.quietMove(direction);
+        else if (piece.friendOnNearMove(direction) != null) return piece.friendOnNearMove(direction);
+        else if (piece.friendOnFarMove(direction) != null) return piece.friendOnFarMove(direction);
+        else if (piece.friendOnBothMove(direction) != null) return piece.friendOnBothMove(direction);
+        else if (piece.sacrificingMove(direction) != null) return piece.sacrificingMove(direction);
+        return null;
+    }
+    ////////////////////////////////////////////////////////////////////////////////////
+
+    public List<Move> allTypeMovesForOnePiece(MoveType[] moveTypes, int location, int[] directions) {
+        List<Move> allTypeMovesForOnePiece = new ArrayList<>();
+        for (MoveType moveType : moveTypes) allTypeMovesForOnePiece.addAll(oneTypeMovesForOnePiece(moveType,location,directions));
+        return allTypeMovesForOnePiece;
+    }
+
+    public List<Move> oneTypeMovesPieceByPiece(boolean isBlue, MoveType moveType, int[] directions,  boolean frontToBack) {
+        List<Move> oneTypeMovesLocationsPieceByPiece = new ArrayList<>();
+        if (frontToBack) {
+            getArmy(isBlue).towersFromFrontToBack();
+        } else {
+            getArmy(isBlue).towersFromBackToFront();
+        }
+        for (Piece piece : getArmy(isBlue).getTowers()){
+            oneTypeMovesLocationsPieceByPiece.addAll(oneTypeMovesForOnePiece(moveType, piece.getSquare().getLocation(),directions));
+        }
+        return oneTypeMovesLocationsPieceByPiece;
+    }
+
+    public List<Move> directionByDirectionForOnePiece(int location, int[] directions) {
+        List<Move> directionByDirectionForOnePiece = new ArrayList<>();
+        for (int direction : directions){
+            if (moveForOneDirection(location,direction) != null)directionByDirectionForOnePiece.add(moveForOneDirection(location,direction));
+        }
+        return directionByDirectionForOnePiece;
+    }
+
+    public List<Move> allTypeMovesForOneDirection(boolean isBlue, int direction, boolean frontToBack){
+        List<Move> allTypeMovesForOneDirection = new ArrayList<>();
+        if (frontToBack) {
+            getArmy(isBlue).towersFromFrontToBack();
+        } else {
+            getArmy(isBlue).towersFromBackToFront();
+        }
+        for (Piece piece : getArmy(isBlue).getTowers()){
+            if (moveForOneDirection(piece.getSquare().getLocation(),direction) != null)allTypeMovesForOneDirection.add(moveForOneDirection(piece.getSquare().getLocation(),direction));
+        }
+        return allTypeMovesForOneDirection;
+    }
+
+    public List<Move> oneTypeMovesForOneDirection(MoveType moveType, boolean isBlue, int direction, boolean frontToBack){
+        List<Move> oneTypeMovesForOneDirection = new ArrayList<>();
+        if (frontToBack) {
+            getArmy(isBlue).towersFromFrontToBack();
+        } else {
+            getArmy(isBlue).towersFromBackToFront();
+        }
+        for (Piece piece : getArmy(isBlue).getTowers()){
+            if (oneTypeMoveForOneDirection(moveType, piece.getSquare().getLocation(),direction) != null)oneTypeMovesForOneDirection.add(oneTypeMoveForOneDirection(moveType, piece.getSquare().getLocation(),direction));
+        }
+        return oneTypeMovesForOneDirection;
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////
 }

@@ -1,6 +1,6 @@
 package model.object;
 
-import model.Move;
+import model.move.Move;
 import model.player.Player;
 import model.player.User;
 import view.DisplayFrame;

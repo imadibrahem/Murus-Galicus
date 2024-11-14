@@ -1,6 +1,7 @@
 package model.object;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class Army {
@@ -10,6 +11,8 @@ public class Army {
     private final List<Piece> towers;
     private final List<Piece> topped;
     private final List<Piece> sacrificedPieces;
+    private final UpperToLowerBoardComparator upperToLowerBoardComparator;
+    private final LowerToUpperBoardComparator lowerToUpperBoardComparator;
 
     public Army(boolean isBlue) {
         this.isBlue = isBlue;
@@ -17,6 +20,8 @@ public class Army {
         this.towers = new ArrayList<>();
         this.topped = new ArrayList<>();
         this.sacrificedPieces = new ArrayList<>();
+        this.upperToLowerBoardComparator = new UpperToLowerBoardComparator();
+        this.lowerToUpperBoardComparator = new LowerToUpperBoardComparator();
         for (int i = 0; i < 16; i++) sacrificedPieces.add(new Piece(isBlue));
     }
 
@@ -38,6 +43,47 @@ public class Army {
 
     public List<Piece> getSacrificedPieces() {
         return sacrificedPieces;
+    }
+
+    public int towersDistances() {
+        int pieceLocation;
+        int distances = 0;
+        for (Piece piece : towers){
+            pieceLocation = isBlue ? piece.getSquare().getLocation() : 55 - (piece.getSquare().getLocation());
+            distances += 7 - (pieceLocation / 8);
+        }
+        return distances;
+    }
+
+    public int wallsDistances() {
+        int pieceLocation;
+        int distances = 0;
+        for (Piece piece : walls){
+            pieceLocation = isBlue ? piece.getSquare().getLocation() : 55 - (piece.getSquare().getLocation());
+            distances += 7 - (pieceLocation / 8);
+        }
+        return distances;
+    }
+    public int towersColumns() {
+        int pieceColumn;
+        int columns = 2 * towers.size();
+        for (Piece piece : towers){
+            pieceColumn = (piece.getSquare().getLocation() % 8) + 1;
+            if (pieceColumn == 1 || pieceColumn == 8) columns -= 2;
+            else if ((pieceColumn == 2 || pieceColumn == 7)) columns -= 1;
+        }
+        return columns;
+    }
+
+    public int wallsColumns() {
+        int pieceColumn;
+        int columns = 2 * walls.size();
+        for (Piece piece : walls){
+            pieceColumn = (piece.getSquare().getLocation() % 8) + 1;
+            if (pieceColumn == 1 || pieceColumn == 8) columns -= 2;
+            else if ((pieceColumn == 2 || pieceColumn == 7)) columns -= 1;
+        }
+        return columns;
     }
 
     public void withdrawFromBoard() {
@@ -66,23 +112,30 @@ public class Army {
     }
 
     public void withdrawWalls(){
-        int l = -1;
-        String s = "";
-        String color = isBlue? " Blue " :  " Red ";
-        try {
-            Square square;
-            for (Piece piece : walls){
-                square = piece.getSquare();
-                s = "" + square.getLocation();
-                piece.setSquare(null);
-                square.setPiece(null);
-            }
-            sacrificedPieces.addAll(walls);
-            walls.clear();
+        Square square;
+        for (Piece piece : walls){
+            square = piece.getSquare();
+            piece.setSquare(null);
+            square.setPiece(null);
         }
-        catch (NullPointerException e){
+        sacrificedPieces.addAll(walls);
+        walls.clear();
 
-            System.out.println("Problem is in the color" + color + "after : " + s);
+    }
+
+    public void towersFromFrontToBack(){
+        if (isBlue) {
+            Collections.sort(towers, upperToLowerBoardComparator);
+        } else {
+            Collections.sort(towers, lowerToUpperBoardComparator);
+        }
+    }
+
+    public void towersFromBackToFront(){
+        if (isBlue) {
+            Collections.sort(towers, lowerToUpperBoardComparator);
+        } else {
+            Collections.sort(towers, upperToLowerBoardComparator);
         }
     }
 
@@ -99,5 +152,21 @@ public class Army {
                 "topped: " + topped + "\n" +
                 "sacrificedPieces: " + sacrificedPieces + "\n" +
                 "-------------------------\n";
+    }
+
+
+
+    class UpperToLowerBoardComparator implements java.util.Comparator<Piece> {
+        @Override
+        public int compare(Piece a, Piece b) {
+            return a.getSquare().getLocation() - b.getSquare().getLocation();
+        }
+    }
+
+    class LowerToUpperBoardComparator implements java.util.Comparator<Piece> {
+        @Override
+        public int compare(Piece a, Piece b) {
+            return b.getSquare().getLocation() - a.getSquare().getLocation();
+        }
     }
 }

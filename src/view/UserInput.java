@@ -1,6 +1,6 @@
 package view;
 
-import model.Move;
+import model.move.Move;
 import model.player.Player;
 
 import java.awt.*;
@@ -96,8 +96,8 @@ public class UserInput implements MouseListener, MouseMotionListener {
             }
             if (isChoosing && player.getBoard().isFriendlyTower(player.isEvaluationBlue(), squareLocation)){
                 displayBoard.displaySquare[squareLocation].changeColor(Color.CYAN);
-                sacrificingMovesLocations = player.getBoard().sacrificingMovesLocations(player.isEvaluationBlue(), squareLocation);
-                normalMovesLocations = player.getBoard().normalMovesLocations(player.isEvaluationBlue(), squareLocation);
+                sacrificingMovesLocations = player.getBoard().sacrificingMovesLocations(player.isEvaluationBlue(), squareLocation, 1, true);
+                normalMovesLocations = player.getBoard().normalMovesLocations(player.isEvaluationBlue(), squareLocation, 1, true);
                 for (short sacrificing : sacrificingMovesLocations)displayBoard.displaySquare[sacrificing].changeColor(Color.RED);
                 for (short normal : normalMovesLocations)displayBoard.displaySquare[normal].changeColor(Color.GREEN);
                 initial = squareLocation;
@@ -143,8 +143,8 @@ public class UserInput implements MouseListener, MouseMotionListener {
             }
             if (isChoosing && player.getBoard().isFriendlyTower(player.isEvaluationBlue(), squareLocation)){
                 displayBoard.displaySquare[squareLocation].changeColor(Color.CYAN);
-                sacrificingMovesLocations = player.getBoard().sacrificingMovesLocations(player.isEvaluationBlue(), squareLocation);
-                normalMovesLocations = player.getBoard().normalMovesLocations(player.isEvaluationBlue(), squareLocation);
+                sacrificingMovesLocations = player.getBoard().sacrificingMovesLocations(player.isEvaluationBlue(), squareLocation, 1, true);
+                normalMovesLocations = player.getBoard().normalMovesLocations(player.isEvaluationBlue(), squareLocation, 1, true);
                 for (short sacrificing : sacrificingMovesLocations)displayBoard.displaySquare[sacrificing].changeColor(Color.RED);
                 for (short normal : normalMovesLocations)displayBoard.displaySquare[normal].changeColor(Color.GREEN);
                 initial = squareLocation;

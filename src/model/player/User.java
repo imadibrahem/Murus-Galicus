@@ -1,11 +1,8 @@
 package model.player;
 
 import model.Board;
-import model.Move;
+import model.move.Move;
 import view.UserInput;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public class User extends Player{
     UserInput userInput;
