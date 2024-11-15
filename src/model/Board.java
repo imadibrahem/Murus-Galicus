@@ -56,9 +56,9 @@ public abstract class Board {
 
     public abstract List<Move> typeByTypeMovesPieceByPiece(boolean isBlue, MoveType[] moveTypes, int[] directions, boolean frontToBack);
 
-    public abstract List<Move> directionByDirectionMovesPieceByPiece(boolean isBlue, int[] directions, boolean frontToBack);
+    public abstract List<Move> directionByDirectionMovesPieceByPiece(boolean isBlue,MoveType[] moveTypes, int[] directions, boolean frontToBack);
 
-    public abstract List<Move> allTypeMovesDirectionByDirection(boolean isBlue, int[] directions, boolean frontToBack);
+    public abstract List<Move> allTypeMovesDirectionByDirection(boolean isBlue,MoveType[] moveTypes, int[] directions, boolean frontToBack);
 
     public abstract List<Move> typeByTypeMovesDirectionByDirection(boolean isBlue, MoveType[] moveTypes, int[] directions, boolean frontToBack);
 

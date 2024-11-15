@@ -389,7 +389,7 @@ public class ObjectBoard extends Board {
     }
 
     @Override
-    public List<Move> directionByDirectionMovesPieceByPiece(boolean isBlue, int[] directions, boolean frontToBack){
+    public List<Move> directionByDirectionMovesPieceByPiece(boolean isBlue,MoveType[] moveTypes, int[] directions, boolean frontToBack){
         List<Move> directionByDirectionMovesPieceByPiece = new ArrayList<>();
         if (frontToBack) {
             getArmy(isBlue).towersFromFrontToBack();
@@ -397,16 +397,16 @@ public class ObjectBoard extends Board {
             getArmy(isBlue).towersFromBackToFront();
         }
         for (Piece piece : getArmy(isBlue).getTowers()){
-            directionByDirectionMovesPieceByPiece.addAll(directionByDirectionForOnePiece(piece.getSquare().getLocation(),directions));
+            directionByDirectionMovesPieceByPiece.addAll(directionByDirectionForOnePiece(moveTypes, piece.getSquare().getLocation(),directions));
         }
         return directionByDirectionMovesPieceByPiece;
     }
 
     @Override
-    public List<Move> allTypeMovesDirectionByDirection (boolean isBlue, int[] directions, boolean frontToBack){
+    public List<Move> allTypeMovesDirectionByDirection (boolean isBlue, MoveType[] moveTypes, int[] directions, boolean frontToBack){
         List<Move> allTypeMovesDirectionByDirection = new ArrayList<>();
         for (int direction : directions){
-            allTypeMovesDirectionByDirection.addAll(allTypeMovesForOneDirection(isBlue, direction, frontToBack));
+            allTypeMovesDirectionByDirection.addAll(allTypeMovesForOneDirection(isBlue, moveTypes, direction, frontToBack));
         }
         return allTypeMovesDirectionByDirection;
     }
@@ -518,7 +518,7 @@ public class ObjectBoard extends Board {
         else return piece.sacrificingMove(direction);
     }
 
-    public Move moveForOneDirection(int location, int direction){
+    public Move moveForOneDirection(MoveType[] moveTypes, int location, int direction){
         Piece piece = squares[location].getUpperPiece();
         if (piece.quietMove(direction) != null) return piece.quietMove(direction);
         else if (piece.friendOnNearMove(direction) != null) return piece.friendOnNearMove(direction);
@@ -548,15 +548,17 @@ public class ObjectBoard extends Board {
         return oneTypeMovesLocationsPieceByPiece;
     }
 
-    public List<Move> directionByDirectionForOnePiece(int location, int[] directions) {
+    public List<Move> directionByDirectionForOnePiece(MoveType[] moveTypes, int location, int[] directions) {
         List<Move> directionByDirectionForOnePiece = new ArrayList<>();
         for (int direction : directions){
-            if (moveForOneDirection(location,direction) != null)directionByDirectionForOnePiece.add(moveForOneDirection(location,direction));
+            for (MoveType moveType : moveTypes){
+                if (oneTypeMoveForOneDirection(moveType, location, direction) != null)directionByDirectionForOnePiece.add(oneTypeMoveForOneDirection(moveType, location, direction));
+            }
         }
         return directionByDirectionForOnePiece;
     }
 
-    public List<Move> allTypeMovesForOneDirection(boolean isBlue, int direction, boolean frontToBack){
+    public List<Move> allTypeMovesForOneDirection(boolean isBlue, MoveType[] moveTypes, int direction, boolean frontToBack){
         List<Move> allTypeMovesForOneDirection = new ArrayList<>();
         if (frontToBack) {
             getArmy(isBlue).towersFromFrontToBack();
@@ -564,7 +566,10 @@ public class ObjectBoard extends Board {
             getArmy(isBlue).towersFromBackToFront();
         }
         for (Piece piece : getArmy(isBlue).getTowers()){
-            if (moveForOneDirection(piece.getSquare().getLocation(),direction) != null)allTypeMovesForOneDirection.add(moveForOneDirection(piece.getSquare().getLocation(),direction));
+            for (MoveType moveType : moveTypes){
+                if (oneTypeMoveForOneDirection(moveType, piece.getSquare().getLocation(), direction) != null)allTypeMovesForOneDirection.add(oneTypeMoveForOneDirection(moveType, piece.getSquare().getLocation(), direction));
+
+            }
         }
         return allTypeMovesForOneDirection;
     }
