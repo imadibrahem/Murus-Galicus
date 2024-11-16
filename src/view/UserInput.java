@@ -23,9 +23,9 @@ public class UserInput implements MouseListener, MouseMotionListener {
     int targetFar = -1;
 
 
-    public UserInput(DisplayBoard displayBoard) {
-        this.displayBoard = displayBoard;
-        displayBoard.addMouseListener(this);
+    public UserInput() {
+        //this.displayBoard = displayBoard;
+        //displayBoard.addMouseListener(this);
         nearDistances.add(-9);
         nearDistances.add(-8);
         nearDistances.add(-7);
@@ -37,10 +37,15 @@ public class UserInput implements MouseListener, MouseMotionListener {
 
     }
 
-    public void setPlayer(Player player) {
+    public void setDisplayBoard(DisplayBoard displayBoard) {
+        this.displayBoard = displayBoard;
+        displayBoard.addMouseListener(this);
 
+    }
+
+    public void setPlayer(Player player) {
         this.player = player;
-        isChoosing = true;
+        if (player != null) isChoosing = true;
     }
 
     public boolean isChoosing() {
