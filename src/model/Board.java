@@ -1,11 +1,18 @@
 package model;
 
+import model.evolutionTheory.MoveGeneratorEvolutionTheory;
 import model.move.Move;
+import model.move.MoveGeneratingStyle;
+import model.move.MoveGenerator;
 import model.move.MoveType;
 
 import java.util.List;
 
 public abstract class Board {
+    MoveGenerator moveGenerator = new MoveGeneratorEvolutionTheory(this, MoveGeneratingStyle.ALL_TYPE_MOVES_PIECE_BY_PIECE,
+            new MoveType[]{MoveType.FRIEND_ON_BOTH, MoveType.FRIEND_ON_NEAR, MoveType.FRIEND_ON_FAR, MoveType.QUIET, MoveType.SACRIFICE},
+            new int[]{1, 8, 2, 3, 7, 6, 4, 5}, true);
+
     public Board() {}
 
     public abstract void build(String FEN);
@@ -17,8 +24,6 @@ public abstract class Board {
     public abstract void unmakeMove(Move move, boolean isBlue);
 
     public abstract void cleanBoard();
-
-    public abstract List<Move> computeAllMoves(boolean isBlue);
 
     public abstract List<Move> generateSacrificingMoves(boolean isBlue);
 
@@ -38,11 +43,11 @@ public abstract class Board {
 
     public abstract int towersNumber(boolean isBlue);
 
-    public abstract int gameState(boolean isBlue);
-
     public abstract boolean isInCheck(boolean isBlue);
 
     public abstract boolean isInLosingPos(boolean isBlue);
+
+    public abstract boolean lostGame(boolean isBlue);
 
     public abstract boolean isFriendlyTower(boolean isBlue, int location);
 
@@ -63,4 +68,28 @@ public abstract class Board {
     public abstract List<Move> typeByTypeMovesDirectionByDirection(boolean isBlue, MoveType[] moveTypes, int[] directions, boolean frontToBack);
 
     public abstract List<Move> directionByDirectionMovesTypeByType(boolean isBlue, MoveType[] moveTypes, int[] directions, boolean frontToBack);
+
+    public int gameState(boolean isBlue) {
+        int state = 0;
+
+        if (isInCheck(isBlue)) {
+            if (lostGame(isBlue)) return -5;
+            state = isInLosingPos(isBlue) ? -4 : -1;
+        }
+
+        if (isInCheck(!isBlue)) {
+            if (lostGame(!isBlue)) return 5;
+
+            int opponentState = isInLosingPos(!isBlue) ? 4 : 3;
+
+            if (state == 0) return opponentState;
+            return opponentState - (state == -1 ? 2 : 6);
+        }
+
+        return state;
+    }
+
+    public List<Move> generateMoves(boolean isBlue){
+        return moveGenerator.generateMoves(isBlue);
+    }
 }

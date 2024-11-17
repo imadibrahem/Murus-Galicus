@@ -80,8 +80,8 @@ public class Army {
         int columns = 2 * walls.size();
         for (Piece piece : walls){
             pieceColumn = (piece.getSquare().getLocation() % 8) + 1;
-            if (pieceColumn == 1 || pieceColumn == 8) columns -= 2;
-            else if ((pieceColumn == 2 || pieceColumn == 7)) columns -= 1;
+            if (pieceColumn == 1 || pieceColumn == 8) columns -= 1;
+            //else if ((pieceColumn == 2 || pieceColumn == 7)) columns -= 1;
         }
         return columns;
     }
@@ -156,14 +156,14 @@ public class Army {
 
 
 
-    class UpperToLowerBoardComparator implements java.util.Comparator<Piece> {
+    static class UpperToLowerBoardComparator implements java.util.Comparator<Piece> {
         @Override
         public int compare(Piece a, Piece b) {
             return a.getSquare().getLocation() - b.getSquare().getLocation();
         }
     }
 
-    class LowerToUpperBoardComparator implements java.util.Comparator<Piece> {
+    static class LowerToUpperBoardComparator implements java.util.Comparator<Piece> {
         @Override
         public int compare(Piece a, Piece b) {
             return b.getSquare().getLocation() - a.getSquare().getLocation();

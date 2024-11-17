@@ -251,11 +251,6 @@ public class ObjectBoard extends Board {
     }
 
     @Override
-    public List<Move> computeAllMoves(boolean isBlue) {
-        return null;// TODO: 11/14/2024
-    }
-
-    @Override
     public List<Move> generateSacrificingMoves(boolean isBlue) {
         return null;// TODO: 11/14/2024
     }
@@ -301,22 +296,40 @@ public class ObjectBoard extends Board {
     }
 
     @Override
-    public int gameState(boolean isBlue) {
-        // TODO: 10/31/2024  
-        return 0;
-    }
-
-    @Override
     public boolean isInCheck(boolean isBlue) {
-        // TODO: 10/31/2024  
+        if (generateMoves(isBlue).size() < 2) return true;
+        for (Piece tower : getArmy(!isBlue).getTowers()){
+            int location = isBlue ? tower.getSquare().getLocation() : 55 - tower.getSquare().getLocation();
+            if (location > 31) return true;
+        }
         return false;
     }
 
     @Override
     public boolean isInLosingPos(boolean isBlue) {
-        // TODO: 10/31/2024  
+        if (generateMoves(isBlue).size() < 2) return true;
+        List<Move> possibleMoves = new ArrayList<>();
+        for (Piece tower : getArmy(!isBlue).getTowers()){
+            int location = isBlue ? tower.getSquare().getLocation() : 55 - tower.getSquare().getLocation();
+            if (location > 31) {
+                if (location < 40)possibleMoves.addAll(allTypeMovesForOnePiece(new MoveType[]{MoveType.QUIET, MoveType.FRIEND_ON_NEAR, MoveType.FRIEND_ON_FAR, MoveType.FRIEND_ON_BOTH}
+                        ,tower.getSquare().getLocation() ,new int[]{1,2,8}));
+                else if (location < 48)possibleMoves.addAll(sacrificingMovesForOnePiece(tower.getSquare().getLocation(), new int[]{1,2,8}));
+            }
+        }
+        return !(possibleMoves.isEmpty());
+    }
+
+    @Override
+    public boolean lostGame(boolean isBlue) {
+        if (generateMoves(isBlue).size() < 1) return true;
+        for (Piece tower : getArmy(!isBlue).getTowers()){
+            int location = isBlue ? tower.getSquare().getLocation() : 55 - tower.getSquare().getLocation();
+            if (location > 47) return true;
+        }
         return false;
     }
+
 
     public boolean isFriendlyTower(boolean isBlue, int location) {
        return squares[location].getUpperPiece() != null && squares[location].getUpperPiece().isBlue() == isBlue;
