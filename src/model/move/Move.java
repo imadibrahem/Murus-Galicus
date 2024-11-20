@@ -12,7 +12,6 @@ public class Move {
 
     @Override
     public String toString() {
-        // TODO: 10/19/2024
         return (value >> 7) + "=>" + getDirection() + "(" +getTargetType() + ") | ";
     }
 

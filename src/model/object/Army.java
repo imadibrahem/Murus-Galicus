@@ -45,45 +45,40 @@ public class Army {
         return sacrificedPieces;
     }
 
-    public int towersDistances() {
+    public int distanceFinder(int[] values, List<Piece> pieceList){
         int pieceLocation;
         int distances = 0;
-        for (Piece piece : towers){
+        for (Piece piece : pieceList){
             pieceLocation = isBlue ? piece.getSquare().getLocation() : 55 - (piece.getSquare().getLocation());
-            distances += 7 - (pieceLocation / 8);
+            distances += values [6 - (pieceLocation / 8)];
         }
         return distances;
     }
 
-    public int wallsDistances() {
-        int pieceLocation;
-        int distances = 0;
-        for (Piece piece : walls){
-            pieceLocation = isBlue ? piece.getSquare().getLocation() : 55 - (piece.getSquare().getLocation());
-            distances += 7 - (pieceLocation / 8);
-        }
-        return distances;
-    }
-    public int towersColumns() {
-        int pieceColumn;
-        int columns = 2 * towers.size();
-        for (Piece piece : towers){
-            pieceColumn = (piece.getSquare().getLocation() % 8) + 1;
-            if (pieceColumn == 1 || pieceColumn == 8) columns -= 2;
-            else if ((pieceColumn == 2 || pieceColumn == 7)) columns -= 1;
-        }
-        return columns;
+    public int towersDistances(int[] values) {
+        return distanceFinder(values, towers);
     }
 
-    public int wallsColumns() {
+    public int wallsDistances(int[] values) {
+        return distanceFinder(values, walls);
+
+    }
+    public int columnsFinder(int[] values, List<Piece> pieceList){
         int pieceColumn;
-        int columns = 2 * walls.size();
-        for (Piece piece : walls){
-            pieceColumn = (piece.getSquare().getLocation() % 8) + 1;
-            if (pieceColumn == 1 || pieceColumn == 8) columns -= 1;
-            //else if ((pieceColumn == 2 || pieceColumn == 7)) columns -= 1;
+        int columns = 0;
+        for (Piece piece : pieceList){
+            pieceColumn = (piece.getSquare().getLocation() % 8);
+            if (pieceColumn > 3) pieceColumn = 7 - pieceColumn;
+            columns += values[pieceColumn];
         }
         return columns;
+    }
+    public int towersColumns(int[] values) {
+        return columnsFinder(values, towers);
+    }
+
+    public int wallsColumns(int[] values) {
+        return columnsFinder(values, walls);
     }
 
     public void withdrawFromBoard() {
@@ -125,17 +120,17 @@ public class Army {
 
     public void towersFromFrontToBack(){
         if (isBlue) {
-            Collections.sort(towers, upperToLowerBoardComparator);
+            towers.sort(upperToLowerBoardComparator);
         } else {
-            Collections.sort(towers, lowerToUpperBoardComparator);
+            towers.sort(lowerToUpperBoardComparator);
         }
     }
 
     public void towersFromBackToFront(){
         if (isBlue) {
-            Collections.sort(towers, lowerToUpperBoardComparator);
+            towers.sort(lowerToUpperBoardComparator);
         } else {
-            Collections.sort(towers, upperToLowerBoardComparator);
+            towers.sort(upperToLowerBoardComparator);
         }
     }
 

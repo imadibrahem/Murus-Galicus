@@ -266,23 +266,23 @@ public class ObjectBoard extends Board {
     }
 
     @Override
-    public int towersDistances(boolean isBlue) {
-        return getArmy(isBlue).towersDistances();
+    public int towersDistances(boolean isBlue, int[] values) {
+        return getArmy(isBlue).towersDistances(values);
     }
 
     @Override
-    public int wallsDistances(boolean isBlue) {
-        return getArmy(isBlue).wallsDistances();
+    public int wallsDistances(boolean isBlue, int[] values) {
+        return getArmy(isBlue).wallsDistances(values);
     }
 
     @Override
-    public int towersColumns(boolean isBlue) {
-        return getArmy(isBlue).towersColumns();
+    public int towersColumns(boolean isBlue,int[] values) {
+        return getArmy(isBlue).towersColumns(values);
     }
 
     @Override
-    public int wallsColumns(boolean isBlue) {
-        return getArmy(isBlue).wallsColumns();
+    public int wallsColumns(boolean isBlue,int[] values) {
+        return getArmy(isBlue).wallsColumns(values);
     }
 
     @Override

@@ -31,13 +31,13 @@ public abstract class Board {
 
     public abstract List<Move> generateMixedMoves(boolean isBlue);
 
-    public abstract int towersDistances(boolean isBlue);
+    public abstract int towersDistances(boolean isBlue, int[] values);
 
-    public abstract int wallsDistances(boolean isBlue);
+    public abstract int wallsDistances(boolean isBlue, int[] values);
 
-    public abstract int towersColumns(boolean isBlue);
+    public abstract int towersColumns(boolean isBlue, int[] values);
 
-    public abstract int wallsColumns(boolean isBlue);
+    public abstract int wallsColumns(boolean isBlue, int[] values);
 
     public abstract int wallsNumber(boolean isBlue);
 
