@@ -25,12 +25,6 @@ public abstract class Board {
 
     public abstract void cleanBoard();
 
-    public abstract List<Move> generateSacrificingMoves(boolean isBlue);
-
-    public abstract List<Move> generateQuietMoves(boolean isBlue);
-
-    public abstract List<Move> generateMixedMoves(boolean isBlue);
-
     public abstract int towersDistances(boolean isBlue, int[] values);
 
     public abstract int wallsDistances(boolean isBlue, int[] values);
@@ -53,9 +47,9 @@ public abstract class Board {
 
     public abstract boolean isFriendlyPiece(boolean isBlue, int location);
 
-    public abstract List<Short> normalMovesLocations (boolean isBlue, int location, int startDirection, boolean clockwise);
+    public abstract List<Short> normalMovesLocations (boolean isBlue, int location, int startDirection);
 
-    public abstract List<Short> sacrificingMovesLocations (boolean isBlue, int location, int startDirection, boolean clockwise);
+    public abstract List<Short> sacrificingMovesLocations (boolean isBlue, int location, int startDirection);
 
     public abstract List<Move>  allTypeMovesPieceByPiece(boolean isBlue, MoveType[] moveTypes, int[] directions, boolean frontToBack);
 

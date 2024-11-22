@@ -111,6 +111,12 @@ public class Square {
     }
 
     public static void main (String[] args){
+        System.out.println("BitShifting");
+        System.out.println("32L >> 1: " +(32L >> 1));
+        System.out.println("32L >> -1: "+(32L >> -1));
+        System.out.println("32L << 1: "+(32L << 1));
+        System.out.println("32L << -1: "+(32L << -1));
+        System.out.println("```````````````````````");
         ObjectBoard board = new ObjectBoard("1tttttt1/t5ww/8/8/8/8/TTTTTTTT");
         for (int i = 1; i < 9; i++){
             System.out.println(i + "->" + ((i + 5) % 9));

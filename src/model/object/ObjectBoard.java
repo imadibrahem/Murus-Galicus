@@ -251,21 +251,6 @@ public class ObjectBoard extends Board {
     }
 
     @Override
-    public List<Move> generateSacrificingMoves(boolean isBlue) {
-        return null;// TODO: 11/14/2024
-    }
-
-    @Override
-    public List<Move> generateQuietMoves(boolean isBlue) {
-        return null;// TODO: 11/14/2024
-    }
-
-    @Override
-    public List<Move> generateMixedMoves(boolean isBlue) {
-        return null;// TODO: 11/14/2024
-    }
-
-    @Override
     public int towersDistances(boolean isBlue, int[] values) {
         return getArmy(isBlue).towersDistances(values);
     }
@@ -297,7 +282,7 @@ public class ObjectBoard extends Board {
 
     @Override
     public boolean isInCheck(boolean isBlue) {
-        if (generateMoves(isBlue).size() < 2) return true;
+        if (generateMoves(isBlue).size() < 3) return true;
         for (Piece tower : getArmy(!isBlue).getTowers()){
             int location = isBlue ? tower.getSquare().getLocation() : 55 - tower.getSquare().getLocation();
             if (location > 31) return true;
@@ -307,7 +292,7 @@ public class ObjectBoard extends Board {
 
     @Override
     public boolean isInLosingPos(boolean isBlue) {
-        if (generateMoves(isBlue).size() < 2) return true;
+        if (generateMoves(isBlue).size() < 3) return true;
         List<Move> possibleMoves = new ArrayList<>();
         for (Piece tower : getArmy(!isBlue).getTowers()){
             int location = isBlue ? tower.getSquare().getLocation() : 55 - tower.getSquare().getLocation();
@@ -341,7 +326,7 @@ public class ObjectBoard extends Board {
     }
 
     @Override
-    public List<Short> normalMovesLocations(boolean isBlue, int location, int startDirection, boolean clockwise) {
+    public List<Short> normalMovesLocations(boolean isBlue, int location, int startDirection) {
         List<Short> normalMovesLocations = new ArrayList<>();
         int currentDirection = startDirection;
         if (this.isFriendlyTower(isBlue, location)){
@@ -359,7 +344,7 @@ public class ObjectBoard extends Board {
     }
 
     @Override
-    public List<Short> sacrificingMovesLocations(boolean isBlue, int location, int startDirection, boolean clockwise) {
+    public List<Short> sacrificingMovesLocations(boolean isBlue, int location, int startDirection) {
         List<Short> sacrificingMovesLocations = new ArrayList<>();
         int currentDirection = startDirection;
         if (this.isFriendlyTower(isBlue, location)){
@@ -368,8 +353,7 @@ public class ObjectBoard extends Board {
                 if (piece.sacrificingMove(currentDirection) != null){
                     sacrificingMovesLocations.add(squares[location].singleMoveSquare(currentDirection, isBlue).getLocation());
                 }
-                if (clockwise) currentDirection = (currentDirection % 8) + 1;
-                else currentDirection = (currentDirection - 6) % 8 + 1;
+                currentDirection = (currentDirection % 8) + 1;
             }
         }
 

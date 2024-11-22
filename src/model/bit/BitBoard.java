@@ -4,6 +4,7 @@ import model.Board;
 import model.move.Move;
 import model.move.MoveType;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class BitBoard extends Board {
@@ -18,12 +19,19 @@ public class BitBoard extends Board {
     private final long col_B = 18085043209519168L;
     private final long col_H = 282578800148737L;
     private final long col_G = 565157600297474L;
+    private final int[] redDirections = {0, 8, 7, -1, -9, -8, -7, 1, 9};
+    private final int[] blueDirections = {0, -8, -7, 1, 9, 8, 7, -1, -9};
 
     private long bw;
     private long bt;
     private long rw;
     private long rt;
     private String FEN;
+
+    public BitBoard(String FEN) {
+        this.FEN = FEN;
+        build(FEN);
+    }
 
     @Override
     public void build(String FEN) {
@@ -56,7 +64,7 @@ public class BitBoard extends Board {
     @Override
 
     public String generateFEN() {
-        char[] board = String.format("%064d", Long.parseLong(Long.toBinaryString(rw))).replace('1','w').toCharArray();
+        char[] board = String.format("%64s", Long.toBinaryString(rw)).replace(' ', '0').replace('1','w').toCharArray();
         long blueWalls = bw;
         long redTowers = rt;
         long blueTowers = bt;
@@ -100,32 +108,57 @@ public class BitBoard extends Board {
 
         @Override
     public void makeMove(Move move, boolean isBlue) {
+        long initial = 1L << move.getInitialLocation(!isBlue), firstTarget, secondTarget;
+        if (isBlue){
+            bt ^= initial;
+            if (move.isTargetEmpty()) bw ^= normalMoveValidator(initial, move.getDirection(), true);
+            else if (move.isTargetBothFriendly()){
+                firstTarget = normalMoveValidator(initial, move.getDirection(), true);
+                bw ^= firstTarget;
+                bt ^= firstTarget;
+            }
+            else if (move.isTargetEnemy()){
+                bw ^= initial;
+                rw ^= sacrificingMoveValidator(initial, move.getDirection(), true);
+            }
+            else {
+                firstTarget = normalMoveValidator(initial, move.getDirection(), true);
+                secondTarget = firstTarget & bw;
+                bw ^= firstTarget;
+                bt ^= secondTarget;
+            }
+        }
+        else {
+            rt ^= initial;
+            if (move.isTargetEmpty()) rw ^= normalMoveValidator(initial, move.getDirection(), false);
+            else if (move.isTargetBothFriendly()){
+                firstTarget = normalMoveValidator(initial, move.getDirection(), false);
+                rw ^= firstTarget;
+                rt ^= firstTarget;
+            }
+            else if (move.isTargetEnemy()){
+                rw ^= initial;
+                bw ^= sacrificingMoveValidator(initial, move.getDirection(), false);
+            }
+            else {
+                firstTarget = normalMoveValidator(initial, move.getDirection(), true);
+                secondTarget = firstTarget & rw;
+                rw ^= firstTarget;
+                rt ^= secondTarget;
+            }
 
+
+        }
     }
 
     @Override
     public void unmakeMove(Move move, boolean isBlue) {
-
+// TODO: 11/20/2024
     }
 
     @Override
     public void cleanBoard() {
         rt = rw = bt = bw = 0L;
-    }
-
-    @Override
-    public List<Move> generateSacrificingMoves(boolean isBlue) {
-        return null;
-    }
-
-    @Override
-    public List<Move> generateQuietMoves(boolean isBlue) {
-        return null;
-    }
-
-    @Override
-    public List<Move> generateMixedMoves(boolean isBlue) {
-        return null;
     }
 
     @Override
@@ -165,38 +198,65 @@ public class BitBoard extends Board {
 
     @Override
     public boolean isInCheck(boolean isBlue) {
-        return false;
+        if (generateMoves(isBlue).size() < 3) return true;
+        return isBlue ? ((rt|rw) & (row_2|row_3)) != 0 : ((bw|bt) & (row_6|row_5)) != 0;
     }
 
     @Override
     public boolean isInLosingPos(boolean isBlue) {
+        if (generateMoves(isBlue).size() < 3) return true;
+        // TODO: 11/20/2024 after move generating
         return false;
     }
 
     @Override
     public boolean lostGame(boolean isBlue) {
-        return false;
+        if (generateMoves(isBlue).size() < 1) return true;
+        return isBlue ? ((rt|rw) & row_1) != 0 : ((bw|bt) & row_7) != 0;
     }
 
     @Override
     public boolean isFriendlyTower(boolean isBlue, int location) {
-        return false;
+        return isBlue ? ((1L << (55 - location)) & bt) != 0 : ((1L << (55 - location)) & rt) != 0;
     }
 
     @Override
     public boolean isFriendlyPiece(boolean isBlue, int location) {
-        return false;
+        return isBlue ? ((1L << (55 - location)) & bw) != 0 : ((1L << (55 - location)) & rw) != 0;
     }
 
     @Override
-    public List<Short> normalMovesLocations(boolean isBlue, int location, int startDirection, boolean clockwise) {
-        return null;
+    public List<Short> normalMovesLocations(boolean isBlue, int location, int startDirection) {
+        List<Short> normalMovesLocations = new ArrayList<>();
+        int currentDirection = startDirection;
+        long bitLocation = 1L << (55 - location);
+        if (this.isFriendlyTower(isBlue, location)){
+            for (int i = 1; i < 9; i++){
+                if (normalMoveValidator(bitLocation, currentDirection, isBlue) > 0){
+                    short first = (short) (isBlue ? location + blueDirections[currentDirection] : location + redDirections[currentDirection]);
+                    normalMovesLocations.add(first);
+                    normalMovesLocations.add((short) (isBlue ? first + blueDirections[currentDirection] : first + redDirections[currentDirection]));
+                }
+                currentDirection = (currentDirection % 8) + 1;
+            }
+        }
+        return normalMovesLocations;
     }
 
     @Override
-    public List<Short> sacrificingMovesLocations(boolean isBlue, int location, int startDirection, boolean clockwise) {
-        return null;
-    }
+    public List<Short> sacrificingMovesLocations(boolean isBlue, int location, int startDirection) {
+        List<Short> sacrificingMovesLocations = new ArrayList<>();
+        int currentDirection = startDirection;
+        long bitLocation = 1L << (55 - location);
+        if (this.isFriendlyTower(isBlue, location)){
+            for (int i = 1; i < 9; i++){
+                if (sacrificingMoveValidator(bitLocation, currentDirection, isBlue) > 0) {
+                    sacrificingMovesLocations.add((short) (isBlue ? location + blueDirections[currentDirection] : location + redDirections[currentDirection]));
+                }
+                currentDirection = (currentDirection % 8) + 1;
+            }
+        }
+        return sacrificingMovesLocations;    }
 
     @Override
     public List<Move> allTypeMovesPieceByPiece(boolean isBlue, MoveType[] moveTypes, int[] directions, boolean frontToBack) {
@@ -227,7 +287,7 @@ public class BitBoard extends Board {
     public List<Move> directionByDirectionMovesTypeByType(boolean isBlue, MoveType[] moveTypes, int[] directions, boolean frontToBack) {
         return null;
     }
-
+    ///////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////
 
     public int distancesFinder(boolean isBlue, long locations, int[] values) {
@@ -252,4 +312,55 @@ public class BitBoard extends Board {
         }
         return result;
     }
+    ///////////////////////////////////////////////////////////////////////
+
+    public long sacrificingMoveValidator(long initial, int direction, boolean isBlue){
+        if (direction == 1) return isBlue ? (initial << 8) & rw : (initial >> 8) & bw;
+        else if (direction == 2) return isBlue ? (initial << 7) & rw & ~col_A : (initial >> 7) & bw & ~col_H;
+        else if (direction == 3) return isBlue ? (initial >> 1) & rw & ~col_A : (initial << 1) & bw & ~col_H;
+        else if (direction == 4) return isBlue ? (initial >> 9) & rw & ~col_A : (initial << 9) & bw & ~col_H;
+        else if (direction == 5) return isBlue ? (initial >> 8) & rw : (initial << 8) & bw;
+        else if (direction == 6) return isBlue ? (initial >> 7) & rw & ~col_H : (initial << 7) & bw & ~col_A;
+        else if (direction == 7) return isBlue ? (initial << 1) & rw & ~col_H : (initial >> 1) & bw & ~col_A;
+        else if (direction == 8) return isBlue ? (initial << 9) & rw & ~col_H  : (initial >> 9) & bw & ~col_A;
+        return 0L;
+    }
+
+    public long normalMoveValidator(long initial, int direction, boolean isBlue){
+        long first = 0L, second = 0L;
+        if (direction == 1) {
+            first = isBlue ? (initial << 8) & ~(rw|rt|bt|row_7) : (initial >> 8) & ~(bw|bt|rt|row_1);
+            second = isBlue ? (first << 8) & ~(rw|rt|bt) : (first >> 8) & ~(bw|bt|rt);
+        }
+        else if (direction == 2){
+            first = isBlue ? (initial << 7) & ~(rw|rt|bt|col_A|col_H|row_7) : (initial >> 7) & ~(bw|bt|rt|col_A|col_H|row_1);
+            second = isBlue ? (first << 7) & ~(rw|rt|bt) : (first >> 7) & ~(bw|bt|rt);
+        }
+        else if (direction == 3){
+            first = isBlue ? (initial >> 1) & ~(rw|rt|bt|col_A|col_H) : (initial << 1) & ~(bw|bt|rt|col_A|col_H);
+            second = isBlue ? (first >> 1) & ~(rw|rt|bt) : (first << 1) & ~(bw|bt|rt);
+        }
+        else if (direction == 4){
+            first = isBlue ? (initial >> 9) & ~(rw|rt|bt|col_A|col_H|row_1) : (initial << 9) & ~(bw|bt|rt|col_A|col_H|row_7);
+            second = isBlue ? (first >> 9) & ~(rw|rt|bt) : (first << 9) & ~(bw|bt|rt);
+        }
+        else if (direction == 5){
+            first = isBlue ? (initial >> 8) & ~(rw|rt|bt|row_1) : (initial << 8) & ~(bw|bt|rt|row_7);
+            second = isBlue ? (first >> 8) & ~(rw|rt|bt) : (first << 8) & ~(bw|bt|rt);
+        }
+        else if (direction == 6){
+            first = isBlue ? (initial >> 7) & ~(rw|rt|bt|col_A|col_H|row_1) : (initial << 7) & ~(bw|bt|rt|col_A|col_H|row_7);
+            second = isBlue ? (first >> 7) & ~(rw|rt|bt) : (first << 7) & ~(bw|bt|rt);
+        }
+        else if (direction == 7){
+            first = isBlue ? (initial << 1) & ~(rw|rt|bt|col_A|col_H) : (initial >> 1) & ~(bw|bt|rt|col_A|col_H);
+            second = isBlue ? (first << 1) & ~(rw|rt|bt) : (first >> 1) & ~(bw|bt|rt);
+        }
+        else if (direction == 8){
+            first = isBlue ? (initial << 9) & ~(rw|rt|bt|col_A|col_H|row_7) : (initial >> 9) & ~(bw|bt|rt|col_A|col_H|row_1);
+            second = isBlue ? (first << 9) & ~(rw|rt|bt) : (first >> 9) & ~(bw|bt|rt);
+        }
+        return second > 0 ? (first|second) : 0L;
+    }
+
 }

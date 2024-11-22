@@ -1,5 +1,6 @@
 package model;
 
+import model.bit.BitBoard;
 import model.evolutionTheory.MoveGeneratorEvolutionTheory;
 import model.move.Move;
 import model.move.MoveGeneratingStyle;
@@ -104,11 +105,16 @@ public class Game {
     public static void main (String[] args){
         UserInput userInput = new UserInput();
         String FenInitial = "tttttttt/8/8/8/8/8/TTTTTTTT,b";
-        Board blueBoard = new ObjectBoard(FenTrimmer(FenInitial));
         MoveType[] moveTypes = {MoveType.FRIEND_ON_BOTH, MoveType.FRIEND_ON_NEAR, MoveType.FRIEND_ON_FAR, MoveType.QUIET, MoveType.SACRIFICE};
         int [] directions = {1, 8, 2, 3, 7, 6, 4, 5};
+       /*
+        Board blueBoard = new ObjectBoard(FenTrimmer(FenInitial));
         MoveGenerator blueGenerator = new MoveGeneratorEvolutionTheory(blueBoard, MoveGeneratingStyle.ALL_TYPE_MOVES_PIECE_BY_PIECE,moveTypes, directions, true );
         Player blue = new RandomPlayer(true, blueBoard,blueGenerator);
+
+        */
+        Board blueBoard = new BitBoard(FenTrimmer(FenInitial));
+        Player blue = new User(true,blueBoard,userInput);
 
         Board redBoard = new ObjectBoard(FenTrimmer(FenInitial));
         Player red = new User(false,redBoard,userInput);
