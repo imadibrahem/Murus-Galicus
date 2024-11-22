@@ -167,15 +167,15 @@ public class ObjectBoard extends Board {
                 getArmy(isBlue).getTopped().add(target);
             }
             initial.setPiece(null);
-            int type;
-            if (farEmpty&&nearEmpty) type = 0;
-            else if (!farEmpty&&!nearEmpty) type = 3;
-            else if (farEmpty) type = 1;
-            else type = 2;
+            //int type;
+            //if (farEmpty&&nearEmpty) type = 0;
+            //else if (!farEmpty&&!nearEmpty) type = 3;
+            //else if (farEmpty) type = 1;
+            //else type = 2;
             //System.out.println("+++++++++++++++++++++++++");
             //System.out.println("+++++++++++++++++++++++++");
             //System.out.println("*************************");
-            System.out.println("make Move type was: " + type);
+            //System.out.println("make Move type was: " + type);
             ///System.out.println("*************************");
             //System.out.println("+++++++++++++++++++++++++");
             //System.out.println("+++++++++++++++++++++++++");

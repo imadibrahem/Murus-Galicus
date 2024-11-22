@@ -111,18 +111,18 @@ public class BitBoard extends Board {
         long initial = 1L << move.getInitialLocation(!isBlue), firstTarget, secondTarget;
         if (isBlue){
             bt ^= initial;
-            if (move.isTargetEmpty()) bw ^= normalMoveValidator(initial, move.getDirection(), true);
+            if (move.isTargetEmpty()) bw ^= normalMoveRouteFinder(initial, move.getDirection(), true);
             else if (move.isTargetBothFriendly()){
-                firstTarget = normalMoveValidator(initial, move.getDirection(), true);
+                firstTarget = normalMoveRouteFinder(initial, move.getDirection(), true);
                 bw ^= firstTarget;
                 bt ^= firstTarget;
             }
             else if (move.isTargetEnemy()){
                 bw ^= initial;
-                rw ^= sacrificingMoveValidator(initial, move.getDirection(), true);
+                rw ^= sacrificingMoveRouteFinder(initial, move.getDirection(), true);
             }
             else {
-                firstTarget = normalMoveValidator(initial, move.getDirection(), true);
+                firstTarget = normalMoveRouteFinder(initial, move.getDirection(), true);
                 secondTarget = firstTarget & bw;
                 bw ^= firstTarget;
                 bt ^= secondTarget;
@@ -130,18 +130,18 @@ public class BitBoard extends Board {
         }
         else {
             rt ^= initial;
-            if (move.isTargetEmpty()) rw ^= normalMoveValidator(initial, move.getDirection(), false);
+            if (move.isTargetEmpty()) rw ^= normalMoveRouteFinder(initial, move.getDirection(), false);
             else if (move.isTargetBothFriendly()){
-                firstTarget = normalMoveValidator(initial, move.getDirection(), false);
+                firstTarget = normalMoveRouteFinder(initial, move.getDirection(), false);
                 rw ^= firstTarget;
                 rt ^= firstTarget;
             }
             else if (move.isTargetEnemy()){
                 rw ^= initial;
-                bw ^= sacrificingMoveValidator(initial, move.getDirection(), false);
+                bw ^= sacrificingMoveRouteFinder(initial, move.getDirection(), false);
             }
             else {
-                firstTarget = normalMoveValidator(initial, move.getDirection(), true);
+                firstTarget = normalMoveRouteFinder(initial, move.getDirection(), true);
                 secondTarget = firstTarget & rw;
                 rw ^= firstTarget;
                 rt ^= secondTarget;
@@ -153,7 +153,24 @@ public class BitBoard extends Board {
 
     @Override
     public void unmakeMove(Move move, boolean isBlue) {
-// TODO: 11/20/2024
+        long initial = 1L << move.getInitialLocation(!isBlue), firstTarget, secondTarget;
+        if (move.isTargetNearFriendly() || move.isTargetFarFriendly()){
+            if (isBlue){
+                bt ^= initial;
+                firstTarget = normalMoveRouteFinder(initial, move.getDirection(), true);
+                secondTarget = firstTarget & bt;
+                bw ^= firstTarget;
+                bt ^= secondTarget;
+            }
+            else{
+                rt ^= initial;
+                firstTarget = normalMoveRouteFinder(initial, move.getDirection(), true);
+                secondTarget = firstTarget & rt;
+                rw ^= firstTarget;
+                rt ^= secondTarget;
+            }
+        }
+        else makeMove(move,isBlue);
     }
 
     @Override
@@ -317,12 +334,12 @@ public class BitBoard extends Board {
     public long sacrificingMoveValidator(long initial, int direction, boolean isBlue){
         if (direction == 1) return isBlue ? (initial << 8) & rw : (initial >> 8) & bw;
         else if (direction == 2) return isBlue ? (initial << 7) & rw & ~col_A : (initial >> 7) & bw & ~col_H;
+        else if (direction == 8) return isBlue ? (initial << 9) & rw & ~col_H  : (initial >> 9) & bw & ~col_A;
         else if (direction == 3) return isBlue ? (initial >> 1) & rw & ~col_A : (initial << 1) & bw & ~col_H;
+        else if (direction == 7) return isBlue ? (initial << 1) & rw & ~col_H : (initial >> 1) & bw & ~col_A;
         else if (direction == 4) return isBlue ? (initial >> 9) & rw & ~col_A : (initial << 9) & bw & ~col_H;
         else if (direction == 5) return isBlue ? (initial >> 8) & rw : (initial << 8) & bw;
         else if (direction == 6) return isBlue ? (initial >> 7) & rw & ~col_H : (initial << 7) & bw & ~col_A;
-        else if (direction == 7) return isBlue ? (initial << 1) & rw & ~col_H : (initial >> 1) & bw & ~col_A;
-        else if (direction == 8) return isBlue ? (initial << 9) & rw & ~col_H  : (initial >> 9) & bw & ~col_A;
         return 0L;
     }
 
@@ -336,9 +353,18 @@ public class BitBoard extends Board {
             first = isBlue ? (initial << 7) & ~(rw|rt|bt|col_A|col_H|row_7) : (initial >> 7) & ~(bw|bt|rt|col_A|col_H|row_1);
             second = isBlue ? (first << 7) & ~(rw|rt|bt) : (first >> 7) & ~(bw|bt|rt);
         }
+        else if (direction == 8){
+            first = isBlue ? (initial << 9) & ~(rw|rt|bt|col_A|col_H|row_7) : (initial >> 9) & ~(bw|bt|rt|col_A|col_H|row_1);
+            second = isBlue ? (first << 9) & ~(rw|rt|bt) : (first >> 9) & ~(bw|bt|rt);
+        }
         else if (direction == 3){
             first = isBlue ? (initial >> 1) & ~(rw|rt|bt|col_A|col_H) : (initial << 1) & ~(bw|bt|rt|col_A|col_H);
             second = isBlue ? (first >> 1) & ~(rw|rt|bt) : (first << 1) & ~(bw|bt|rt);
+        }
+
+        else if (direction == 7){
+            first = isBlue ? (initial << 1) & ~(rw|rt|bt|col_A|col_H) : (initial >> 1) & ~(bw|bt|rt|col_A|col_H);
+            second = isBlue ? (first << 1) & ~(rw|rt|bt) : (first >> 1) & ~(bw|bt|rt);
         }
         else if (direction == 4){
             first = isBlue ? (initial >> 9) & ~(rw|rt|bt|col_A|col_H|row_1) : (initial << 9) & ~(bw|bt|rt|col_A|col_H|row_7);
@@ -352,15 +378,56 @@ public class BitBoard extends Board {
             first = isBlue ? (initial >> 7) & ~(rw|rt|bt|col_A|col_H|row_1) : (initial << 7) & ~(bw|bt|rt|col_A|col_H|row_7);
             second = isBlue ? (first >> 7) & ~(rw|rt|bt) : (first << 7) & ~(bw|bt|rt);
         }
-        else if (direction == 7){
-            first = isBlue ? (initial << 1) & ~(rw|rt|bt|col_A|col_H) : (initial >> 1) & ~(bw|bt|rt|col_A|col_H);
-            second = isBlue ? (first << 1) & ~(rw|rt|bt) : (first >> 1) & ~(bw|bt|rt);
-        }
-        else if (direction == 8){
-            first = isBlue ? (initial << 9) & ~(rw|rt|bt|col_A|col_H|row_7) : (initial >> 9) & ~(bw|bt|rt|col_A|col_H|row_1);
-            second = isBlue ? (first << 9) & ~(rw|rt|bt) : (first >> 9) & ~(bw|bt|rt);
-        }
         return second > 0 ? (first|second) : 0L;
     }
+
+    public long sacrificingMoveRouteFinder(long initial, int direction, boolean isBlue){
+        if (direction == 1) return isBlue ? (initial << 8) : (initial >> 8);
+        else if (direction == 2) return isBlue ? (initial << 7) : (initial >> 7);
+        else if (direction == 8) return isBlue ? (initial << 9) : (initial >> 9);
+        else if (direction == 3) return isBlue ? (initial >> 1) : (initial << 1);
+        else if (direction == 7) return isBlue ? (initial << 1) : (initial >> 1);
+        else if (direction == 4) return isBlue ? (initial >> 9) : (initial << 9);
+        else if (direction == 5) return isBlue ? (initial >> 8) : (initial << 8);
+        else if (direction == 6) return isBlue ? (initial >> 7) : (initial << 7);
+        return 0L;    }
+
+    public long normalMoveRouteFinder(long initial, int direction, boolean isBlue){
+        long first = 0L, second = 0L;
+        if (direction == 1) {
+            first = isBlue ? (initial << 8) : (initial >> 8);
+            second = isBlue ? (first << 8) : (first >> 8);
+        }
+        else if (direction == 2){
+            first = isBlue ? (initial << 7) : (initial >> 7);
+            second = isBlue ? (first << 7) : (first >> 7);
+        }
+        else if (direction == 8){
+            first = isBlue ? (initial << 9) : (initial >> 9);
+            second = isBlue ? (first << 9) : (first >> 9);
+        }
+        else if (direction == 3){
+            first = isBlue ? (initial >> 1) : (initial << 1);
+            second = isBlue ? (first >> 1) : (first << 1);
+        }
+        else if (direction == 7){
+            first = isBlue ? (initial << 1) : (initial >> 1);
+            second = isBlue ? (first << 1) : (first >> 1);
+        }
+        else if (direction == 4){
+            first = isBlue ? (initial >> 9) : (initial << 9);
+            second = isBlue ? (first >> 9): (first << 9);
+        }
+        else if (direction == 5){
+            first = isBlue ? (initial >> 8): (initial << 8);
+            second = isBlue ? (first >> 8): (first << 8);
+        }
+        else if (direction == 6){
+            first = isBlue ? (initial >> 7) : (initial << 7);
+            second = isBlue ? (first >> 7) : (first << 7);
+        }
+        return first|second;
+    }
+
 
 }

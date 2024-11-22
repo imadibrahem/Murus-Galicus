@@ -14,9 +14,7 @@ import view.DisplayBoard;
 import view.DisplayFrame;
 import view.UserInput;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Stack;
+import java.util.*;
 
 public class Game {
     String initialFEN;
@@ -30,7 +28,7 @@ public class Game {
     Player playerOn;
     UserInput userInput;
     List<Short> history;
-    Stack <Move> moves;
+    Deque<Move> moves;
     int rounds = 0;
 
     public Game(UserInput userInput, Player red, Player blue, String initialFEN) {
@@ -38,7 +36,7 @@ public class Game {
         this.blue = blue;
         this.initialFEN =initialFEN;
         history = new ArrayList<>();
-        moves = new Stack<>();
+        moves = new ArrayDeque<>();
         setFenAndPlayerOn();
         displayFrame = new DisplayFrame(FEN);
         displayBoard = displayFrame.getDisplayBoard();
@@ -88,6 +86,7 @@ public class Game {
     public void playRound() {
         rounds++;
         Move move = playerOn.decideMove();
+        //System.out.println(move);
         moves.add(move);
         history.add(move.getValue());
         playerOn.makeMove(move);
@@ -96,9 +95,59 @@ public class Game {
     }
 
     public void playGame() {
-        while (rounds < 70){
+        while (rounds < 50){
             playRound();
             switchPlayer();
+        }
+    }
+    public void rewindGame() {
+        playerOn = playerOn.isEvaluationBlue()? red : blue;
+        playerOn.getBoard().build(FEN);
+        blue.switchTurn();
+        red.switchTurn();
+        while (rounds > 0){
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            Move move = moves.pollLast();
+           // System.out.println(move);
+            playerOn.unmakeMove(move);
+            FEN = playerOn.getBoard().generateFEN();
+            displayBoard.updateBoard(FEN);
+            playerOn = playerOn.isEvaluationBlue()? red : blue;
+            playerOn.getBoard().build(FEN);
+            blue.switchTurn();
+            red.switchTurn();
+            rounds--;
+
+        }
+    }
+
+    public void replayGame() {
+        String [] parts = initialFEN.split(",");
+        FEN = parts[0];
+        playerOn = parts[1].equals("b") ? blue : red;
+        playerOn.setOn(true);
+        red.getBoard().build(FEN);
+        blue.getBoard().build(FEN);
+        displayBoard.updateBoard(FEN);
+        while (!moves.isEmpty()){
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            Move move = moves.pollFirst();
+            // System.out.println(move);
+            playerOn.makeMove(move);
+            FEN = playerOn.getBoard().generateFEN();
+            displayBoard.updateBoard(FEN);
+            playerOn = playerOn.isEvaluationBlue()? red : blue;
+            playerOn.getBoard().build(FEN);
+            blue.switchTurn();
+            red.switchTurn();
         }
     }
 
@@ -121,95 +170,9 @@ public class Game {
 
         Game game = new Game(userInput, red, blue, FenInitial);
         game.playGame();
-        /*
-        String FEN = "tttttttt/8/8/8/8/8/TTTTTTTT";
-        DisplayFrame displayFrame = new DisplayFrame(FEN);
-        DisplayBoard displayBoard = displayFrame.getDisplayBoard();
-        UserInput userInput =new UserInput();
-        userInput.setDisplayBoard(displayBoard);
-        ObjectBoard redBoard = new ObjectBoard(FEN);
-        ObjectBoard blueBoard = new ObjectBoard(FEN);
-        Player red = new User(false,redBoard,userInput);
-        Player blue = new User(true ,blueBoard,userInput);
-        blue.setOn(true);
-        Player playerOn = blue;
-        userInput.setPlayer(blue);
-        Stack <Move> moves = new Stack<>();
-        int rounds = 0;
+        //game.rewindGame();
+        //game.replayGame();
 
-        while (rounds < 10){
-
-            System.out.println("*************************");
-            System.out.println("BLUE PLAYER BOARD :");
-            System.out.println(blueBoard.getArmy(true));
-            System.out.println(blueBoard.getArmy(false));
-            System.out.println("*************************");
-            System.out.println("*************************");
-
-
-           // System.out.println("RED PLAYER BOARD :");
-           // System.out.println(blueBoard.getArmy(true));
-            //System.out.println(blueBoard.getArmy(false));
-            System.out.println("*************************");
-
-
-
-
-            Move move = playerOn.decideMove();
-            moves.add(move);
-
-            //System.out.println("+++++++++++++++++++++++++");
-            //System.out.println("+++++++++++++++++++++++++");
-            System.out.println("*************************");
-            System.out.println("Move type is: " + move.getTargetType());
-            String color = playerOn.isEvaluationBlue() ? " Blue " : " Red ";
-            System.out.println("Player" + color + "has moved from " + move.getInitialLocation(playerOn.isEvaluationBlue())
-                                +"th Square in the direction nr. " + move.getDirection());
-            System.out.println("*************************");
-            //System.out.println("+++++++++++++++++++++++++");
-            //System.out.println("+++++++++++++++++++++++++");
-
-            playerOn.makeMove(move);
-            FEN = playerOn.getBoard().generateFEN();
-            displayBoard.updateBoard(FEN);
-            playerOn = playerOn.isEvaluationBlue()? red : blue;
-            playerOn.getBoard().build(FEN);
-            blue.switchTurn();
-            red.switchTurn();
-            userInput.setPlayer(playerOn);
-            rounds++;
-        }
-        System.out.println("*************************");
-        System.out.println("******** UNMAKE *********");
-        System.out.println("*************************");
-        playerOn = playerOn.isEvaluationBlue()? red : blue;
-        blue.switchTurn();
-        red.switchTurn();
-        while (rounds > 0){
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-
-            Move move = moves.pop();
-            System.out.println("******** UNMAKE *********");
-            System.out.println("Move type is: " + move.getTargetType());
-            String color = playerOn.isEvaluationBlue() ? " Blue " : " Red ";
-            System.out.println("Player" + color + "has moved from " + move.getInitialLocation(playerOn.isEvaluationBlue())
-                    +"th Square in the direction nr. " + move.getDirection());
-            System.out.println("*************************");
-
-            playerOn.unmakeMove(move);
-            FEN = playerOn.getBoard().generateFEN();
-            displayBoard.updateBoard(FEN);
-            playerOn = playerOn.isEvaluationBlue()? red : blue;
-            playerOn.getBoard().build(FEN);
-            blue.switchTurn();
-            red.switchTurn();
-            rounds--;
-        }
-        */
 
 
     }
