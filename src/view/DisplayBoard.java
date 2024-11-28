@@ -9,7 +9,7 @@ public class DisplayBoard extends JPanel {
     int tileSize = 85;
     int rows = 7;
     int cols = 8;
-    DisplaySquare[] displaySquare;
+    public DisplaySquare[] displaySquare;
     String FEN;
     DisplayPieces displayPieces;
     Border border = BorderFactory.createLineBorder(Color.black,2);

@@ -16,7 +16,12 @@ public class RandomPlayer extends Player{
 
     @Override
     public Move decideMove() {
-        List<Move> moves = moveGenerator.generateMoves(isBlue());
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        List<Move> moves = moveGenerator.generateMoves(isEvaluationBlue());
         Random random = new Random();
         int randomIndex = random.nextInt(moves.size());
         return moves.get(randomIndex);

@@ -3,6 +3,7 @@ package model.bit;
 import model.Board;
 import model.move.Move;
 import model.move.MoveType;
+import model.object.Square;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -282,6 +283,21 @@ public class BitBoard extends Board {
         }
         return sacrificingMovesLocations;
     }
+
+    @Override
+    public short sacrificingMovesLocation (boolean isBlue, int location, int direction) {
+        return (short) (isBlue ? location + blueDirections[direction] : location + redDirections[direction]);
+    }
+
+    @Override
+    public short[] normalMovesLocation (boolean isBlue, int location, int direction) {
+        short[] normalMovesLocation = new short[2];
+        short first = (short) (isBlue ? location + blueDirections[direction] : location + redDirections[direction]);
+        normalMovesLocation[0] = first;
+        normalMovesLocation[1] = (short) (isBlue ? first + blueDirections[direction] : first + redDirections[direction]);
+        return normalMovesLocation;
+    }
+
 /////////////////////////////////////////////////////////////////////////////////////////
 
     @Override

@@ -5,6 +5,7 @@ import model.move.Move;
 import model.move.MoveGeneratingStyle;
 import model.move.MoveGenerator;
 import model.move.MoveType;
+import model.player.Player;
 
 import java.util.List;
 
@@ -50,6 +51,10 @@ public abstract class Board {
     public abstract List<Short> normalMovesLocations (boolean isBlue, int location, int startDirection);
 
     public abstract List<Short> sacrificingMovesLocations (boolean isBlue, int location, int startDirection);
+
+    public abstract short sacrificingMovesLocation (boolean isBlue, int location, int direction);
+
+    public abstract short[] normalMovesLocation (boolean isBlue, int location, int direction);
 
     public abstract List<Move>  allTypeMovesPieceByPiece(boolean isBlue, MoveType[] moveTypes, int[] directions, boolean frontToBack);
 

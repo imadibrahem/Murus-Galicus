@@ -348,6 +348,20 @@ public class ObjectBoard extends Board {
         return sacrificingMovesLocations;
     }
 
+    @Override
+    public short sacrificingMovesLocation (boolean isBlue, int location, int direction) {
+        return squares[location].singleMoveSquare(direction, isBlue).getLocation();
+    }
+
+    @Override
+    public short[] normalMovesLocation (boolean isBlue, int location, int direction) {
+        short[] normalMovesLocation = new short[2];
+        Square[] doubleMoveSquares = squares[location].doubleMoveSquares(direction, isBlue);
+        normalMovesLocation[0] = doubleMoveSquares[0].getLocation();
+        normalMovesLocation[1] = doubleMoveSquares[1].getLocation();
+        return normalMovesLocation;
+    }
+
     ////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////
 
