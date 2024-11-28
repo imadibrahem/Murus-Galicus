@@ -5,6 +5,7 @@ import model.move.Move;
 import model.move.MoveType;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class BitBoard extends Board {
@@ -216,20 +217,26 @@ public class BitBoard extends Board {
     @Override
     public boolean isInCheck(boolean isBlue) {
         if (generateMoves(isBlue).size() < 3) return true;
-        return isBlue ? ((rt|rw) & (row_2|row_3)) != 0 : ((bw|bt) & (row_6|row_5)) != 0;
+        return isBlue ? ((rt & (row_2|row_3)) | (rw & row_3)) != 0 : ((bt & (row_6|row_5)) | (rw & row_5)) != 0;
     }
 
     @Override
     public boolean isInLosingPos(boolean isBlue) {
         if (generateMoves(isBlue).size() < 3) return true;
-        // TODO: 11/20/2024 after move generating
+        long normalMoveEnemyPieces = isBlue ? rt & row_3 : bt & row_5;
+        long sacrificingMoveEnemyPieces = isBlue ? rt & row_2 : bt & row_6;
+        int[] forwardDirections = new int[]{1,2,8};
+        for (int direction : forwardDirections){
+            if (normalMoveValidator(normalMoveEnemyPieces,direction,!isBlue) != 0) return true;
+            if (sacrificingMoveValidator(sacrificingMoveEnemyPieces,direction,!isBlue) != 0) return true;
+        }
         return false;
     }
 
     @Override
     public boolean lostGame(boolean isBlue) {
         if (generateMoves(isBlue).size() < 1) return true;
-        return isBlue ? ((rt|rw) & row_1) != 0 : ((bw|bt) & row_7) != 0;
+        return isBlue ? (rw & row_1) != 0 : (bw & row_7) != 0;
     }
 
     @Override
@@ -273,36 +280,140 @@ public class BitBoard extends Board {
                 currentDirection = (currentDirection % 8) + 1;
             }
         }
-        return sacrificingMovesLocations;    }
+        return sacrificingMovesLocations;
+    }
+/////////////////////////////////////////////////////////////////////////////////////////
 
     @Override
     public List<Move> allTypeMovesPieceByPiece(boolean isBlue, MoveType[] moveTypes, int[] directions, boolean frontToBack) {
-        return null;
+        List<Move> allTypeMovesPieceByPiece = new ArrayList<>();
+        long towers = isBlue ? bt : rt;
+        List<Integer> locations = locationsProvider(towers);
+        long locationBit;
+        if ((!isBlue && frontToBack) || (isBlue && !frontToBack)) Collections.reverse(locations);
+        for (int location : locations){
+            locationBit = 1L << location;
+            for (MoveType moveType : moveTypes){
+                for (int direction : directions){
+                    if (oneTypeMovesPiecesFinder(isBlue, moveType, locationBit, direction) > 0){
+                        int loc = isBlue ? 55 - location : location;
+                        allTypeMovesPieceByPiece.add(moveProvider(direction, loc, moveType));
+                    }
+                }
+            }
+        }
+
+        return allTypeMovesPieceByPiece;
     }
 
     @Override
     public List<Move> typeByTypeMovesPieceByPiece(boolean isBlue, MoveType[] moveTypes, int[] directions, boolean frontToBack) {
-        return null;
+        List<Move> typeByTypeMovesPieceByPiece = new ArrayList<>();
+        long towers = isBlue ? bt : rt;
+        List<Integer> locations = locationsProvider(towers);
+        long locationBit;
+        if ((!isBlue && frontToBack) || (isBlue && !frontToBack)) Collections.reverse(locations);
+        for (MoveType moveType : moveTypes){
+            for (int location : locations){
+                locationBit = 1L << location;
+                for (int direction : directions){
+                    if (oneTypeMovesPiecesFinder(isBlue, moveType, locationBit, direction) > 0){
+                        int loc = isBlue ? 55 - location : location;
+                        typeByTypeMovesPieceByPiece.add(moveProvider(direction, loc, moveType));
+                    }
+                }
+            }
+        }
+
+        return typeByTypeMovesPieceByPiece;
     }
 
     @Override
     public List<Move> directionByDirectionMovesPieceByPiece(boolean isBlue, MoveType[] moveTypes, int[] directions, boolean frontToBack) {
-        return null;
+        List<Move> directionByDirectionMovesPieceByPiece = new ArrayList<>();
+        long towers = isBlue ? bt : rt;
+        List<Integer> locations = locationsProvider(towers);
+        long locationBit;
+        if ((!isBlue && frontToBack) || (isBlue && !frontToBack)) Collections.reverse(locations);
+        for (int location : locations){
+            locationBit = 1L << location;
+            for (int direction : directions){
+                for (MoveType moveType : moveTypes){
+                    if (oneTypeMovesPiecesFinder(isBlue, moveType, locationBit, direction) > 0){
+                        int loc = isBlue ? 55 - location : location;
+                        directionByDirectionMovesPieceByPiece.add(moveProvider(direction, loc, moveType));
+                    }
+                }
+            }
+        }
+
+        return directionByDirectionMovesPieceByPiece;
     }
 
     @Override
     public List<Move> allTypeMovesDirectionByDirection(boolean isBlue, MoveType[] moveTypes, int[] directions, boolean frontToBack) {
-        return null;
+        List<Move> allTypeMovesDirectionByDirection = new ArrayList<>();
+        long towers = isBlue ? bt : rt;
+        List<Integer> locations = locationsProvider(towers);
+        long locationBit;
+        if ((!isBlue && frontToBack) || (isBlue && !frontToBack)) Collections.reverse(locations);
+        for (int direction : directions){
+            for (int location : locations){
+                locationBit = 1L << location;
+                for (MoveType moveType : moveTypes){
+                    if (oneTypeMovesPiecesFinder(isBlue, moveType, locationBit, direction) > 0){
+                        int loc = isBlue ? 55 - location : location;
+                        allTypeMovesDirectionByDirection.add(moveProvider(direction, loc, moveType));
+                    }
+                }
+            }
+        }
+        return allTypeMovesDirectionByDirection;
     }
 
     @Override
     public List<Move> typeByTypeMovesDirectionByDirection(boolean isBlue, MoveType[] moveTypes, int[] directions, boolean frontToBack) {
-        return null;
+        List<Move> typeByTypeMovesDirectionByDirection = new ArrayList<>();
+        long towers = isBlue ? bt : rt;
+        long moveTypeLocations;
+        List<Integer> locations;
+        for (MoveType moveType : moveTypes){
+            for (int direction : directions){
+                moveTypeLocations = oneTypeMovesPiecesFinder(isBlue, moveType, towers, direction);
+                if (moveTypeLocations > 0){
+                    locations = locationsProvider(moveTypeLocations);
+                    if ((!isBlue && frontToBack) || (isBlue && !frontToBack)) Collections.reverse(locations);
+                    for (int location : locations){
+                        int loc = isBlue ? 55 - location : location;
+                        typeByTypeMovesDirectionByDirection.add(moveProvider(direction, loc, moveType));
+                    }
+                }
+            }
+        }
+        return typeByTypeMovesDirectionByDirection;
     }
 
     @Override
     public List<Move> directionByDirectionMovesTypeByType(boolean isBlue, MoveType[] moveTypes, int[] directions, boolean frontToBack) {
-        return null;
+        List<Move> directionByDirectionMovesTypeByType = new ArrayList<>();
+        long towers = isBlue ? bt : rt;
+        long moveTypeLocations;
+        List<Integer> locations;
+        for (int direction : directions){
+            for (MoveType moveType : moveTypes){
+                moveTypeLocations = oneTypeMovesPiecesFinder(isBlue, moveType, towers, direction);
+                if (moveTypeLocations > 0){
+                    locations = locationsProvider(moveTypeLocations);
+                    if ((!isBlue && frontToBack) || (isBlue && !frontToBack)) Collections.reverse(locations);
+                    for (int location : locations){
+                        int loc = isBlue ? 55 - location : location;
+                        directionByDirectionMovesTypeByType.add(moveProvider(direction, loc, moveType));
+                    }
+                }
+
+            }
+        }
+        return directionByDirectionMovesTypeByType;
     }
     ///////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////
@@ -380,6 +491,258 @@ public class BitBoard extends Board {
         }
         return second > 0 ? (first|second) : 0L;
     }
+//////////////////////////////////////////////////////////////////////////////////
+
+    public long sacrificingMovesPiecesFinder(long initial, int direction, boolean isBlue){
+        long target, pieces = 0L;
+        if (direction == 1){
+            target = isBlue ? (initial << 8) & rw : (initial >> 8) & bw;
+            pieces = isBlue ? target >> 8 : target << 8;
+        }
+        else if (direction == 2){
+            target = isBlue ? (initial << 7) & rw & ~col_A : (initial >> 7) & bw & ~col_H;
+            pieces = isBlue ? target >> 7 : target << 7;
+        }
+        else if (direction == 8){
+            target = isBlue ? (initial << 9) & rw & ~col_H  : (initial >> 9) & bw & ~col_A;
+            pieces = isBlue ? target >> 9 : target << 9;
+        }
+        else if (direction == 3){
+            target = isBlue ? (initial >> 1) & rw & ~col_A : (initial << 1) & bw & ~col_H;
+            pieces = isBlue ? target << 1 : target >> 1;
+        }
+        else if (direction == 7){
+            target = isBlue ? (initial << 1) & rw & ~col_H : (initial >> 1) & bw & ~col_A;
+            pieces = isBlue ? target >> 1 : target << 1;
+        }
+        else if (direction == 4){
+            target = isBlue ? (initial >> 9) & rw & ~col_A : (initial << 9) & bw & ~col_H;
+            pieces = isBlue ? target << 9 : target >> 9;
+        }
+        else if (direction == 5){
+            target = isBlue ? (initial >> 8) & rw : (initial << 8) & bw;
+            pieces = isBlue ? target << 8 : target >> 8;
+        }
+        else if (direction == 6){
+            target = isBlue ? (initial >> 7) & rw & ~col_H : (initial << 7) & bw & ~col_A;
+            pieces = isBlue ? target << 7 : target >> 7;
+        }
+        return pieces;
+    }
+
+    public long quietMovesPiecesFinder(long initial, int direction, boolean isBlue){
+        long first, second, empty = ~(rt|rw|bt|bw), pieces = 0L;
+        if (direction == 1) {
+            first = isBlue ? (initial << 8) & ~(row_7) & empty : (initial >> 8) & ~(row_1) & empty;
+            second = isBlue ? (first << 8) & empty : (first >> 8) & empty;
+            first = isBlue ? second >> 8 : second << 8;
+            pieces = isBlue ? first >> 8 : first << 8;
+        }
+        else if (direction == 2){
+            first = isBlue ? (initial << 7) & ~(col_A|col_H|row_7) & empty : (initial >> 7) & ~(col_A|col_H|row_1) & empty;
+            second = isBlue ? (first << 7) & empty : (first >> 7) & empty;
+            first = isBlue ? second >> 7 : second << 7;
+            pieces = isBlue ? first >> 7 : first << 7;
+        }
+        else if (direction == 8){
+            first = isBlue ? (initial << 9) & ~(col_A|col_H|row_7) & empty : (initial >> 9) & ~(col_A|col_H|row_1) & empty;
+            second = isBlue ? (first << 9) & empty : (first >> 9) & empty;
+            first = isBlue ? second >> 9 : second << 9;
+            pieces = isBlue ? first >> 9 : first << 9;
+        }
+        else if (direction == 3){
+            first = isBlue ? (initial >> 1) & ~(col_A|col_H) & empty : (initial << 1) & ~(col_A|col_H) & empty;
+            second = isBlue ? (first >> 1) & empty : (first << 1) & empty;
+            first = isBlue ? second << 1 : second >> 1;
+            pieces = isBlue ? first << 1 : first >> 1;
+        }
+        else if (direction == 7){
+            first = isBlue ? (initial << 1) & ~(col_A|col_H) & empty : (initial >> 1) & ~(col_A|col_H) & empty;
+            second = isBlue ? (first << 1) & empty : (first >> 1) & empty;
+            first = isBlue ? second >> 1 : second << 1;
+            pieces = isBlue ? first >> 1 : first << 1;
+        }
+        else if (direction == 4){
+            first = isBlue ? (initial >> 9) & ~(col_A|col_H|row_1) & empty : (initial << 9) & ~(col_A|col_H|row_7) & empty;
+            second = isBlue ? (first >> 9) & empty : (first << 9) & empty;
+            first = isBlue ? second << 9 : second >> 9;
+            pieces = isBlue ? first << 9 : first >> 9;
+        }
+        else if (direction == 5){
+            first = isBlue ? (initial >> 8) & ~(row_1) & empty : (initial << 8) & ~(row_7) & empty;
+            second = isBlue ? (first >> 8) & empty : (first << 8) & empty;
+            first = isBlue ? second << 8 : second >> 8;
+            pieces = isBlue ? first << 8 : first >> 8;
+        }
+        else if (direction == 6){
+            first = isBlue ? (initial >> 7) & ~(col_A|col_H|row_1) & empty : (initial << 7) & ~(col_A|col_H|row_7) & empty;
+            second = isBlue ? (first >> 7) & empty : (first << 7) & empty;
+            first = isBlue ? second << 7 : second >> 7;
+            pieces = isBlue ? first << 7 : first >> 7;
+        }
+        return pieces;
+    }
+
+    public long friendOnBothMovesPiecesFinder(long initial, int direction, boolean isBlue){
+        long first, second, friend = isBlue ? bw : rw, pieces = 0L;
+        if (direction == 1) {
+            first = isBlue ? (initial << 8) & ~(row_7) & friend : (initial >> 8) & ~(row_1) & friend;
+            second = isBlue ? (first << 8) & friend : (first >> 8) & friend;
+            first = isBlue ? second >> 8 : second << 8;
+            pieces = isBlue ? first >> 8 : first << 8;
+        }
+        else if (direction == 2){
+            first = isBlue ? (initial << 7) & ~(col_A|col_H|row_7) & friend : (initial >> 7) & ~(col_A|col_H|row_1) & friend;
+            second = isBlue ? (first << 7) & friend : (first >> 7) & friend;
+            first = isBlue ? second >> 7 : second << 7;
+            pieces = isBlue ? first >> 7 : first << 7;
+        }
+        else if (direction == 8){
+            first = isBlue ? (initial << 9) & ~(col_A|col_H|row_7) & friend : (initial >> 9) & ~(col_A|col_H|row_1) & friend;
+            second = isBlue ? (first << 9) & friend : (first >> 9) & friend;
+            first = isBlue ? second >> 9 : second << 9;
+            pieces = isBlue ? first >> 9 : first << 9;
+        }
+        else if (direction == 3){
+            first = isBlue ? (initial >> 1) & ~(col_A|col_H) & friend : (initial << 1) & ~(col_A|col_H) & friend;
+            second = isBlue ? (first >> 1) & friend : (first << 1) & friend;
+            first = isBlue ? second << 1 : second >> 1;
+            pieces = isBlue ? first << 1 : first >> 1;
+        }
+        else if (direction == 7){
+            first = isBlue ? (initial << 1) & ~(col_A|col_H) & friend : (initial >> 1) & ~(col_A|col_H) & friend;
+            second = isBlue ? (first << 1) & friend : (first >> 1) & friend;
+            first = isBlue ? second >> 1 : second << 1;
+            pieces = isBlue ? first >> 1 : first << 1;
+        }
+        else if (direction == 4){
+            first = isBlue ? (initial >> 9) & ~(col_A|col_H|row_1) & friend : (initial << 9) & ~(col_A|col_H|row_7) & friend;
+            second = isBlue ? (first >> 9) & friend : (first << 9) & friend;
+            first = isBlue ? second << 9 : second >> 9;
+            pieces = isBlue ? first << 9 : first >> 9;
+        }
+        else if (direction == 5){
+            first = isBlue ? (initial >> 8) & ~(row_1) & friend : (initial << 8) & ~(row_7) & friend;
+            second = isBlue ? (first >> 8) & friend : (first << 8) & friend;
+            first = isBlue ? second << 8 : second >> 8;
+            pieces = isBlue ? first << 8 : first >> 8;
+        }
+        else if (direction == 6){
+            first = isBlue ? (initial >> 7) & ~(col_A|col_H|row_1) & friend : (initial << 7) & ~(col_A|col_H|row_7) & friend;
+            second = isBlue ? (first >> 7) & friend : (first << 7) & friend;
+            first = isBlue ? second << 7 : second >> 7;
+            pieces = isBlue ? first << 7 : first >> 7;
+        }
+        return pieces;
+    }
+
+    public long friendOnNearPiecesFinder(long initial, int direction, boolean isBlue){
+        long first, second, friend = isBlue ? bw : rw, empty = ~(rt|rw|bt|bw), pieces = 0L;
+        if (direction == 1) {
+            first = isBlue ? (initial << 8) & ~(row_7) & friend : (initial >> 8) & ~(row_1) & friend;
+            second = isBlue ? (first << 8) & empty : (first >> 8) & empty;
+            first = isBlue ? second >> 8 : second << 8;
+            pieces = isBlue ? first >> 8 : first << 8;
+        }
+        else if (direction == 2){
+            first = isBlue ? (initial << 7) & ~(col_A|col_H|row_7) & friend : (initial >> 7) & ~(col_A|col_H|row_1) & friend;
+            second = isBlue ? (first << 7) & empty : (first >> 7) & empty;
+            first = isBlue ? second >> 7 : second << 7;
+            pieces = isBlue ? first >> 7 : first << 7;
+        }
+        else if (direction == 8){
+            first = isBlue ? (initial << 9) & ~(col_A|col_H|row_7) & friend : (initial >> 9) & ~(col_A|col_H|row_1) & friend;
+            second = isBlue ? (first << 9) & empty : (first >> 9) & empty;
+            first = isBlue ? second >> 9 : second << 9;
+            pieces = isBlue ? first >> 9 : first << 9;
+        }
+        else if (direction == 3){
+            first = isBlue ? (initial >> 1) & ~(col_A|col_H) & friend : (initial << 1) & ~(col_A|col_H) & friend;
+            second = isBlue ? (first >> 1) & empty : (first << 1) & empty;
+            first = isBlue ? second << 1 : second >> 1;
+            pieces = isBlue ? first << 1 : first >> 1;
+        }
+        else if (direction == 7){
+            first = isBlue ? (initial << 1) & ~(col_A|col_H) & friend : (initial >> 1) & ~(col_A|col_H) & friend;
+            second = isBlue ? (first << 1) & empty : (first >> 1) & empty;
+            first = isBlue ? second >> 1 : second << 1;
+            pieces = isBlue ? first >> 1 : first << 1;
+        }
+        else if (direction == 4){
+            first = isBlue ? (initial >> 9) & ~(col_A|col_H|row_1) & friend : (initial << 9) & ~(col_A|col_H|row_7) & friend;
+            second = isBlue ? (first >> 9) & empty : (first << 9) & empty;
+            first = isBlue ? second << 9 : second >> 9;
+            pieces = isBlue ? first << 9 : first >> 9;
+        }
+        else if (direction == 5){
+            first = isBlue ? (initial >> 8) & ~(row_1) & friend : (initial << 8) & ~(row_7) & friend;
+            second = isBlue ? (first >> 8) & empty : (first << 8) & empty;
+            first = isBlue ? second << 8 : second >> 8;
+            pieces = isBlue ? first << 8 : first >> 8;
+        }
+        else if (direction == 6){
+            first = isBlue ? (initial >> 7) & ~(col_A|col_H|row_1) & friend : (initial << 7) & ~(col_A|col_H|row_7) & friend;
+            second = isBlue ? (first >> 7) & empty : (first << 7) & empty;
+            first = isBlue ? second << 7 : second >> 7;
+            pieces = isBlue ? first << 7 : first >> 7;
+        }
+        return pieces;
+    }
+
+    public long friendOnFarMovesPiecesFinder(long initial, int direction, boolean isBlue){
+        long first, second, friend = isBlue ? bw : rw, empty = ~(rt|rw|bt|bw), pieces = 0L;
+        if (direction == 1) {
+            first = isBlue ? (initial << 8) & ~(row_7) & empty : (initial >> 8) & ~(row_1) & empty;
+            second = isBlue ? (first << 8) & friend : (first >> 8) & friend;
+            first = isBlue ? second >> 8 : second << 8;
+            pieces = isBlue ? first >> 8 : first << 8;
+        }
+        else if (direction == 2){
+            first = isBlue ? (initial << 7) & ~(col_A|col_H|row_7) & empty : (initial >> 7) & ~(col_A|col_H|row_1) & empty;
+            second = isBlue ? (first << 7) & friend : (first >> 7) & friend;
+            first = isBlue ? second >> 7 : second << 7;
+            pieces = isBlue ? first >> 7 : first << 7;
+        }
+        else if (direction == 8){
+            first = isBlue ? (initial << 9) & ~(col_A|col_H|row_7) & empty : (initial >> 9) & ~(col_A|col_H|row_1) & empty;
+            second = isBlue ? (first << 9) & friend : (first >> 9) & friend;
+            first = isBlue ? second >> 9 : second << 9;
+            pieces = isBlue ? first >> 9 : first << 9;
+        }
+        else if (direction == 3){
+            first = isBlue ? (initial >> 1) & ~(col_A|col_H) & empty : (initial << 1) & ~(col_A|col_H) & empty;
+            second = isBlue ? (first >> 1) & friend : (first << 1) & friend;
+            first = isBlue ? second << 1 : second >> 1;
+            pieces = isBlue ? first << 1 : first >> 1;
+        }
+        else if (direction == 7){
+            first = isBlue ? (initial << 1) & ~(col_A|col_H) & empty : (initial >> 1) & ~(col_A|col_H) & empty;
+            second = isBlue ? (first << 1) & friend : (first >> 1) & friend;
+            first = isBlue ? second >> 1 : second << 1;
+            pieces = isBlue ? first >> 1 : first << 1;
+        }
+        else if (direction == 4){
+            first = isBlue ? (initial >> 9) & ~(col_A|col_H|row_1) & empty : (initial << 9) & ~(col_A|col_H|row_7) & empty;
+            second = isBlue ? (first >> 9) & friend : (first << 9) & friend;
+            first = isBlue ? second << 9 : second >> 9;
+            pieces = isBlue ? first << 9 : first >> 9;
+        }
+        else if (direction == 5){
+            first = isBlue ? (initial >> 8) & ~(row_1) & empty : (initial << 8) & ~(row_7) & empty;
+            second = isBlue ? (first >> 8) & friend : (first << 8) & friend;
+            first = isBlue ? second << 8 : second >> 8;
+            pieces = isBlue ? first << 8 : first >> 8;
+        }
+        else if (direction == 6){
+            first = isBlue ? (initial >> 7) & ~(col_A|col_H|row_1) & empty : (initial << 7) & ~(col_A|col_H|row_7) & empty;
+            second = isBlue ? (first >> 7) & friend : (first << 7) & friend;
+            first = isBlue ? second << 7 : second >> 7;
+            pieces = isBlue ? first << 7 : first >> 7;
+        }
+        return pieces;
+    }
+
+////////////////////////////////////////////////////////////////////////////////////
 
     public long sacrificingMoveRouteFinder(long initial, int direction, boolean isBlue){
         if (direction == 1) return isBlue ? (initial << 8) : (initial >> 8);
@@ -428,6 +791,34 @@ public class BitBoard extends Board {
         }
         return first|second;
     }
+    //////////////////////////////////////////////////////////////////////////////
 
+    public Move moveProvider(int direction, int location, MoveType moveType){
+        int type;
+        if (moveType == MoveType.QUIET) type = 0;
+        else if (moveType == MoveType.FRIEND_ON_NEAR) type = 1;
+        else if (moveType == MoveType.FRIEND_ON_FAR) type = 2;
+        else if (moveType == MoveType.FRIEND_ON_BOTH) type = 3;
+        else type = 4;
+        return new Move((short) (location << 7 | direction << 3 | type));
+    }
+    public long oneTypeMovesPiecesFinder(boolean isBlue, MoveType moveType, long initial, int direction){
+        if (moveType == MoveType.QUIET) return quietMovesPiecesFinder(initial, direction, isBlue);
+        else if (moveType == MoveType.FRIEND_ON_NEAR) return friendOnNearPiecesFinder(initial, direction, isBlue);
+        else if (moveType == MoveType.FRIEND_ON_FAR) return friendOnFarMovesPiecesFinder(initial, direction, isBlue);
+        else if (moveType == MoveType.FRIEND_ON_BOTH) return friendOnBothMovesPiecesFinder(initial, direction, isBlue);
+        else return sacrificingMovesPiecesFinder(initial, direction, isBlue);
+    }
+
+    public List<Integer> locationsProvider(long pieces){
+        List<Integer> locations = new ArrayList<>();
+        int loc;
+        while (pieces != 0){
+            loc = Long.numberOfLeadingZeros(pieces);
+            pieces ^= Long.highestOneBit(pieces);
+            locations.add(63 - loc);
+        }
+        return locations;
+    }
 
 }

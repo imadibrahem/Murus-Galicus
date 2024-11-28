@@ -2,6 +2,7 @@ package model.player;
 
 import model.Board;
 import model.move.Move;
+import model.move.MoveGenerator;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -14,6 +15,8 @@ public abstract class Player {
     protected int winScore;
     protected int loseScore = -winScore;
     Map<Integer, Integer> directionMap = new HashMap<>();
+    protected MoveGenerator moveGenerator;
+
 
 
     public Player(boolean isBlue,Board board) {
@@ -29,6 +32,23 @@ public abstract class Player {
         directionMap.put(8, 5);
         directionMap.put(9, 4);
     }
+
+    public Player(boolean isBlue,Board board,MoveGenerator moveGenerator) {
+        this.isBlue = isBlue;
+        this.board = board;
+        this.isEvaluationBlue = isBlue;
+        this.moveGenerator = moveGenerator;
+        directionMap.put(-9, 8);
+        directionMap.put(-8, 1);
+        directionMap.put(-7, 2);
+        directionMap.put(-1, 7);
+        directionMap.put(1, 3);
+        directionMap.put(7, 6);
+        directionMap.put(8, 5);
+        directionMap.put(9, 4);
+    }
+
+
 
     public boolean isBlue() {
         return isBlue;
@@ -54,6 +74,10 @@ public abstract class Player {
         return board;
     }
 
+    public MoveGenerator getMoveGenerator() {
+        return moveGenerator;
+    }
+
     public void switchColor() {
         isBlue = !isBlue;
     }
@@ -65,6 +89,7 @@ public abstract class Player {
     public void switchTurn(){
         isOn = !isOn;
     }
+
 
     public abstract Move decideMove();
 
@@ -79,6 +104,7 @@ public abstract class Player {
     public Move recieveCords(int initial , int targetNear, int targetFar){
         int location = this.isEvaluationBlue() ? initial : 55 - initial;
         int distance = isEvaluationBlue() ? targetNear - initial :initial - targetNear;
+        // TODO: 11/28/2024 remove later:
         if (directionMap.get(distance) == null) System.out.println("Problem is with the distance: " + distance
                 + "initial is: " + initial + "near target is : " + targetNear + "far target is : " + targetFar);
         int direction = directionMap.get(distance);

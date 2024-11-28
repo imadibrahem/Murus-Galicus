@@ -109,9 +109,6 @@ public class ObjectBoard extends Board {
 
     @Override
     public void makeMove(Move move, boolean isBlue) {
-        boolean nearEmpty = false;
-        boolean farEmpty = false;
-
         Square initial = squares[move.getInitialLocation(isBlue)];
         Square targetNear = initial.singleMoveSquare(move.getDirection(), isBlue);
         Piece upper = initial.getUpperPiece();
@@ -136,7 +133,6 @@ public class ObjectBoard extends Board {
             upper.setSquare(targetNear);
             lower.setSquare(targetFar);
             if (move.isTargetEmpty() || move.isTargetFarFriendly()){
-                nearEmpty = true;
                 upper.setTower(false);
                 targetNear.setPiece(upper);
                 getArmy(isBlue).getTowers().remove(upper);
@@ -151,7 +147,6 @@ public class ObjectBoard extends Board {
                 //getArmy(isBlue).getTowers().add(upper);
             }
             if (move.isTargetEmpty() || move.isTargetNearFriendly()){
-                farEmpty = true;
                 targetFar.setPiece(lower);
                 getArmy(isBlue).getWalls().add(lower);
             }
@@ -167,18 +162,7 @@ public class ObjectBoard extends Board {
                 getArmy(isBlue).getTopped().add(target);
             }
             initial.setPiece(null);
-            //int type;
-            //if (farEmpty&&nearEmpty) type = 0;
-            //else if (!farEmpty&&!nearEmpty) type = 3;
-            //else if (farEmpty) type = 1;
-            //else type = 2;
-            //System.out.println("+++++++++++++++++++++++++");
-            //System.out.println("+++++++++++++++++++++++++");
-            //System.out.println("*************************");
-            //System.out.println("make Move type was: " + type);
-            ///System.out.println("*************************");
-            //System.out.println("+++++++++++++++++++++++++");
-            //System.out.println("+++++++++++++++++++++++++");
+
         }
     }
 
@@ -287,6 +271,10 @@ public class ObjectBoard extends Board {
             int location = isBlue ? tower.getSquare().getLocation() : 55 - tower.getSquare().getLocation();
             if (location > 31) return true;
         }
+        for (Piece wall : getArmy(!isBlue).getWalls()){
+            int location = isBlue ? wall.getSquare().getLocation() : 55 - wall.getSquare().getLocation();
+            if (location > 31 && location < 48) return true;
+        }
         return false;
     }
 
@@ -299,7 +287,7 @@ public class ObjectBoard extends Board {
             if (location > 31) {
                 if (location < 40)possibleMoves.addAll(allTypeMovesForOnePiece(new MoveType[]{MoveType.QUIET, MoveType.FRIEND_ON_NEAR, MoveType.FRIEND_ON_FAR, MoveType.FRIEND_ON_BOTH}
                         ,tower.getSquare().getLocation() ,new int[]{1,2,8}));
-                else if (location < 48)possibleMoves.addAll(sacrificingMovesForOnePiece(tower.getSquare().getLocation(), new int[]{1,2,8}));
+                else possibleMoves.addAll(sacrificingMovesForOnePiece(tower.getSquare().getLocation(), new int[]{1,2,8}));
             }
         }
         return !(possibleMoves.isEmpty());
@@ -308,8 +296,8 @@ public class ObjectBoard extends Board {
     @Override
     public boolean lostGame(boolean isBlue) {
         if (generateMoves(isBlue).size() < 1) return true;
-        for (Piece tower : getArmy(!isBlue).getTowers()){
-            int location = isBlue ? tower.getSquare().getLocation() : 55 - tower.getSquare().getLocation();
+        for (Piece wall : getArmy(!isBlue).getWalls()){
+            int location = isBlue ? wall.getSquare().getLocation() : 55 - wall.getSquare().getLocation();
             if (location > 47) return true;
         }
         return false;
@@ -410,18 +398,6 @@ public class ObjectBoard extends Board {
 
     @Override
     public List<Move> typeByTypeMovesDirectionByDirection(boolean isBlue, MoveType[] moveTypes, int[] directions, boolean frontToBack){
-        List<Move> typeByTypeMovesDirectionByDirection = new ArrayList<>();
-        for (int direction : directions){
-            for (MoveType moveType : moveTypes){
-                typeByTypeMovesDirectionByDirection.addAll(oneTypeMovesForOneDirection(moveType,isBlue,direction,frontToBack));
-            }
-        }
-        return typeByTypeMovesDirectionByDirection;
-
-    }
-
-    @Override
-    public List<Move> directionByDirectionMovesTypeByType(boolean isBlue, MoveType[] moveTypes, int[] directions, boolean frontToBack){
         List<Move> directionByDirectionMovesTypeByType = new ArrayList<>();
         for (MoveType moveType : moveTypes){
             for (int direction : directions){
@@ -429,6 +405,18 @@ public class ObjectBoard extends Board {
             }
         }
         return directionByDirectionMovesTypeByType;
+
+    }
+
+    @Override
+    public List<Move> directionByDirectionMovesTypeByType(boolean isBlue, MoveType[] moveTypes, int[] directions, boolean frontToBack){
+        List<Move> typeByTypeMovesDirectionByDirection = new ArrayList<>();
+        for (int direction : directions){
+            for (MoveType moveType : moveTypes){
+                typeByTypeMovesDirectionByDirection.addAll(oneTypeMovesForOneDirection(moveType,isBlue,direction,frontToBack));
+            }
+        }
+        return typeByTypeMovesDirectionByDirection;
 
     }
 
@@ -460,8 +448,7 @@ public class ObjectBoard extends Board {
         List<Move> friendOnNearMoveForOnePiece = new ArrayList<>();
         Piece piece = squares[location].getUpperPiece();
         for (int direction : directions) {
-            if (piece.friendOnNearMove(direction) != null)
-                friendOnNearMoveForOnePiece.add(piece.friendOnNearMove(direction));
+            if (piece.friendOnNearMove(direction) != null)friendOnNearMoveForOnePiece.add(piece.friendOnNearMove(direction));
         }
         return friendOnNearMoveForOnePiece;
     }
@@ -470,8 +457,8 @@ public class ObjectBoard extends Board {
         List<Move> friendOnNearMoveForOnePiece = new ArrayList<>();
         Piece piece = squares[location].getUpperPiece();
         for (int direction : directions) {
-            if (piece.friendOnNearMove(direction) != null)
-                friendOnNearMoveForOnePiece.add(piece.friendOnNearMove(direction));
+            if (piece.friendOnFarMove(direction) != null) friendOnNearMoveForOnePiece.add(piece.friendOnFarMove(direction));
+
         }
         return friendOnNearMoveForOnePiece;
     }
@@ -480,8 +467,7 @@ public class ObjectBoard extends Board {
         List<Move> friendOnBothMoveForOnePiece = new ArrayList<>();
         Piece piece = squares[location].getUpperPiece();
         for (int direction : directions) {
-            if (piece.friendOnBothMove(direction) != null)
-                friendOnBothMoveForOnePiece.add(piece.friendOnBothMove(direction));
+            if (piece.friendOnBothMove(direction) != null) friendOnBothMoveForOnePiece.add(piece.friendOnBothMove(direction));
         }
         return friendOnBothMoveForOnePiece;
     }
@@ -490,7 +476,8 @@ public class ObjectBoard extends Board {
         List<Move> sacrificingMoves = new ArrayList<>();
         Piece piece = squares[location].getUpperPiece();
         for (int direction : directions) {
-            if (piece.sacrificingMove(direction) != null) sacrificingMoves.add(piece.sacrificingMove(direction));
+            if (piece.sacrificingMove(direction) != null)sacrificingMoves.add(piece.sacrificingMove(direction));
+
         }
         return sacrificingMoves;
     }
@@ -528,7 +515,9 @@ public class ObjectBoard extends Board {
 
     public List<Move> allTypeMovesForOnePiece(MoveType[] moveTypes, int location, int[] directions) {
         List<Move> allTypeMovesForOnePiece = new ArrayList<>();
-        for (MoveType moveType : moveTypes) allTypeMovesForOnePiece.addAll(oneTypeMovesForOnePiece(moveType,location,directions));
+        for (MoveType moveType : moveTypes) {
+            allTypeMovesForOnePiece.addAll(oneTypeMovesForOnePiece(moveType,location,directions));
+        }
         return allTypeMovesForOnePiece;
     }
 

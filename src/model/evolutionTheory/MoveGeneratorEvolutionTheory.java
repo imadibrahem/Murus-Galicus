@@ -105,64 +105,29 @@ public class MoveGeneratorEvolutionTheory extends MoveGenerator {
     public List<List<Move>> generateAllStyles (boolean isBlue){
         List<List<Move>> allStyles = new ArrayList<>();
 
-        System.out.println("allTypeMovesPieceByPiece from front to back");
-        System.out.println(allTypeMovesPieceByPiece(isBlue));
         allStyles.add(allTypeMovesPieceByPiece(isBlue));
-        System.out.println();
         switchFrontToBack();
-        System.out.println("allTypeMovesPieceByPiece from back to front");
-        System.out.println(allTypeMovesPieceByPiece(isBlue));
         allStyles.add(allTypeMovesPieceByPiece(isBlue));
-        System.out.println("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
 
-        System.out.println("typeByTypeMovesPieceByPiece from front to back");
-        System.out.println(typeByTypeMovesPieceByPiece(isBlue));
         allStyles.add(typeByTypeMovesPieceByPiece(isBlue));
-        System.out.println();
         switchFrontToBack();
-        System.out.println("typeByTypeMovesPieceByPiece from back to front");
-        System.out.println(typeByTypeMovesPieceByPiece(isBlue));
         allStyles.add(typeByTypeMovesPieceByPiece(isBlue));
-        System.out.println("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
 
-        System.out.println("directionByDirectionMovesPieceByPiece from front to back");
-        System.out.println(directionByDirectionMovesPieceByPiece(isBlue));
         allStyles.add(directionByDirectionMovesPieceByPiece(isBlue));
-        System.out.println();
         switchFrontToBack();
-        System.out.println("directionByDirectionMovesPieceByPiece from back to front");
-        System.out.println(directionByDirectionMovesPieceByPiece(isBlue));
         allStyles.add(directionByDirectionMovesPieceByPiece(isBlue));
-        System.out.println("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
 
-        System.out.println("allTypeMovesDirectionByDirection from front to back");
-        System.out.println(allTypeMovesDirectionByDirection(isBlue));
         allStyles.add(allTypeMovesDirectionByDirection(isBlue));
-        System.out.println();
         switchFrontToBack();
-        System.out.println("allTypeMovesDirectionByDirection from back to front");
-        System.out.println(allTypeMovesDirectionByDirection(isBlue));
         allStyles.add(allTypeMovesDirectionByDirection(isBlue));
-        System.out.println("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
 
-        System.out.println("typeByTypeMovesDirectionByDirection from front to back");
-        System.out.println(typeByTypeMovesDirectionByDirection(isBlue));
         allStyles.add(typeByTypeMovesDirectionByDirection(isBlue));
-        System.out.println();
         switchFrontToBack();
-        System.out.println("typeByTypeMovesDirectionByDirection from back to front");
-        System.out.println(typeByTypeMovesDirectionByDirection(isBlue));
         allStyles.add(typeByTypeMovesDirectionByDirection(isBlue));
-        System.out.println("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
 
-        System.out.println("directionByDirectionMovesTypeByType from front to back");
         allStyles.add(directionByDirectionMovesTypeByType(isBlue));
-        System.out.println();
         switchFrontToBack();
-        System.out.println("directionByDirectionMovesTypeByType from back to front");
-        System.out.println(directionByDirectionMovesTypeByType(isBlue));
         allStyles.add(directionByDirectionMovesTypeByType(isBlue));
-        System.out.println("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
 
         return allStyles;
     }

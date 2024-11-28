@@ -129,6 +129,8 @@ public class Game {
         String [] parts = initialFEN.split(",");
         FEN = parts[0];
         playerOn = parts[1].equals("b") ? blue : red;
+        Player playerOff = parts[1].equals("b") ? red : blue;
+        playerOff.setOn(false);
         playerOn.setOn(true);
         red.getBoard().build(FEN);
         blue.getBoard().build(FEN);
@@ -153,27 +155,87 @@ public class Game {
 
     public static void main (String[] args){
         UserInput userInput = new UserInput();
-        String FenInitial = "tttttttt/8/8/8/8/8/TTTTTTTT,b";
+        String FenInitial = "1ttttttt/ww6/T7/8/1W6/1WW5/1T1WTTTT,b";
+        //FenInitial = "1ttttttt/ww6/T7/8/1W6/1WW5/1T1W4,b";
         MoveType[] moveTypes = {MoveType.FRIEND_ON_BOTH, MoveType.FRIEND_ON_NEAR, MoveType.FRIEND_ON_FAR, MoveType.QUIET, MoveType.SACRIFICE};
         int [] directions = {1, 8, 2, 3, 7, 6, 4, 5};
-       /*
+
         Board blueBoard = new ObjectBoard(FenTrimmer(FenInitial));
         MoveGenerator blueGenerator = new MoveGeneratorEvolutionTheory(blueBoard, MoveGeneratingStyle.ALL_TYPE_MOVES_PIECE_BY_PIECE,moveTypes, directions, true );
         Player blue = new RandomPlayer(true, blueBoard,blueGenerator);
 
-        */
+        Board redBoard = new ObjectBoard(FenTrimmer(FenInitial));
+        MoveGenerator redGenerator = new MoveGeneratorEvolutionTheory(redBoard, MoveGeneratingStyle.ALL_TYPE_MOVES_PIECE_BY_PIECE,moveTypes, directions, true );
+        Player red = new RandomPlayer(false, blueBoard,redGenerator);
+
+
+        Board blueBoard2 = new BitBoard(FenTrimmer(FenInitial));
+        MoveGenerator blueGenerator2 = new MoveGeneratorEvolutionTheory(blueBoard2, MoveGeneratingStyle.ALL_TYPE_MOVES_PIECE_BY_PIECE,moveTypes, directions, true );
+        Player blue2 = new RandomPlayer(true, blueBoard2,blueGenerator2);
+
+        Board redBoard2 = new BitBoard(FenTrimmer(FenInitial));
+        MoveGenerator redGenerator2 = new MoveGeneratorEvolutionTheory(redBoard2, MoveGeneratingStyle.ALL_TYPE_MOVES_PIECE_BY_PIECE,moveTypes, directions, true );
+        Player red2 = new RandomPlayer(false, blueBoard2,redGenerator2);
+        /*
         Board blueBoard = new BitBoard(FenTrimmer(FenInitial));
         Player blue = new User(true,blueBoard,userInput);
 
+
         Board redBoard = new ObjectBoard(FenTrimmer(FenInitial));
         Player red = new User(false,redBoard,userInput);
-
+*/
         Game game = new Game(userInput, red, blue, FenInitial);
-        game.playGame();
-        //game.rewindGame();
-        //game.replayGame();
+        Game game2 = new Game(userInput, red2, blue2, FenInitial);
 
+        List<List<Move>> allStyles = blue.getMoveGenerator().generateAllStyles(true);
+        System.out.println("555555555555555555555555555555555555555");
+        System.out.println("555555555555555555555555555555555555555");
 
+        List<List<Move>> allStyles2 = blue2.getMoveGenerator().generateAllStyles(true);
+
+        for (int i = 0; i < allStyles.size(); i++){
+            System.out.println("***************************************************");
+            System.out.println("***************************************************");
+            System.out.println("***************************************************");
+            if (!allStyles.get(i).equals(allStyles2.get(i))){
+                System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+                System.out.println("!!!!!!!!!!!!!!!!!!  PROBLEM in style nr." +((i+2)/2)+"!!!!!!!!!!!");
+                System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+
+                Set<Move> clean = new HashSet<>();
+                Set<Move> duplicates = new HashSet<>();
+                for (Move move : allStyles.get(i)){
+                    if (!clean.add(move)) duplicates.add(move);
+                }
+                if (!duplicates.isEmpty()) System.out.println("object got duplicates" + duplicates);
+
+                Set<Move> clean2 = new HashSet<>();
+                Set<Move> duplicates2 = new HashSet<>();
+                for (Move move : allStyles2.get(i)){
+                    if (!clean2.add(move)) duplicates2.add(move);
+                }
+                if (!duplicates2.isEmpty()) System.out.println("bit got duplicates" + duplicates2);
+
+                List<Move> differences = new ArrayList<>(allStyles.get(i));
+                differences.removeAll(allStyles2.get(i));
+                if (!differences.isEmpty()) System.out.println("object got more moves: " + differences);
+
+                List<Move> differences2 = new ArrayList<>(allStyles2.get(i));
+                differences2.removeAll(allStyles.get(i));
+                if (!differences2.isEmpty()) System.out.println("bit got more moves: " + differences2);
+
+                System.out.println("sorting:");
+            }
+
+            System.out.println(allStyles.get(i));
+            System.out.println("***************************************************");
+            System.out.println(allStyles2.get(i));
+        }
+        System.out.println("***************************************************");
+        System.out.println("***************************************************");
+        System.out.println("***************************************************");
+
+        //game.playGame();
 
     }
 
