@@ -2,6 +2,7 @@ package model.player;
 
 import model.Board;
 import model.move.Move;
+import model.move.MoveGenerator;
 import view.UserInput;
 
 public class User extends Player{
@@ -12,6 +13,10 @@ public class User extends Player{
         this.userInput = userInput;
     }
 
+    public User(boolean isBlue, Board board, MoveGenerator moveGenerator, UserInput userInput) {
+        super(isBlue, board, moveGenerator);
+        this.userInput = userInput;
+    }
 
     @Override
     public Move decideMove() {

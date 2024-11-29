@@ -17,9 +17,9 @@ public class BitBoard extends Board {
     private final long row_5 = 1095216660480L;
     private final long row_6 = 280375465082880L;
     private final long row_7 = 71776119061217280L;
-    private final long col_A = 36170086419038336L;
+    private final long col_A = -9187201950435737472L;
     private final long col_B = 18085043209519168L;
-    private final long col_H = 282578800148737L;
+    private final long col_H = 72340172838076673L;
     private final long col_G = 565157600297474L;
     private final int[] redDirections = {0, 8, 7, -1, -9, -8, -7, 1, 9};
     private final int[] blueDirections = {0, -8, -7, 1, 9, 8, 7, -1, -9};
@@ -143,7 +143,7 @@ public class BitBoard extends Board {
                 bw ^= sacrificingMoveRouteFinder(initial, move.getDirection(), false);
             }
             else {
-                firstTarget = normalMoveRouteFinder(initial, move.getDirection(), true);
+                firstTarget = normalMoveRouteFinder(initial, move.getDirection(), false);
                 secondTarget = firstTarget & rw;
                 rw ^= firstTarget;
                 rt ^= secondTarget;
@@ -218,7 +218,7 @@ public class BitBoard extends Board {
     @Override
     public boolean isInCheck(boolean isBlue) {
         if (generateMoves(isBlue).size() < 3) return true;
-        return isBlue ? ((rt & (row_2|row_3)) | (rw & row_3)) != 0 : ((bt & (row_6|row_5)) | (rw & row_5)) != 0;
+        return isBlue ? ((rt & (row_2|row_3)) | (rw & row_3)) != 0 : ((bt & (row_6|row_5)) | (bw & row_5)) != 0;
     }
 
     @Override

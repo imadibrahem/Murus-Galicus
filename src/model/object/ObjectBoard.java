@@ -273,7 +273,7 @@ public class ObjectBoard extends Board {
         }
         for (Piece wall : getArmy(!isBlue).getWalls()){
             int location = isBlue ? wall.getSquare().getLocation() : 55 - wall.getSquare().getLocation();
-            if (location > 31 && location < 48) return true;
+            if (location > 31 && location < 40) return true;
         }
         return false;
     }
