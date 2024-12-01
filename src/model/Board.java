@@ -79,11 +79,12 @@ public abstract class Board {
         if (isInCheck(!isBlue)) {
             if (lostGame(!isBlue)) return 5;
 
-            int opponentState = isInLosingPos(!isBlue) ? 4 : 3;
+            int opponentState = isInLosingPos(!isBlue) ? 4 : 2;
 
             if (state == 0) return opponentState;
-            return opponentState - (state == -1 ? 2 : 6);
-        }
+            if (state == -1)  return opponentState - 1;
+            return (opponentState == 2 ? -3 : -2);
+         }
 
         return state;
     }

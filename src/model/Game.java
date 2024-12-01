@@ -206,23 +206,24 @@ public class Game {
     }
 
     public static void main (String[] args){
+
         UserInput userInput = new UserInput();
         UserInput userInput2 = new UserInput();
         String FenInitial = "tttttttt/8/8/8/8/8/TTTTTTTT,b";
-        FenInitial = "t6t/6W1/8/8/5t2/1W6/TT3W2,b";
+        //FenInitial = "t6t/6W1/8/8/5t2/1W6/TT3W2,b";
         //FenInitial = "1ttttttt/ww6/T7/8/1W6/1WW5/1T1W4,b";
         MoveType[] moveTypes = {MoveType.FRIEND_ON_BOTH, MoveType.FRIEND_ON_NEAR, MoveType.FRIEND_ON_FAR, MoveType.QUIET, MoveType.SACRIFICE};
         int [] directions = {1, 8, 2, 3, 7, 6, 4, 5};
 
         Board blueBoard = new ObjectBoard(FenTrimmer(FenInitial));
         MoveGenerator blueGenerator = new MoveGeneratorEvolutionTheory(blueBoard, MoveGeneratingStyle.ALL_TYPE_MOVES_PIECE_BY_PIECE,moveTypes, directions, true );
-        //Player blue = new RandomPlayer(true, blueBoard,blueGenerator);
-        Player blue = new User(true, blueBoard, blueGenerator,userInput);
+        Player blue = new RandomPlayer(true, blueBoard,blueGenerator);
+        //Player blue = new User(true, blueBoard, blueGenerator,userInput);
 
         Board redBoard = new ObjectBoard(FenTrimmer(FenInitial));
         MoveGenerator redGenerator = new MoveGeneratorEvolutionTheory(redBoard, MoveGeneratingStyle.ALL_TYPE_MOVES_PIECE_BY_PIECE,moveTypes, directions, true );
-        //Player red = new RandomPlayer(false, redBoard,redGenerator);
-        Player red = new User(false, redBoard, redGenerator,userInput);
+        Player red = new RandomPlayer(false, redBoard,redGenerator);
+        //Player red = new User(false, redBoard, redGenerator,userInput);
 
         Board blueBoard2 = new BitBoard(FenTrimmer(FenInitial));
         MoveGenerator blueGenerator2 = new MoveGeneratorEvolutionTheory(blueBoard2, MoveGeneratingStyle.ALL_TYPE_MOVES_PIECE_BY_PIECE,moveTypes, directions, true );
@@ -239,6 +240,43 @@ public class Game {
         Player red = new User(false,redBoard,userInput);
 
  */
+        /*
+        long col_A = -9187201950435737472L;
+        long indexLeft = 36170086419038336L;
+        long col_H = 72340172838076673L;
+        long indexRight = 282578800148737L;
+        System.out.println("col_A : " + col_A);
+        BitBoard.longBitsPrinter(col_A);
+        System.out.println();
+        System.out.println("col_A shift to right: " + (col_A >>>= 1));
+        BitBoard.longBitsPrinter(col_A >> 1);
+        System.out.println();
+
+        System.out.println("indexLeft : " + indexLeft);
+        BitBoard.longBitsPrinter(indexLeft);
+        System.out.println();
+        System.out.println("indexLeft shift to right: " + (indexLeft >>= 1));
+        BitBoard.longBitsPrinter(indexLeft >> 1);
+        System.out.println();
+
+        System.out.println("col_H : " + col_H);
+        BitBoard.longBitsPrinter(col_H);
+        System.out.println();
+        System.out.println("col_H shift to left: " + (col_H <<= 1));
+        BitBoard.longBitsPrinter(col_H << 1);
+        System.out.println();
+
+        System.out.println("indexRight : " + indexRight);
+        BitBoard.longBitsPrinter(indexRight);
+        System.out.println();
+        System.out.println("indexRight shift to left: " + (indexRight <<= 1));
+        BitBoard.longBitsPrinter(indexRight << 1);
+        System.out.println();
+
+         */
+
+
+
         Game game = new Game(userInput, red, blue, FenInitial);
         Game game2 = new Game(userInput2, red2, blue2, FenInitial);
         //game.playGame();

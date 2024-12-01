@@ -196,12 +196,28 @@ public class BitBoard extends Board {
     @Override
     public int towersColumns(boolean isBlue, int[] values) {
         long pieces = isBlue ? bt : rt;
+
+        // TODO: 11/30/2024 remove later
+        /*
+        String player = isBlue ? "Blue Player" : "Red Player";
+        System.out.println("Towers Columns for the " + player);
+
+         */
+
         return columnsFinder(pieces, values);
     }
 
     @Override
     public int wallsColumns(boolean isBlue, int[] values) {
         long pieces = isBlue ? bw : rw;
+
+        // TODO: 11/30/2024 remove later
+        /*
+        String player = isBlue ? "Blue Player" : "Red Player";
+        System.out.println("Walls Columns for the " + player);
+
+         */
+
         return columnsFinder(pieces, values);
     }
 
@@ -446,13 +462,52 @@ public class BitBoard extends Board {
     }
 
     public int columnsFinder(long locations, int[] values) {
-        long indexLeft = col_A;
-        long indexRight = col_H;
+        long indexLeft = 36170086419038336L;
+/*
+        System.out.println("col_A: ");
+        longBitsPrinter(indexLeft);
+        System.out.println();
+
+ */
+
+        long indexRight = 282578800148737L;
+/*
+        System.out.println("col_H: ");
+        longBitsPrinter(col_H);
+        System.out.println();
+        longBitsPrinter(indexRight);
+        System.out.println();
+
+        System.out.println("together:");
+        longBitsPrinter(indexRight|indexLeft);
+
+ */
+
+
+
         int result = 0;
         for (int i = 0; i < 4 ; i++){
             result += values[i] * (Long.bitCount(locations & (indexRight|indexLeft)));
-            indexRight <<= 8;
-            indexLeft >>= 8;
+
+            // TODO: 11/30/2024 remove later
+            /*
+            System.out.println("index: " + i);
+            System.out.println("locations: ");
+            System.out.println();
+            longBitsPrinter(locations);
+            System.out.println();
+            System.out.println("indexes: ");
+            System.out.println();
+            longBitsPrinter((indexRight|indexLeft));
+            System.out.println();
+            System.out.println("result: ");
+            System.out.println();
+            longBitsPrinter(locations & (indexRight|indexLeft));
+
+             */
+
+            indexRight <<= 1;
+            indexLeft >>= 1;
         }
         return result;
     }
@@ -835,6 +890,11 @@ public class BitBoard extends Board {
             locations.add(63 - loc);
         }
         return locations;
+    }
+
+    public static void longBitsPrinter(long locations){
+        String bits = String.format("%64s", Long.toBinaryString(locations)).replace(' ', '0');
+        for (int i = 0; i < 8; i++)System.out.println(bits.substring(i * 8, (i * 8) + 8));
     }
 
 }
