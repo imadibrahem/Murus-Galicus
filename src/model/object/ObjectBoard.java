@@ -433,6 +433,58 @@ public class ObjectBoard extends Board {
         return typeByTypeMovesDirectionByDirection;
 
     }
+    //////////////////////////////////////////////////////////////////////////
+    @Override
+    public int isolatedTowersNumber(boolean isBlue){
+        int count = 0;
+        List<Piece> isolatedTowers = new ArrayList<>(getArmy(isBlue).getTowers());
+        List<Short> towersLocations = new ArrayList<>();
+        List<Short> otherLocations;
+        List<Short> currentLocations;
+        for (Piece piece : getArmy(isBlue).getTowers()){
+            towersLocations.addAll(normalMovesLocations(isBlue,piece.getSquare().getLocation(),1));
+            for (int i = 1; i < 9; i++){
+                if (piece.friendOnBothMove(i) != null || piece.friendOnFarMove(i) != null|| piece.friendOnNearMove(i) != null){
+                    isolatedTowers.remove(piece);
+                    count++;
+                    break;
+                }
+            }
+        }
+        for (Piece piece : isolatedTowers){
+            currentLocations = normalMovesLocations(isBlue,piece.getSquare().getLocation(),1);
+            otherLocations = new ArrayList<>(towersLocations);
+            currentLocations.forEach(otherLocations::remove);
+            if (otherLocations.removeAll(currentLocations))count++;
+        }
+        return getArmy(isBlue).getTowers().size() - count;
+    }
+
+    @Override
+    public int isolatedWallsNumber(boolean isBlue){
+        //System.out.println(isBlue? "Blue: " : "Red: " );
+        Square[] doubleMoveSquares;
+        List<Piece> walls = new ArrayList<>(getArmy(isBlue).getWalls());
+        for (Piece piece : getArmy(isBlue).getTowers()){
+            //System.out.println("before tower :" + piece);
+            //System.out.println(walls);
+            for (int i = 1; i < 9; i++){
+                doubleMoveSquares = piece.getSquare().doubleMoveSquares(i,isBlue);
+                if (doubleMoveSquares[1] != null && doubleMoveSquares[1].getUpperPiece() == null && doubleMoveSquares[0].getUpperPiece() == null
+                        && (doubleMoveSquares[0].getPiece() == null || doubleMoveSquares[0].getPiece().isBlue() == isBlue)
+                        && (doubleMoveSquares[1].getPiece() == null || doubleMoveSquares[1].getPiece().isBlue() == isBlue)){
+                    if (doubleMoveSquares[0].getPiece() != null) walls.remove(doubleMoveSquares[0].getPiece());
+                    if (doubleMoveSquares[1].getPiece() != null) walls.remove(doubleMoveSquares[1].getPiece());
+                }
+            }
+        }
+        /*
+        System.out.println("end:");
+        System.out.println(walls);
+        System.out.println("//////////////");
+         */
+        return walls.size();
+    }
 
 ////////////////////////////////////////////////////////////////////////////////////
 

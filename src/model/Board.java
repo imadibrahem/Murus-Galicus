@@ -5,8 +5,11 @@ import model.move.Move;
 import model.move.MoveGeneratingStyle;
 import model.move.MoveGenerator;
 import model.move.MoveType;
+import model.object.Piece;
+import model.object.Square;
 import model.player.Player;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public abstract class Board {
@@ -67,6 +70,10 @@ public abstract class Board {
     public abstract List<Move> typeByTypeMovesDirectionByDirection(boolean isBlue, MoveType[] moveTypes, int[] directions, boolean frontToBack);
 
     public abstract List<Move> directionByDirectionMovesTypeByType(boolean isBlue, MoveType[] moveTypes, int[] directions, boolean frontToBack);
+
+    public abstract int isolatedTowersNumber(boolean isBlue);
+
+    public abstract int isolatedWallsNumber(boolean isBlue);
 
     public int gameState(boolean isBlue) {
         int state = 0;

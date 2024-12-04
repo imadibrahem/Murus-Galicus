@@ -20,7 +20,7 @@ public class GameComparator {
         this.secondGame = secondGame;
     }
 
-    public void compareMoveGeneratingAndGameState(){
+    public void compareBoardsFunctions(){
         //int[] distancesValues = {1, 2, 3, 4, 5, 6, 7};
         int[] distancesValues = {1, 1, 1, 1, 1, 1, 1};
 
@@ -36,6 +36,7 @@ public class GameComparator {
             secondGame.switchPlayer();
             firstGame.checkForWinner();
             compareDistancesAndColumns(distancesValues, columnsValues);
+            compareIsolatedPieces();
             color = firstGame.playerOn.isEvaluationBlue() ? "Blue Player" : "Red Player";
         }
     }
@@ -211,4 +212,47 @@ public class GameComparator {
         }
 
     }
+    public void compareIsolatedPieces(){
+        int firstBlueIsolatedWalls = firstGame.blueBoard.isolatedWallsNumber(true);
+        int firstBlueIsolatedTowers = firstGame.blueBoard.isolatedTowersNumber(true);
+
+        int firstRedIsolatedWalls = firstGame.redBoard.isolatedWallsNumber(false);
+        int firstRedIsolatedTowers = firstGame.redBoard.isolatedTowersNumber(false);
+
+        int secondBlueIsolatedWalls = secondGame.blueBoard.isolatedWallsNumber(true);
+        int secondBlueIsolatedTowers = secondGame.blueBoard.isolatedTowersNumber(true);
+
+        int secondRedIsolatedWalls = secondGame.redBoard.isolatedWallsNumber(false);
+        int secondRedIsolatedTowers = secondGame.redBoard.isolatedTowersNumber(false);
+
+        if (firstBlueIsolatedWalls != secondBlueIsolatedWalls){
+            System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+            System.out.println("!!!!!!!!!!  PROBLEM in Isolated Blue Walls !!!!!!!!!!");
+            System.out.println("!!!!!!!!!!!!!! first = " + firstBlueIsolatedWalls + " second = " + secondBlueIsolatedWalls + " !!!!!!!!!!!!!!!!!");
+            System.out.println("******************************************************");
+        }
+
+        if (firstBlueIsolatedTowers != secondBlueIsolatedTowers){
+            System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+            System.out.println("!!!!!!!!!!  PROBLEM in Isolated Blue Towers !!!!!!!!!");
+            System.out.println("!!!!!!!!!!!!!! first = " + firstBlueIsolatedTowers + " second = " + secondBlueIsolatedTowers + " !!!!!!!!!!!!!!!!!");
+            System.out.println("******************************************************");
+        }
+
+        if (firstRedIsolatedWalls != secondRedIsolatedWalls){
+            System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+            System.out.println("!!!!!!!!!!  PROBLEM in Isolated Red Walls !!!!!!!!!!!");
+            System.out.println("!!!!!!!!!!!!!! first = " + firstRedIsolatedWalls + " second = " + secondRedIsolatedWalls + " !!!!!!!!!!!!!!!!!");
+            System.out.println("******************************************************");
+        }
+
+        if (firstRedIsolatedTowers != secondRedIsolatedTowers){
+            System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+            System.out.println("!!!!!!!!!!  PROBLEM in Isolated Red Towers !!!!!!!!!");
+            System.out.println("!!!!!!!!!!!!!! first = " + firstRedIsolatedTowers + " second = " + secondRedIsolatedTowers + " !!!!!!!!!!!!!!!!!");
+            System.out.println("******************************************************");
+        }
+
+    }
+
 }

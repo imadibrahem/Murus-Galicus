@@ -196,28 +196,12 @@ public class BitBoard extends Board {
     @Override
     public int towersColumns(boolean isBlue, int[] values) {
         long pieces = isBlue ? bt : rt;
-
-        // TODO: 11/30/2024 remove later
-        /*
-        String player = isBlue ? "Blue Player" : "Red Player";
-        System.out.println("Towers Columns for the " + player);
-
-         */
-
         return columnsFinder(pieces, values);
     }
 
     @Override
     public int wallsColumns(boolean isBlue, int[] values) {
         long pieces = isBlue ? bw : rw;
-
-        // TODO: 11/30/2024 remove later
-        /*
-        String player = isBlue ? "Blue Player" : "Red Player";
-        System.out.println("Walls Columns for the " + player);
-
-         */
-
         return columnsFinder(pieces, values);
     }
 
@@ -447,6 +431,62 @@ public class BitBoard extends Board {
         }
         return directionByDirectionMovesTypeByType;
     }
+
+    ///////////////////////////////////////////////////////////////////////
+
+    @Override
+    public int isolatedTowersNumber(boolean isBlue){
+        long towers = isBlue ? bt : rt;
+        long others, tower, accessibility, isolatedTowers, notIsolatedTowers = 0;
+        for (int i = 1; i < 9; i++){
+            notIsolatedTowers |= (friendOnNearPiecesFinder(towers,i,isBlue)|friendOnFarMovesPiecesFinder(towers,i,isBlue)|friendOnBothMovesPiecesFinder(towers,i,isBlue));
+        }
+        isolatedTowers = towers ^ notIsolatedTowers;
+        while (isolatedTowers != 0){
+            tower = Long.highestOneBit(isolatedTowers);
+            isolatedTowers ^= tower;
+            others = towers ^ tower;
+            accessibility = 0;
+            for (int i = 1; i < 9; i++){
+                accessibility |= normalMoveValidator(others,i,isBlue);
+            }
+            for (int i = 1; i < 9; i++){
+                if ((accessibility &  normalMoveValidator(tower,i,isBlue)) != 0){
+                    notIsolatedTowers |= tower;
+                    break;
+                }
+            }
+        }
+
+        return towersNumber(isBlue) -Long.bitCount(notIsolatedTowers);
+    }
+
+    @Override
+    public int isolatedWallsNumber(boolean isBlue){
+        long towers = isBlue ? bt : rt;
+        long walls = isBlue ? bw : rw;
+        //System.out.println(isBlue? "Blue: " : "Red: " );
+        long notIsolatedWalls = 0;
+        for (int i = 1; i < 9; i++){
+            /*
+            System.out.println("before direction: " + i);
+            System.out.println("isolated");
+            longBitsPrinter((walls ^ notIsolatedWalls));
+            System.out.println("not Isolated Walls");
+            longBitsPrinter(notIsolatedWalls);
+            System.out.println("towers");
+            longBitsPrinter(towers);
+            System.out.println("validator direction: " + i);
+            longBitsPrinter(normalMoveValidator(towers,i,isBlue)& ~towers);
+             */
+            notIsolatedWalls |= ((normalMoveValidator(towers,i,isBlue) & ~towers) & walls);
+        }
+        //System.out.println("end");
+       // longBitsPrinter((walls ^ notIsolatedWalls));
+        return wallsNumber(isBlue) - Long.bitCount(notIsolatedWalls);
+    }
+
+    ///////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////
 
@@ -463,55 +503,17 @@ public class BitBoard extends Board {
 
     public int columnsFinder(long locations, int[] values) {
         long indexLeft = 36170086419038336L;
-/*
-        System.out.println("col_A: ");
-        longBitsPrinter(indexLeft);
-        System.out.println();
-
- */
-
         long indexRight = 282578800148737L;
-/*
-        System.out.println("col_H: ");
-        longBitsPrinter(col_H);
-        System.out.println();
-        longBitsPrinter(indexRight);
-        System.out.println();
-
-        System.out.println("together:");
-        longBitsPrinter(indexRight|indexLeft);
-
- */
-
-
-
         int result = 0;
         for (int i = 0; i < 4 ; i++){
             result += values[i] * (Long.bitCount(locations & (indexRight|indexLeft)));
-
-            // TODO: 11/30/2024 remove later
-            /*
-            System.out.println("index: " + i);
-            System.out.println("locations: ");
-            System.out.println();
-            longBitsPrinter(locations);
-            System.out.println();
-            System.out.println("indexes: ");
-            System.out.println();
-            longBitsPrinter((indexRight|indexLeft));
-            System.out.println();
-            System.out.println("result: ");
-            System.out.println();
-            longBitsPrinter(locations & (indexRight|indexLeft));
-
-             */
-
             indexRight <<= 1;
             indexLeft >>= 1;
         }
         return result;
     }
-    ///////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////////////
+
 
     public long sacrificingMoveValidator(long initial, int direction, boolean isBlue){
         if (direction == 1) return isBlue ? (initial << 8) & rw : (initial >> 8) & bw;
@@ -530,38 +532,48 @@ public class BitBoard extends Board {
         if (direction == 1) {
             first = isBlue ? (initial << 8) & ~(rw|rt|bt|row_7) : (initial >> 8) & ~(bw|bt|rt|row_1);
             second = isBlue ? (first << 8) & ~(rw|rt|bt) : (first >> 8) & ~(bw|bt|rt);
+            first = isBlue ? second >> 8 : second << 8;
         }
         else if (direction == 2){
             first = isBlue ? (initial << 7) & ~(rw|rt|bt|col_A|col_H|row_7) : (initial >> 7) & ~(bw|bt|rt|col_A|col_H|row_1);
             second = isBlue ? (first << 7) & ~(rw|rt|bt) : (first >> 7) & ~(bw|bt|rt);
+            first = isBlue ? second >> 7 : second << 7;
         }
         else if (direction == 8){
             first = isBlue ? (initial << 9) & ~(rw|rt|bt|col_A|col_H|row_7) : (initial >> 9) & ~(bw|bt|rt|col_A|col_H|row_1);
             second = isBlue ? (first << 9) & ~(rw|rt|bt) : (first >> 9) & ~(bw|bt|rt);
+            first = isBlue ? second >> 9 : second << 9;
         }
         else if (direction == 3){
             first = isBlue ? (initial >> 1) & ~(rw|rt|bt|col_A|col_H) : (initial << 1) & ~(bw|bt|rt|col_A|col_H);
             second = isBlue ? (first >> 1) & ~(rw|rt|bt) : (first << 1) & ~(bw|bt|rt);
+            first = isBlue ? second << 1 : second >> 1;
         }
 
         else if (direction == 7){
             first = isBlue ? (initial << 1) & ~(rw|rt|bt|col_A|col_H) : (initial >> 1) & ~(bw|bt|rt|col_A|col_H);
             second = isBlue ? (first << 1) & ~(rw|rt|bt) : (first >> 1) & ~(bw|bt|rt);
+            first = isBlue ? second >> 1 : second << 1;
         }
         else if (direction == 4){
-            first = isBlue ? (initial >> 9) & ~(rw|rt|bt|col_A|col_H|row_1) : (initial << 9) & ~(bw|bt|rt|col_A|col_H|row_7);
+            first = isBlue ? ((initial & ~(row_1))>> 9) & ~(rw|rt|bt|col_A|col_H|row_1) : ((initial & ~(row_7)) << 9) & ~(bw|bt|rt|col_A|col_H|row_7);
             second = isBlue ? (first >> 9) & ~(rw|rt|bt) : (first << 9) & ~(bw|bt|rt);
+            first = isBlue ? second << 9 : second >> 9;
         }
         else if (direction == 5){
-            first = isBlue ? (initial >> 8) & ~(rw|rt|bt|row_1) : (initial << 8) & ~(bw|bt|rt|row_7);
+            first = isBlue ? ((initial & ~(row_1)) >> 8) & ~(rw|rt|bt|row_1) : ((initial & ~(row_7)) << 8) & ~(bw|bt|rt|row_7);
             second = isBlue ? (first >> 8) & ~(rw|rt|bt) : (first << 8) & ~(bw|bt|rt);
+            first = isBlue ? second << 8 : second >> 8;
         }
         else if (direction == 6){
-            first = isBlue ? (initial >> 7) & ~(rw|rt|bt|col_A|col_H|row_1) : (initial << 7) & ~(bw|bt|rt|col_A|col_H|row_7);
+            first = isBlue ? ((initial & ~(row_1)) >> 7) & ~(rw|rt|bt|col_A|col_H|row_1) : ((initial & ~(row_7)) << 7) & ~(bw|bt|rt|col_A|col_H|row_7);
             second = isBlue ? (first >> 7) & ~(rw|rt|bt) : (first << 7) & ~(bw|bt|rt);
+            first = isBlue ? second << 7 : second >> 7;
         }
-        return second > 0 ? (first|second) : 0L;
+        return (first|second) ;
     }
+
+
 //////////////////////////////////////////////////////////////////////////////////
 
     public long sacrificingMovesPiecesFinder(long initial, int direction, boolean isBlue){
@@ -894,7 +906,8 @@ public class BitBoard extends Board {
 
     public static void longBitsPrinter(long locations){
         String bits = String.format("%64s", Long.toBinaryString(locations)).replace(' ', '0');
-        for (int i = 0; i < 8; i++)System.out.println(bits.substring(i * 8, (i * 8) + 8));
+        for (int i = 1; i < 8; i++)System.out.println(bits.substring(i * 8, (i * 8) + 8));
+        System.out.println();
     }
 
 }

@@ -111,6 +111,7 @@ public class Square {
     }
 
     public static void main (String[] args){
+
         System.out.println("BitShifting");
         System.out.println("32L >> 1: " +(32L >> 1));
         System.out.println("32L >> -1: "+(32L >> -1));
@@ -223,10 +224,6 @@ public class Square {
         f = board.generateFEN();
         frame.getDisplayBoard().updateBoard(f);
         System.out.println(f);
-
-
-
-
 
 
 
