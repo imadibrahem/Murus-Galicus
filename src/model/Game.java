@@ -9,10 +9,7 @@ import model.move.MoveGeneratingStyle;
 import model.move.MoveGenerator;
 import model.move.MoveType;
 import model.object.ObjectBoard;
-import model.player.FunctionPlayer;
-import model.player.Player;
-import model.player.RandomPlayer;
-import model.player.User;
+import model.player.*;
 import view.DisplayBoard;
 import view.DisplayFrame;
 import view.UserInput;
@@ -95,7 +92,7 @@ public class Game {
 
     public void playRound() {
         rounds++;
-        Move move = playerOn.decideMove();
+        Move move = playerOn.findMove();
         //System.out.println(move);
         moves.add(move);
         history.add(move.getValue());
@@ -202,11 +199,34 @@ public class Game {
         if (blueBoard.lostGame(true)){
             winner = red;
             System.out.println("GAME OVER RED PLAYER WON!!");
+            printNodesAndDurations();
         }
         else if (redBoard.lostGame(false)){
             winner = blue;
             System.out.println("GAME OVER BLUE PLAYER WON!!");
+            printNodesAndDurations();
         }
+
+    }
+
+    public void printNodesAndDurations(){
+        System.out.println();
+        System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+        System.out.println("++++++++++++ Blue Player Nodes: "+ blue.getNodes() +" ++++++++++++++++");
+        System.out.println("Blue Player Moves Nodes: "+ blue.getMovesNodes());
+        System.out.println();
+        System.out.println("++++++++++ Blue Player Duration: "+ blue.getDuration() +" ++++++++++++++");
+        System.out.println("Blue Player Moves Durations: "+ blue.getMoveDurations());
+        System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+        System.out.println();
+        System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+        System.out.println("++++++++++++ Red Player Nodes: "+ red.getNodes() +" ++++++++++++++++");
+        System.out.println("Red Player Moves Nodes: "+ red.getMovesNodes());
+        System.out.println();
+        System.out.println("++++++++++ Red Player Duration: "+ red.getDuration() +" ++++++++++++++");
+        System.out.println("Red Player Moves Durations: "+ red.getMoveDurations());
+        System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+        System.out.println();
     }
 
     public void makeAndUnmakeAllMoves(){
@@ -274,14 +294,16 @@ public class Game {
         EvaluationFunction blueEvaluationFunction = new InitialEvaluationFunction(blueBoard);
         //Player blue = new RandomPlayer(true, blueBoard,blueGenerator, blueEvaluationFunction);
         //Player blue = new User(true, blueBoard, blueEvaluationFunction, blueGenerator,userInput);
-        Player blue = new FunctionPlayer(true, blueBoard,blueGenerator, blueEvaluationFunction);
+        //Player blue = new FunctionPlayer(true, blueBoard,blueGenerator, blueEvaluationFunction);
+        Player blue = new MinMax(true, blueBoard,blueGenerator, blueEvaluationFunction,4);
 
         Board redBoard = new ObjectBoard(FenTrimmer(FenInitial));
         MoveGenerator redGenerator = new MoveGeneratorEvolutionTheory(redBoard, MoveGeneratingStyle.ALL_TYPE_MOVES_PIECE_BY_PIECE,moveTypes, directions, true );
         EvaluationFunction redEvaluationFunction = new InitialEvaluationFunction(redBoard);
         //Player red = new RandomPlayer(false, redBoard,redGenerator, redEvaluationFunction);
         //Player red = new User(false, redBoard, redGenerator, redEvaluationFunction, userInput);
-        Player red = new FunctionPlayer(false, redBoard,redGenerator, redEvaluationFunction);
+        //Player red = new FunctionPlayer(false, redBoard,redGenerator, redEvaluationFunction);
+        Player red = new MinMax(false, redBoard,redGenerator, redEvaluationFunction,3);
 
         Board blueBoard2 = new BitBoard(FenTrimmer(FenInitial));
         MoveGenerator blueGenerator2 = new MoveGeneratorEvolutionTheory(blueBoard2, MoveGeneratingStyle.ALL_TYPE_MOVES_PIECE_BY_PIECE,moveTypes, directions, true );

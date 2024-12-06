@@ -2,20 +2,27 @@ package model.player;
 
 import model.Board;
 import model.evaluationFunction.EvaluationFunction;
-import model.evaluationFunction.InitialEvaluationFunction;
 import model.move.Move;
 import model.move.MoveGenerator;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public abstract class Player {
     private boolean isBlue;
-    private final boolean isEvaluationBlue;
+    protected final boolean isEvaluationBlue;
     private final Board board;
     private boolean isOn = false;
-    private final EvaluationFunction evaluationFunction;
-
+    protected final EvaluationFunction evaluationFunction;
+    protected int nodes = 0;
+    protected int moveNodes = 0;
+    protected List<Integer> movesNodes = new ArrayList<>();
+    protected double moveStartTime;
+    protected double duration = 0;
+    protected double moveDuration;
+    protected List<Double> moveDurations = new ArrayList<>();
     Map<Integer, Integer> directionMap = new HashMap<>();
     protected MoveGenerator moveGenerator;
 
@@ -52,7 +59,21 @@ public abstract class Player {
         directionMap.put(9, 4);
     }
 
+    public double getDuration() {
+        return duration;
+    }
 
+    public List<Double> getMoveDurations() {
+        return moveDurations;
+    }
+
+    public int getNodes() {
+        return nodes;
+    }
+
+    public List<Integer> getMovesNodes() {
+        return movesNodes;
+    }
 
     public boolean isBlue() {
         return isBlue;
@@ -90,9 +111,6 @@ public abstract class Player {
         isOn = !isOn;
     }
 
-
-    public abstract Move decideMove();
-
     public void makeMove(Move move){
         board.makeMove(move, isBlue);
     }
@@ -119,6 +137,16 @@ public abstract class Player {
             else targetType = 2;
         }
         return new Move((short) (location << 7 | direction << 3 | targetType));
-
     }
+
+    public Move findMove(){
+        moveStartTime = System.currentTimeMillis();
+        Move move = decideMove();
+        moveDuration = (System.currentTimeMillis() - moveStartTime) / 1000;
+        moveDurations.add(moveDuration);
+        duration += moveDuration;
+        return move;
+    }
+    public abstract Move decideMove();
+
 }

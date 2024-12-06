@@ -33,8 +33,8 @@ public class GameComparator {
             compareEvaluation();
             color = firstGame.playerOn.isEvaluationBlue() ? "Blue Player" : "Red Player";
         }
-        secondGame.rewindGame();
-        firstGame.rewindGame();
+        //secondGame.rewindGame();
+        //firstGame.rewindGame();
     }
 
     public void compareMoveGenerating(){
@@ -234,10 +234,12 @@ public class GameComparator {
             System.out.println("!!!!!!!!!!!!!! first Red  = " + firstRed + " second Red  = " + secondRed + " !!!!!!!!!!!!!!!!!");
             System.out.println("******************************************************");
         }
-
+/*
         System.out.println("!!!!!!!!!!!!!! first Blue = " + firstBlue + " second Blue = " + secondBlue + " !!!!!!!!!!!!!!!!!");
         System.out.println("!!!!!!!!!!!!!! first Red  = " + firstRed + " second Red  = " + secondRed + " !!!!!!!!!!!!!!!!!");
         System.out.println("******************************************************");
+
+ */
 
     }
 
