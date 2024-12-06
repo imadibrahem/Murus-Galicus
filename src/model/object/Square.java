@@ -211,21 +211,6 @@ public class Square {
         System.out.println(board.getArmy(true).getWalls());
         System.out.println(board.getArmy(true).getSacrificedPieces());
 
-        frame.getDisplayBoard().updateBoard(f);
-        board.unmakeMove(m, true);
-        f = board.generateFEN();
-        frame.getDisplayBoard().updateBoard(f);
-        UserInput input = new UserInput();
-        input.setDisplayBoard(frame.getDisplayBoard());
-        Player user = new User(false,board, input);
-        input.setPlayer(user);
-        user.setOn(true);
-        user.makeMove(user.decideMove());
-        f = board.generateFEN();
-        frame.getDisplayBoard().updateBoard(f);
-        System.out.println(f);
-
-
 
     }
 

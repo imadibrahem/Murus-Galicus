@@ -166,7 +166,7 @@ public class BitBoard extends Board {
             }
             else{
                 rt ^= initial;
-                firstTarget = normalMoveRouteFinder(initial, move.getDirection(), true);
+                firstTarget = normalMoveRouteFinder(initial, move.getDirection(), false);
                 secondTarget = firstTarget & rt;
                 rw ^= firstTarget;
                 rt ^= secondTarget;
@@ -465,25 +465,36 @@ public class BitBoard extends Board {
     public int isolatedWallsNumber(boolean isBlue){
         long towers = isBlue ? bt : rt;
         long walls = isBlue ? bw : rw;
-        //System.out.println(isBlue? "Blue: " : "Red: " );
         long notIsolatedWalls = 0;
-        for (int i = 1; i < 9; i++){
-            /*
-            System.out.println("before direction: " + i);
-            System.out.println("isolated");
-            longBitsPrinter((walls ^ notIsolatedWalls));
-            System.out.println("not Isolated Walls");
-            longBitsPrinter(notIsolatedWalls);
-            System.out.println("towers");
-            longBitsPrinter(towers);
-            System.out.println("validator direction: " + i);
-            longBitsPrinter(normalMoveValidator(towers,i,isBlue)& ~towers);
-             */
-            notIsolatedWalls |= ((normalMoveValidator(towers,i,isBlue) & ~towers) & walls);
-        }
-        //System.out.println("end");
-       // longBitsPrinter((walls ^ notIsolatedWalls));
+        for (int i = 1; i < 9; i++) notIsolatedWalls |= ((normalMoveValidator(towers,i,isBlue) & ~towers) & walls);
         return wallsNumber(isBlue) - Long.bitCount(notIsolatedWalls);
+    }
+
+    public String printBoard(boolean isBlue){
+
+        String color = isBlue ? "Blue" : "Red";
+        long walls = isBlue ? bw : rw;
+        long towers = isBlue ? bt : rt;
+        int index;
+        char[] board = String.format("%64s", Long.toBinaryString(walls)).replace(' ', '0').replace('1','W').toCharArray();
+        while (towers != 0){
+            index = Long.numberOfLeadingZeros(towers);
+            towers ^= Long.highestOneBit(towers);
+            board[index] = 'T';
+        }
+        StringBuilder boardString = new StringBuilder();
+        for (int r = 1; r < 8; r++){
+            for (int c = 0; c < 8; c++){
+                boardString.append(board[(r * 8) + c]);
+            }
+            boardString.append("\n");
+        }
+        return "*************************\n"+
+                "-------------------------\n"+
+                color + " Pieces: \n"+
+                boardString.toString() +
+                "-------------------------\n";
+
     }
 
     ///////////////////////////////////////////////////////////////////////

@@ -50,13 +50,52 @@ public class EvaluationFunction {
     protected int gameState(boolean isBlue, int[] gameStateFactor){
         int gameState = board.gameState(isBlue);
         if (gameState == 0) return 0;
-        gameState = gameState > 0 ? gameStateFactor[gameState + 3] : gameStateFactor[gameState + 4];
-        return gameState;
+        return gameState > 0 ? gameStateFactor[gameState + 3] : gameStateFactor[gameState + 4];
     }
 
     protected int towersRatio(boolean isBlue, int[] towersRatioFactor){
         int towerDifference = board.towersNumber(isBlue) - board.towersNumber(!isBlue);
         if (towerDifference == 0) return 0;
         return towerDifference > 0 ? towersRatioFactor[towerDifference] : - (towersRatioFactor[-towerDifference]);
+    }
+
+    public Board getBoard() {
+        return board;
+    }
+
+    public int[] getWallsDistancesFactor() {
+        return wallsDistancesFactor;
+    }
+
+    public int[] getWallsColumnsFactor() {
+        return wallsColumnsFactor;
+    }
+
+    public int[] getTowersDistancesFactor() {
+        return towersDistancesFactor;
+    }
+
+    public int[] getTowersColumnsFactor() {
+        return towersColumnsFactor;
+    }
+
+    public int[] getTowersRatioFactor() {
+        return towersRatioFactor;
+    }
+
+    public int[] getGameStateFactor() {
+        return gameStateFactor;
+    }
+
+    public int getMobilityFactor() {
+        return mobilityFactor;
+    }
+
+    public int getIsolatedTowersFactor() {
+        return isolatedTowersFactor;
+    }
+
+    public int getIsolatedWallsFactor() {
+        return isolatedWallsFactor;
     }
 }

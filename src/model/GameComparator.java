@@ -1,11 +1,9 @@
 package model;
 
 import model.move.Move;
+import model.player.Player;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class GameComparator {
     Game firstGame;
@@ -20,25 +18,23 @@ public class GameComparator {
         this.secondGame = secondGame;
     }
 
-    public void compareBoardsFunctions(){
-        //int[] distancesValues = {1, 2, 3, 4, 5, 6, 7};
-        int[] distancesValues = {1, 1, 1, 1, 1, 1, 1};
-
-        //int[] columnsValues = {1, 2, 3, 4};
-        int[] columnsValues = {1, 1, 1, 1};
-
+    public void compareBoardsFunctions(boolean makeUnmake){
         while (firstGame.winner == null){
             compareMoveGenerating();
+            if (makeUnmake) makeAndUnmakeAllMovesTester();
             firstGame.playRound();
             secondGame.makeRound(firstGame.moves.peekLast());
             compareGameStates();
             firstGame.switchPlayer();
             secondGame.switchPlayer();
             firstGame.checkForWinner();
-            compareDistancesAndColumns(distancesValues, columnsValues);
+            compareDistancesAndColumns();
             compareIsolatedPieces();
+            compareEvaluation();
             color = firstGame.playerOn.isEvaluationBlue() ? "Blue Player" : "Red Player";
         }
+        secondGame.rewindGame();
+        firstGame.rewindGame();
     }
 
     public void compareMoveGenerating(){
@@ -68,12 +64,12 @@ public class GameComparator {
                 List<Move> differencesFirst = new ArrayList<>(firstGamePlayerOnAllStyles.get(i));
                 differencesFirst.removeAll(secondGamePlayerOnAllStyles.get(i));
                 if (!differencesFirst.isEmpty()) System.out.println("\n" + "First game " + color
-                        + " got the following moves mre than the Second game: " + differencesFirst);
+                        + " got the following moves more than the Second game: " + differencesFirst);
 
                 List<Move> differencesSecond = new ArrayList<>(secondGamePlayerOnAllStyles.get(i));
                 differencesSecond.removeAll(firstGamePlayerOnAllStyles.get(i));
                 if (!differencesSecond.isEmpty()) System.out.println("\n" + "Second game " + color
-                        + " got the following moves mre than the First game: " + differencesSecond);
+                        + " got the following moves more than the First game: " + differencesSecond);
 
                 System.out.println("**** Sorting: ****");
                 System.out.println(firstGamePlayerOnAllStyles.get(i));
@@ -101,66 +97,32 @@ public class GameComparator {
         }
     }
 
-    public void compareDistancesAndColumns(int[] distancesValues, int[] columnsValues){
-        int firstBlueWallsDistances = firstGame.blueBoard.wallsDistances(true, distancesValues);
-        int firstBlueTowersDistances = firstGame.blueBoard.towersDistances(true, distancesValues);
-        int firstBlueWallsColumns = firstGame.blueBoard.wallsColumns(true, columnsValues);
-        int firstBlueTowersColumns = firstGame.blueBoard.towersColumns(true, columnsValues);
+    public void compareDistancesAndColumns(){
+        int[] towersDistancesValues = firstGame.blue.getEvaluationFunction().getTowersDistancesFactor();
+        int[] towersColumnsValues = firstGame.blue.getEvaluationFunction().getTowersColumnsFactor();
+        int[] wallsDistancesValues = firstGame.blue.getEvaluationFunction().getWallsDistancesFactor();
+        int[] wallsColumnsValues = firstGame.blue.getEvaluationFunction().getWallsColumnsFactor();
 
-        int firstRedWallsDistances = firstGame.redBoard.wallsDistances(false, distancesValues);
-        int firstRedTowersDistances = firstGame.redBoard.towersDistances(false, distancesValues);
-        int firstRedWallsColumns = firstGame.redBoard.wallsColumns(false, columnsValues);
-        int firstRedTowersColumns = firstGame.redBoard.towersColumns(false, columnsValues);
+        int firstBlueWallsDistances = firstGame.blueBoard.wallsDistances(true, wallsDistancesValues);
+        int firstBlueTowersDistances = firstGame.blueBoard.towersDistances(true, towersDistancesValues);
+        int firstBlueWallsColumns = firstGame.blueBoard.wallsColumns(true, wallsColumnsValues);
+        int firstBlueTowersColumns = firstGame.blueBoard.towersColumns(true, towersColumnsValues);
 
-        int secondBlueWallsDistances = secondGame.blueBoard.wallsDistances(true, distancesValues);
-        int secondBlueTowersDistances = secondGame.blueBoard.towersDistances(true, distancesValues);
-        int secondBlueWallsColumns = secondGame.blueBoard.wallsColumns(true, columnsValues);
-        int secondBlueTowersColumns = secondGame.blueBoard.towersColumns(true, columnsValues);
+        int firstRedWallsDistances = firstGame.redBoard.wallsDistances(false, wallsDistancesValues);
+        int firstRedTowersDistances = firstGame.redBoard.towersDistances(false, towersDistancesValues);
+        int firstRedWallsColumns = firstGame.redBoard.wallsColumns(false, wallsColumnsValues);
+        int firstRedTowersColumns = firstGame.redBoard.towersColumns(false, towersColumnsValues);
 
-        int secondRedWallsDistances = secondGame.redBoard.wallsDistances(false, distancesValues);
-        int secondRedTowersDistances = secondGame.redBoard.towersDistances(false, distancesValues);
-        int secondRedWallsColumns = secondGame.redBoard.wallsColumns(false, columnsValues);
-        int secondRedTowersColumns = secondGame.redBoard.towersColumns(false, columnsValues);
-/*
-            System.out.println("!!!!!!!!!!!!!!Blue Walls Distances !!!!!!!!!!!!!!!!!!");
-            System.out.println("!!!!!!!!!!!!!! first = " + firstBlueWallsDistances + " second = " + secondBlueWallsDistances + " !!!!!!!!!!!!!!!!!");
-            System.out.println("******************************************************");
+        int secondBlueWallsDistances = secondGame.blueBoard.wallsDistances(true, wallsDistancesValues);
+        int secondBlueTowersDistances = secondGame.blueBoard.towersDistances(true, towersDistancesValues);
+        int secondBlueWallsColumns = secondGame.blueBoard.wallsColumns(true, wallsColumnsValues);
+        int secondBlueTowersColumns = secondGame.blueBoard.towersColumns(true, towersColumnsValues);
 
-            System.out.println("!!!!!!!! !!! Blue Towers Distances !!!!!!!!!!!!!!!!!!");
-            System.out.println("!!!!!!!!!!!!!! first = " + firstBlueTowersDistances + " second = " + secondBlueTowersDistances + " !!!!!!!!!!!!!!!!!");
-            System.out.println("******************************************************");
+        int secondRedWallsDistances = secondGame.redBoard.wallsDistances(false, wallsDistancesValues);
+        int secondRedTowersDistances = secondGame.redBoard.towersDistances(false, towersDistancesValues);
+        int secondRedWallsColumns = secondGame.redBoard.wallsColumns(false, wallsColumnsValues);
+        int secondRedTowersColumns = secondGame.redBoard.towersColumns(false, towersColumnsValues);
 
-            System.out.println("!!!!!!!!!!  PROBLEM in Blue Walls Columns  !!!!!!!!!");
-            System.out.println("!!!!!!!!!!!!!! first = " + firstBlueWallsColumns + " second = " + secondBlueWallsColumns + " !!!!!!!!!!!!!!!!!");
-            System.out.println("******************************************************");
-
-            System.out.println("!!!!!!!!!!!!!!!!  Blue Towers Columns !!!!!!!!!!!!!!!");
-            System.out.println("!!!!!!!!!!!!!! first = " + firstBlueTowersColumns + " second = " + secondBlueTowersColumns + " !!!!!!!!!!!!!!!!!");
-            System.out.println("******************************************************");
-
-            System.out.println("!!!!!!!!!!!!!!! Red Walls Distances !!!!!!!!!!!!!!!!");
-            System.out.println("!!!!!!!!!!!!!! first = " + firstRedWallsDistances + " second = " + secondRedWallsDistances + " !!!!!!!!!!!!!!!!!");
-            System.out.println("******************************************************");
-
-            System.out.println("!!!!!!!!!!!!! Red Towers Distances !!!!!!!!!!!!!!!!!!");
-            System.out.println("!!!!!!!!!!!!!! first = " + firstRedTowersDistances + " second = " + secondRedTowersDistances + " !!!!!!!!!!!!!!!!!");
-            System.out.println("******************************************************");
-
-            System.out.println("!!!!!!!!!!!!!!! Red Walls Columns !!!!!!!!!!!!!!!!!");
-            System.out.println("!!!!!!!!!!!!!! first = " + firstRedWallsColumns + " second = " + secondRedWallsColumns + " !!!!!!!!!!!!!!!!!");
-            System.out.println("******************************************************");
-
-            System.out.println("!!!!!!!!!!!!!!! Red Towers Columns !!!!!!!!!!!!!!!!!");
-            System.out.println("!!!!!!!!!!!!!! first = " + firstRedTowersColumns + " second = " + secondRedTowersColumns + " !!!!!!!!!!!!!!!!!");
-            System.out.println("******************************************************");
-
-        System.out.println();
-        System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++");
-        System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++");
-        System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++");
-        System.out.println();
-
- */
 
         if (firstBlueWallsDistances != secondBlueWallsDistances){
             System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
@@ -253,6 +215,93 @@ public class GameComparator {
             System.out.println("******************************************************");
         }
 
+    }
+
+    public void compareEvaluation(){
+        int firstBlue = firstGame.blue.getEvaluationFunction().evaluate(true, 0);
+        int firstRed = firstGame.red.getEvaluationFunction().evaluate(false, 0);
+        int secondBlue = secondGame.blue.getEvaluationFunction().evaluate(true, 0);
+        int secondRed = secondGame.red.getEvaluationFunction().evaluate(false, 0);
+        if (firstBlue != secondBlue){
+            System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+            System.out.println("!!!!!!!! PROBLEM in Evaluation function: Blue !!!!!!!");
+            System.out.println("!!!!!!!!!!!!!! first Blue = " + firstBlue + " second Blue = " + secondBlue + " !!!!!!!!!!!!!!!!!");
+            System.out.println("******************************************************");
+        }
+        if (firstRed != secondRed){
+            System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+            System.out.println("!!!!!!!! PROBLEM in Evaluation function: Red !!!!!!!!");
+            System.out.println("!!!!!!!!!!!!!! first Red  = " + firstRed + " second Red  = " + secondRed + " !!!!!!!!!!!!!!!!!");
+            System.out.println("******************************************************");
+        }
+
+        System.out.println("!!!!!!!!!!!!!! first Blue = " + firstBlue + " second Blue = " + secondBlue + " !!!!!!!!!!!!!!!!!");
+        System.out.println("!!!!!!!!!!!!!! first Red  = " + firstRed + " second Red  = " + secondRed + " !!!!!!!!!!!!!!!!!");
+        System.out.println("******************************************************");
+
+    }
+
+    public void makeAndUnmakeAllMovesTester(){
+        List<Move> firstPlayerOnMoves = firstGame.playerOn.getMoveGenerator().generateMoves(firstGame.playerOn.isEvaluationBlue());
+        List<Move> secondPlayerOnMoves = secondGame.playerOn.getMoveGenerator().generateMoves(secondGame.playerOn.isEvaluationBlue());
+
+        for (Move move : firstPlayerOnMoves){
+            String before = firstGame.playerOn.getBoard().printBoard(firstGame.playerOn.isEvaluationBlue());
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            firstGame.makeRound(move);
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            firstGame.unmakeRound(move);
+            String after = firstGame.playerOn.getBoard().printBoard(firstGame.playerOn.isEvaluationBlue());
+            if (!before.equals(after)){
+                System.out.println("******************************************************");
+                System.out.println("************** First Game : "+ move +" ****************");
+                System.out.println("******************************************************");
+                System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+                System.out.println("!!!!!!!!!!!!!!!!!!!! BEFORE !!!!!!!!!!!!!!!!!!!!!!!!!");
+                System.out.println(before);
+                System.out.println("!!!!!!!!!!!!!!!!!!!! AFTER !!!!!!!!!!!!!!!!!!!!!!!!!!");
+                System.out.println(after);
+                System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+                System.out.println();
+            }
+        }
+
+        for (Move move : secondPlayerOnMoves){
+            String before = secondGame.playerOn.getBoard().printBoard(secondGame.playerOn.isEvaluationBlue());
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            secondGame.makeRound(move);
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            secondGame.unmakeRound(move);
+            String after = secondGame.playerOn.getBoard().printBoard(secondGame.playerOn.isEvaluationBlue());
+            if (!before.equals(after)){
+                System.out.println("******************************************************");
+                System.out.println("************** Second Game : "+ move +" ***************");
+                System.out.println("******************************************************");
+                System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+                System.out.println("!!!!!!!!!!!!!!!!!!!! BEFORE !!!!!!!!!!!!!!!!!!!!!!!!!");
+                System.out.println(before);
+                System.out.println("!!!!!!!!!!!!!!!!!!!! AFTER !!!!!!!!!!!!!!!!!!!!!!!!!!");
+                System.out.println(after);
+                System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+                System.out.println();
+            }
+        }
     }
 
 }

@@ -133,15 +133,29 @@ public class Army {
             towers.sort(upperToLowerBoardComparator);
         }
     }
+    public void FromFrontToBack(){
+        if (isBlue) {
+            towers.sort(lowerToUpperBoardComparator);
+            topped.sort(lowerToUpperBoardComparator);
+            walls.sort(lowerToUpperBoardComparator);
+            //sacrificedPieces.sort(lowerToUpperBoardComparator);
+
+        }else {
+            towers.sort(upperToLowerBoardComparator);
+            topped.sort(upperToLowerBoardComparator);
+            walls.sort(upperToLowerBoardComparator);
+            //sacrificedPieces.sort(upperToLowerBoardComparator);
+        }
+
+    }
 
     @Override
     public String toString() {
+        FromFrontToBack();
         String color = isBlue ? "Blue" : "Red";
-        System.out.println("*************************");
-        System.out.println("-------------------------");
-
-        return  "-------------------------\n"
-                +color + " Army: \n"+
+        return  "*************************\n"+
+                "-------------------------\n"+
+                color + " Army: \n"+
                 "walls: " + walls + "\n" +
                 "towers :" + towers + "\n" +
                 "topped: " + topped + "\n" +

@@ -1,6 +1,8 @@
 package model.player;
 
 import model.Board;
+import model.evaluationFunction.EvaluationFunction;
+import model.evaluationFunction.InitialEvaluationFunction;
 import model.move.Move;
 import model.move.MoveGenerator;
 
@@ -12,17 +14,18 @@ public abstract class Player {
     private final boolean isEvaluationBlue;
     private final Board board;
     private boolean isOn = false;
-    protected int winScore;
-    protected int loseScore = -winScore;
+    private final EvaluationFunction evaluationFunction;
+
     Map<Integer, Integer> directionMap = new HashMap<>();
     protected MoveGenerator moveGenerator;
 
 
 
-    public Player(boolean isBlue,Board board) {
+    public Player(boolean isBlue,Board board, EvaluationFunction evaluationFunction) {
         this.isBlue = isBlue;
         this.board = board;
         this.isEvaluationBlue = isBlue;
+        this.evaluationFunction = evaluationFunction;
         directionMap.put(-9, 8);
         directionMap.put(-8, 1);
         directionMap.put(-7, 2);
@@ -33,11 +36,12 @@ public abstract class Player {
         directionMap.put(9, 4);
     }
 
-    public Player(boolean isBlue,Board board,MoveGenerator moveGenerator) {
+    public Player(boolean isBlue,Board board,MoveGenerator moveGenerator, EvaluationFunction evaluationFunction) {
         this.isBlue = isBlue;
         this.board = board;
         this.isEvaluationBlue = isBlue;
         this.moveGenerator = moveGenerator;
+        this.evaluationFunction = evaluationFunction;
         directionMap.put(-9, 8);
         directionMap.put(-8, 1);
         directionMap.put(-7, 2);
@@ -62,20 +66,16 @@ public abstract class Player {
         return isOn;
     }
 
-    public int getWinScore() {
-        return winScore;
-    }
-
-    public int getLoseScore() {
-        return loseScore;
-    }
-
     public Board getBoard() {
         return board;
     }
 
     public MoveGenerator getMoveGenerator() {
         return moveGenerator;
+    }
+
+    public EvaluationFunction getEvaluationFunction() {
+        return evaluationFunction;
     }
 
     public void switchColor() {

@@ -220,6 +220,8 @@ public class ObjectBoard extends Board {
             target = targetFar.getPiece();
             target.setTopped(false);
             getArmy(isBlue).getTowers().remove(lower);
+            getArmy(isBlue).getWalls().add(target);
+            getArmy(isBlue).getTopped().remove(target);
         }
         lower.setTopped(true);
         getArmy(isBlue).getTopped().add(lower);
@@ -484,6 +486,11 @@ public class ObjectBoard extends Board {
         System.out.println("//////////////");
          */
         return walls.size();
+    }
+
+    @Override
+    public String printBoard(boolean isBlue) {
+        return getArmy(isBlue).toString();
     }
 
 ////////////////////////////////////////////////////////////////////////////////////

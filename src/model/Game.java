@@ -1,12 +1,15 @@
 package model;
 
 import model.bit.BitBoard;
+import model.evaluationFunction.EvaluationFunction;
+import model.evaluationFunction.InitialEvaluationFunction;
 import model.evolutionTheory.MoveGeneratorEvolutionTheory;
 import model.move.Move;
 import model.move.MoveGeneratingStyle;
 import model.move.MoveGenerator;
 import model.move.MoveType;
 import model.object.ObjectBoard;
+import model.player.FunctionPlayer;
 import model.player.Player;
 import model.player.RandomPlayer;
 import model.player.User;
@@ -102,6 +105,16 @@ public class Game {
         displayBoard.updateBoard(FEN);
     }
 
+    public void withdrawRound() {
+        rounds--;
+        Move move = moves.pollLast();
+        moves.remove(move);
+        history.remove(history.get(history.size()-1));
+        playerOn.unmakeMove(move);
+        FEN = playerOn.getBoard().generateFEN();
+        displayBoard.updateBoard(FEN);
+    }
+
     public void makeRound(Move move) {
         rounds++;
         //System.out.println(move);
@@ -113,6 +126,16 @@ public class Game {
         displayBoard.updateBoard(FEN);
     }
 
+    public void unmakeRound(Move move) {
+        rounds--;
+        moves.remove(move);
+        history.remove(history.get(history.size()-1));
+        playerOn.unmakeMove(move);
+        FEN = playerOn.getBoard().generateFEN();
+        displayBoard.updateBoard(FEN);
+    }
+
+
     public void playGame() {
         while (winner == null){
             playRound();
@@ -120,6 +143,7 @@ public class Game {
             checkForWinner();
         }
     }
+
     public void rewindGame() {
         playerOn = playerOn.isEvaluationBlue()? red : blue;
         playerOn.getBoard().build(FEN);
@@ -127,13 +151,14 @@ public class Game {
         red.switchTurn();
         while (rounds > 0){
             try {
-                Thread.sleep(1000);
+                Thread.sleep(300);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
             Move move = moves.pollLast();
-           // System.out.println(move);
+            System.out.println(move);
             playerOn.unmakeMove(move);
+            colorOldMove(playerOn.isEvaluationBlue(), move);
             FEN = playerOn.getBoard().generateFEN();
             displayBoard.updateBoard(FEN);
             playerOn = playerOn.isEvaluationBlue()? red : blue;
@@ -184,6 +209,35 @@ public class Game {
         }
     }
 
+    public void makeAndUnmakeAllMoves(){
+        Scanner scanner = new Scanner(System.in);
+        List<Move> allMoves = playerOn.getMoveGenerator().generateMoves(playerOn.isEvaluationBlue());
+        for (Move move : allMoves){
+            String before = playerOn.getBoard().printBoard(playerOn.isEvaluationBlue());
+            System.out.println("Next Move: " + move + " Press to make");
+            scanner.nextLine();
+            makeRound(move);
+            System.out.println("Move was: " + move + " Press to unmake");
+            scanner.nextLine();
+            unmakeRound(move);
+            String after = playerOn.getBoard().printBoard(playerOn.isEvaluationBlue());
+            if (!before.equals(after)){
+                System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+                System.out.println("!!!!!!!!!!!!!!!!!!!! BEFORE !!!!!!!!!!!!!!!!!!!!!!!!!");
+                System.out.println(before);
+                System.out.println("!!!!!!!!!!!!!!!!!!!! AFTER !!!!!!!!!!!!!!!!!!!!!!!!!!");
+                System.out.println(after);
+                System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+
+            }
+            System.out.println();
+        }
+        System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+        System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+        System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+        System.out.println();
+    }
+
     public void colorOldMove(boolean isBlue, Move move){
         displayBoard.displaySquare[oldMoveInitial].returnOldColor();
         displayBoard.displaySquare[oldMoveFirst].returnOldColor();
@@ -217,21 +271,30 @@ public class Game {
 
         Board blueBoard = new ObjectBoard(FenTrimmer(FenInitial));
         MoveGenerator blueGenerator = new MoveGeneratorEvolutionTheory(blueBoard, MoveGeneratingStyle.ALL_TYPE_MOVES_PIECE_BY_PIECE,moveTypes, directions, true );
-        Player blue = new RandomPlayer(true, blueBoard,blueGenerator);
-        //Player blue = new User(true, blueBoard, blueGenerator,userInput);
+        EvaluationFunction blueEvaluationFunction = new InitialEvaluationFunction(blueBoard);
+        //Player blue = new RandomPlayer(true, blueBoard,blueGenerator, blueEvaluationFunction);
+        //Player blue = new User(true, blueBoard, blueEvaluationFunction, blueGenerator,userInput);
+        Player blue = new FunctionPlayer(true, blueBoard,blueGenerator, blueEvaluationFunction);
 
         Board redBoard = new ObjectBoard(FenTrimmer(FenInitial));
         MoveGenerator redGenerator = new MoveGeneratorEvolutionTheory(redBoard, MoveGeneratingStyle.ALL_TYPE_MOVES_PIECE_BY_PIECE,moveTypes, directions, true );
-        Player red = new RandomPlayer(false, redBoard,redGenerator);
-        //Player red = new User(false, redBoard, redGenerator,userInput);
+        EvaluationFunction redEvaluationFunction = new InitialEvaluationFunction(redBoard);
+        //Player red = new RandomPlayer(false, redBoard,redGenerator, redEvaluationFunction);
+        //Player red = new User(false, redBoard, redGenerator, redEvaluationFunction, userInput);
+        Player red = new FunctionPlayer(false, redBoard,redGenerator, redEvaluationFunction);
 
         Board blueBoard2 = new BitBoard(FenTrimmer(FenInitial));
         MoveGenerator blueGenerator2 = new MoveGeneratorEvolutionTheory(blueBoard2, MoveGeneratingStyle.ALL_TYPE_MOVES_PIECE_BY_PIECE,moveTypes, directions, true );
-        Player blue2 = new RandomPlayer(true, blueBoard2,blueGenerator2);
+        EvaluationFunction blueEvaluationFunction2 = new InitialEvaluationFunction(blueBoard2);
+        Player blue2 = new RandomPlayer(true, blueBoard2,blueGenerator2, blueEvaluationFunction2);
+        //Player blue2 = new FunctionPlayer(true, blueBoard2,blueGenerator2, blueEvaluationFunction2);
 
         Board redBoard2 = new BitBoard(FenTrimmer(FenInitial));
         MoveGenerator redGenerator2 = new MoveGeneratorEvolutionTheory(redBoard2, MoveGeneratingStyle.ALL_TYPE_MOVES_PIECE_BY_PIECE,moveTypes, directions, true );
-        Player red2 = new RandomPlayer(false, redBoard2,redGenerator2);
+        EvaluationFunction redEvaluationFunction2 = new InitialEvaluationFunction(redBoard2);
+        Player red2 = new RandomPlayer(false, redBoard2,redGenerator2,redEvaluationFunction2);
+        //Player red2 = new FunctionPlayer(false, redBoard2,redGenerator2, redEvaluationFunction2);
+
 /*
         Board blueBoard = new BitBoard(FenTrimmer(FenInitial));
         Player blue = new User(true,blueBoard,userInput);
@@ -242,10 +305,12 @@ public class Game {
  */
 
         Game game = new Game(userInput, red, blue, FenInitial);
-        Game game2 = new Game(userInput2, red2, blue2, FenInitial);
         //game.playGame();
+
+        Game game2 = new Game(userInput2, red2, blue2, FenInitial);
+        //game2.playGame();
         GameComparator gameComparator = new GameComparator(game, game2);
-        gameComparator.compareBoardsFunctions();
+        gameComparator.compareBoardsFunctions(false);
 
     }
 

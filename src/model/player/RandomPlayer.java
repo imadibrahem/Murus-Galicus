@@ -1,6 +1,7 @@
 package model.player;
 
 import model.Board;
+import model.evaluationFunction.EvaluationFunction;
 import model.move.Move;
 import model.move.MoveGenerator;
 
@@ -9,8 +10,8 @@ import java.util.Random;
 
 public class RandomPlayer extends Player{
 
-    public RandomPlayer(boolean isBlue, Board board, MoveGenerator moveGenerator) {
-        super(isBlue, board, moveGenerator);
+    public RandomPlayer(boolean isBlue, Board board, MoveGenerator moveGenerator, EvaluationFunction evaluationFunction) {
+        super(isBlue, board, moveGenerator, evaluationFunction);
     }
 
 
