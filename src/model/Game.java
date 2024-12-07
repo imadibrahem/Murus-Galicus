@@ -292,24 +292,28 @@ public class Game {
         Board blueBoard = new ObjectBoard(FenTrimmer(FenInitial));
         MoveGenerator blueGenerator = new MoveGeneratorEvolutionTheory(blueBoard, MoveGeneratingStyle.ALL_TYPE_MOVES_PIECE_BY_PIECE,moveTypes, directions, true );
         EvaluationFunction blueEvaluationFunction = new InitialEvaluationFunction(blueBoard);
+        //Player blue = new User(true, blueBoard,blueGenerator ,blueEvaluationFunction,userInput);
         //Player blue = new RandomPlayer(true, blueBoard,blueGenerator, blueEvaluationFunction);
-        //Player blue = new User(true, blueBoard, blueEvaluationFunction, blueGenerator,userInput);
         //Player blue = new FunctionPlayer(true, blueBoard,blueGenerator, blueEvaluationFunction);
-        Player blue = new MinMax(true, blueBoard,blueGenerator, blueEvaluationFunction,4);
+        //Player blue = new MinMax(true, blueBoard,blueGenerator, blueEvaluationFunction,4);
+        //Player blue = new AlphaBeta(true, blueBoard,blueGenerator, blueEvaluationFunction,7);
+        Player blue = new IterativeDeepeningFixedDepth(true, blueBoard,blueGenerator, blueEvaluationFunction,7);
 
         Board redBoard = new ObjectBoard(FenTrimmer(FenInitial));
         MoveGenerator redGenerator = new MoveGeneratorEvolutionTheory(redBoard, MoveGeneratingStyle.ALL_TYPE_MOVES_PIECE_BY_PIECE,moveTypes, directions, true );
         EvaluationFunction redEvaluationFunction = new InitialEvaluationFunction(redBoard);
-        //Player red = new RandomPlayer(false, redBoard,redGenerator, redEvaluationFunction);
         //Player red = new User(false, redBoard, redGenerator, redEvaluationFunction, userInput);
+        //Player red = new RandomPlayer(false, redBoard,redGenerator, redEvaluationFunction);
         //Player red = new FunctionPlayer(false, redBoard,redGenerator, redEvaluationFunction);
-        Player red = new MinMax(false, redBoard,redGenerator, redEvaluationFunction,3);
+        //Player red = new MinMax(false, redBoard,redGenerator, redEvaluationFunction,3);
+        Player red = new AlphaBeta(false, redBoard,redGenerator, redEvaluationFunction,7);
 
         Board blueBoard2 = new BitBoard(FenTrimmer(FenInitial));
         MoveGenerator blueGenerator2 = new MoveGeneratorEvolutionTheory(blueBoard2, MoveGeneratingStyle.ALL_TYPE_MOVES_PIECE_BY_PIECE,moveTypes, directions, true );
         EvaluationFunction blueEvaluationFunction2 = new InitialEvaluationFunction(blueBoard2);
         Player blue2 = new RandomPlayer(true, blueBoard2,blueGenerator2, blueEvaluationFunction2);
         //Player blue2 = new FunctionPlayer(true, blueBoard2,blueGenerator2, blueEvaluationFunction2);
+        //Player blue2 = new IterativeDeepeningFixedDepth(true, blueBoard2,blueGenerator2, blueEvaluationFunction2,5);
 
         Board redBoard2 = new BitBoard(FenTrimmer(FenInitial));
         MoveGenerator redGenerator2 = new MoveGeneratorEvolutionTheory(redBoard2, MoveGeneratingStyle.ALL_TYPE_MOVES_PIECE_BY_PIECE,moveTypes, directions, true );

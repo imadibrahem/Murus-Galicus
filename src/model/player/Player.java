@@ -11,10 +11,10 @@ import java.util.List;
 import java.util.Map;
 
 public abstract class Player {
-    private boolean isBlue;
+    protected boolean isBlue;
     protected final boolean isEvaluationBlue;
-    private final Board board;
-    private boolean isOn = false;
+    protected final Board board;
+    protected boolean isOn = false;
     protected final EvaluationFunction evaluationFunction;
     protected int nodes = 0;
     protected int moveNodes = 0;
@@ -23,8 +23,9 @@ public abstract class Player {
     protected double duration = 0;
     protected double moveDuration;
     protected List<Double> moveDurations = new ArrayList<>();
-    Map<Integer, Integer> directionMap = new HashMap<>();
+    protected Map<Integer, Integer> directionMap = new HashMap<>();
     protected MoveGenerator moveGenerator;
+    protected static final int MAX_DEPTH = 15;
 
 
 
