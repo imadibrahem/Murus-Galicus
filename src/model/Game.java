@@ -36,6 +36,10 @@ public class Game {
     short oldMoveInitial = 0;
     short oldMoveFirst = 0;
     short oldMoveSecond = 0;
+    double blueDurationMean = 0;
+    double redDurationMean = 0;
+    double blueNodesMean = 0;
+    double redNodesMean = 0;
 
     public Game(UserInput userInput, Player red, Player blue, String initialFEN) {
         this.red = red;
@@ -93,7 +97,7 @@ public class Game {
     public void playRound() {
         rounds++;
         Move move = playerOn.findMove();
-        //System.out.println(move);
+        //System.out.println(move + "|||||||||||||||||||||||||||");
         moves.add(move);
         history.add(move.getValue());
         playerOn.makeMove(move);
@@ -211,7 +215,7 @@ public class Game {
 
     public void printNodesAndDurations(){
         System.out.println();
-        System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+        System.out.println("++++++++++++ Blue Player played : "+ blue.getRounds() +" rounds ++++++++++++++");
         System.out.println("++++++++++++ Blue Player Nodes: "+ blue.getNodes() +" ++++++++++++++++");
         System.out.println("Blue Player Moves Nodes: "+ blue.getMovesNodes());
         System.out.println();
@@ -219,7 +223,7 @@ public class Game {
         System.out.println("Blue Player Moves Durations: "+ blue.getMoveDurations());
         System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++");
         System.out.println();
-        System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+        System.out.println("++++++++++++ Red Player played : "+ red.getRounds() +" rounds ++++++++++++++");
         System.out.println("++++++++++++ Red Player Nodes: "+ red.getNodes() +" ++++++++++++++++");
         System.out.println("Red Player Moves Nodes: "+ red.getMovesNodes());
         System.out.println();
@@ -227,6 +231,14 @@ public class Game {
         System.out.println("Red Player Moves Durations: "+ red.getMoveDurations());
         System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++");
         System.out.println();
+        blueDurationMean = blue.getDuration()/blue.getRounds();
+        redDurationMean = red.getDuration()/red.getRounds();
+        blueNodesMean =  blue.getNodes()/(double)blue.getRounds();
+        redNodesMean = red.getNodes()/(double)red.getRounds();
+        System.out.println(blueDurationMean);
+        System.out.println(redDurationMean);
+        System.out.println(blueNodesMean);
+        System.out.println(redNodesMean);
     }
 
     public void makeAndUnmakeAllMoves(){
@@ -288,7 +300,7 @@ public class Game {
         //FenInitial = "1tt4t/wwT/T6t/8/1W6/1WW5/1T1W3T,b";
         MoveType[] moveTypes = {MoveType.FRIEND_ON_BOTH, MoveType.FRIEND_ON_NEAR, MoveType.FRIEND_ON_FAR, MoveType.QUIET, MoveType.SACRIFICE};
         int [] directions = {1, 8, 2, 3, 7, 6, 4, 5};
-
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         Board blueBoard = new ObjectBoard(FenTrimmer(FenInitial));
         MoveGenerator blueGenerator = new MoveGeneratorEvolutionTheory(blueBoard, MoveGeneratingStyle.ALL_TYPE_MOVES_PIECE_BY_PIECE,moveTypes, directions, true );
         EvaluationFunction blueEvaluationFunction = new InitialEvaluationFunction(blueBoard);
@@ -296,48 +308,59 @@ public class Game {
         //Player blue = new RandomPlayer(true, blueBoard,blueGenerator, blueEvaluationFunction);
         //Player blue = new FunctionPlayer(true, blueBoard,blueGenerator, blueEvaluationFunction);
         //Player blue = new MinMax(true, blueBoard,blueGenerator, blueEvaluationFunction,4);
-        //Player blue = new AlphaBeta(true, blueBoard,blueGenerator, blueEvaluationFunction,7);
-        Player blue = new IterativeDeepeningFixedDepth(true, blueBoard,blueGenerator, blueEvaluationFunction,7);
+        Player blue = new AlphaBeta(true, blueBoard,blueGenerator, blueEvaluationFunction,4);
+        //Player blue = new IterativeDeepeningFixedDepth(true, blueBoard,blueGenerator, blueEvaluationFunction,4);
 
         Board redBoard = new ObjectBoard(FenTrimmer(FenInitial));
         MoveGenerator redGenerator = new MoveGeneratorEvolutionTheory(redBoard, MoveGeneratingStyle.ALL_TYPE_MOVES_PIECE_BY_PIECE,moveTypes, directions, true );
         EvaluationFunction redEvaluationFunction = new InitialEvaluationFunction(redBoard);
         //Player red = new User(false, redBoard, redGenerator, redEvaluationFunction, userInput);
-        //Player red = new RandomPlayer(false, redBoard,redGenerator, redEvaluationFunction);
-        //Player red = new FunctionPlayer(false, redBoard,redGenerator, redEvaluationFunction);
-        //Player red = new MinMax(false, redBoard,redGenerator, redEvaluationFunction,3);
-        Player red = new AlphaBeta(false, redBoard,redGenerator, redEvaluationFunction,7);
+        //Player red = new MinMax(false, redBoard,redGenerator, redEvaluationFunction,4);
+        //Player red = new AlphaBeta(false, redBoard,redGenerator, redEvaluationFunction,4);
+        Player red = new IterativeDeepeningFixedDepth(false, redBoard,redGenerator, redEvaluationFunction,4);
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
         Board blueBoard2 = new BitBoard(FenTrimmer(FenInitial));
         MoveGenerator blueGenerator2 = new MoveGeneratorEvolutionTheory(blueBoard2, MoveGeneratingStyle.ALL_TYPE_MOVES_PIECE_BY_PIECE,moveTypes, directions, true );
         EvaluationFunction blueEvaluationFunction2 = new InitialEvaluationFunction(blueBoard2);
-        Player blue2 = new RandomPlayer(true, blueBoard2,blueGenerator2, blueEvaluationFunction2);
-        //Player blue2 = new FunctionPlayer(true, blueBoard2,blueGenerator2, blueEvaluationFunction2);
-        //Player blue2 = new IterativeDeepeningFixedDepth(true, blueBoard2,blueGenerator2, blueEvaluationFunction2,5);
+        Player blue2 = new AlphaBeta(true, blueBoard2,blueGenerator2, blueEvaluationFunction2,4);
+        //Player blue2 = new IterativeDeepeningFixedDepth(true, blueBoard2,blueGenerator2, blueEvaluationFunction2,4);
 
         Board redBoard2 = new BitBoard(FenTrimmer(FenInitial));
         MoveGenerator redGenerator2 = new MoveGeneratorEvolutionTheory(redBoard2, MoveGeneratingStyle.ALL_TYPE_MOVES_PIECE_BY_PIECE,moveTypes, directions, true );
         EvaluationFunction redEvaluationFunction2 = new InitialEvaluationFunction(redBoard2);
-        Player red2 = new RandomPlayer(false, redBoard2,redGenerator2,redEvaluationFunction2);
-        //Player red2 = new FunctionPlayer(false, redBoard2,redGenerator2, redEvaluationFunction2);
+        //Player red2 = new MinMax(false, redBoard2,redGenerator2, redEvaluationFunction2, 4);
+        //Player red2 = new AlphaBeta(false, redBoard2,redGenerator2, redEvaluationFunction2, 4);
+        Player red2 = new IterativeDeepeningFixedDepth(false, redBoard2,redGenerator2, redEvaluationFunction2, 4);
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-/*
-        Board blueBoard = new BitBoard(FenTrimmer(FenInitial));
-        Player blue = new User(true,blueBoard,userInput);
+        Board blueBoard3 = new BitBoard(FenTrimmer(FenInitial));
+        MoveGenerator blueGenerator3 = new MoveGeneratorEvolutionTheory(blueBoard3, MoveGeneratingStyle.ALL_TYPE_MOVES_PIECE_BY_PIECE,moveTypes, directions, true );
+        EvaluationFunction blueEvaluationFunction3 = new InitialEvaluationFunction(blueBoard3);
+        Player blue3 = new AlphaBeta(true, blueBoard3,blueGenerator3, blueEvaluationFunction3,4);
+        //Player blue3 = new IterativeDeepeningFixedDepth(true, blueBoard3,blueGenerator3, blueEvaluationFunction3,4);
 
-        Board redBoard = new ObjectBoard(FenTrimmer(FenInitial));
-        Player red = new User(false,redBoard,userInput);
+        Board redBoard3 = new BitBoard(FenTrimmer(FenInitial));
+        MoveGenerator redGenerator3 = new MoveGeneratorEvolutionTheory(redBoard3, MoveGeneratingStyle.ALL_TYPE_MOVES_PIECE_BY_PIECE,moveTypes, directions, true );
+        EvaluationFunction redEvaluationFunction3 = new InitialEvaluationFunction(redBoard3);
+        Player red3 = new MinMax(false, redBoard3,redGenerator3, redEvaluationFunction3, 4);
+        //Player red3 = new AlphaBeta(false, redBoard3,redGenerator3, redEvaluationFunction3, 4);
+        //Player red3 = new IterativeDeepeningFixedDepth(false, redBoard3,redGenerator3, redEvaluationFunction3, 4);
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
- */
 
-        Game game = new Game(userInput, red, blue, FenInitial);
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        //Game game = new Game(userInput, red, blue, FenInitial);
         //game.playGame();
 
-        Game game2 = new Game(userInput2, red2, blue2, FenInitial);
+        //Game game2 = new Game(userInput2, red2, blue2, FenInitial);
         //game2.playGame();
-        GameComparator gameComparator = new GameComparator(game, game2);
-        gameComparator.compareBoardsFunctions(false);
 
+        //GameComparator gameComparator = new GameComparator(game, game2);
+        //gameComparator.compareBoardsFunctions(false);
+        PlayerComparator playerComparator = new PlayerComparator(userInput, blue, red, userInput2, blue2, red2, FenInitial);
+        playerComparator.playGames();
     }
 
 }

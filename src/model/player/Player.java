@@ -16,6 +16,7 @@ public abstract class Player {
     protected final Board board;
     protected boolean isOn = false;
     protected final EvaluationFunction evaluationFunction;
+    protected int rounds = 0;
     protected int nodes = 0;
     protected int moveNodes = 0;
     protected List<Integer> movesNodes = new ArrayList<>();
@@ -58,6 +59,10 @@ public abstract class Player {
         directionMap.put(7, 6);
         directionMap.put(8, 5);
         directionMap.put(9, 4);
+    }
+
+    public int getRounds() {
+        return rounds;
     }
 
     public double getDuration() {
@@ -141,6 +146,7 @@ public abstract class Player {
     }
 
     public Move findMove(){
+        rounds++;
         moveStartTime = System.currentTimeMillis();
         Move move = decideMove();
         moveDuration = (System.currentTimeMillis() - moveStartTime) / 1000;

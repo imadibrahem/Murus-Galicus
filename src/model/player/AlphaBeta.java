@@ -18,6 +18,7 @@ public class AlphaBeta extends Player{
 
     @Override
     public Move decideMove() {
+        //best = null;
         maximizer(searchDepth,Integer.MIN_VALUE, Integer.MAX_VALUE);
         movesNodes.add(moveNodes);
         nodes += moveNodes;
@@ -26,7 +27,7 @@ public class AlphaBeta extends Player{
     }
 
     private int maximizer(int depth, int alpha, int beta) {
-        if (depth == 0)return evaluationFunction.evaluate(isEvaluationBlue,searchDepth);
+        if (depth == 0 || board.lostGame(true) || board.lostGame(false))return evaluationFunction.evaluate(isEvaluationBlue,searchDepth);
         moveNodes++;
         List<Move> allMoves = moveGenerator.generateMoves(isBlue());
         for (Move move : allMoves) {
@@ -37,7 +38,7 @@ public class AlphaBeta extends Player{
             unmakeMove(move);
             if (rating > alpha){
                 alpha = rating;
-                if (depth == searchDepth)best = move;
+                if (depth == searchDepth) best = move;
             }
             if (alpha >= beta) return alpha;
         }
@@ -45,9 +46,8 @@ public class AlphaBeta extends Player{
     }
 
     private int minimizer(int depth, int alpha, int beta) {
-        if (depth == 0)return evaluationFunction.evaluate(isEvaluationBlue,searchDepth);
+        if (depth == 0 || board.lostGame(true) || board.lostGame(false))return evaluationFunction.evaluate(isEvaluationBlue,searchDepth);
         moveNodes++;
-        int minEval = Integer.MAX_VALUE;
         List<Move> allMoves = moveGenerator.generateMoves(isBlue());
         for (Move move : allMoves) {
             makeMove(move);
@@ -55,9 +55,9 @@ public class AlphaBeta extends Player{
             int rating = maximizer(depth-1, alpha, beta);
             switchColor();
             unmakeMove(move);
-            if (rating <= beta) beta = rating;
+            if (rating < beta) beta = rating;
             if (alpha >= beta) return beta;
         }
-        return minEval;
+        return beta;
     }
 }

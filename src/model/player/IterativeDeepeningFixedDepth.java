@@ -20,19 +20,30 @@ public class IterativeDeepeningFixedDepth extends Player{
 
     @Override
     public Move decideMove() {
+        //best = null;
+        //globalBest = null;
         while (currentSearchDepth < (searchDepth + 1)){
-            maximizer(currentSearchDepth, Integer.MIN_VALUE, Integer.MAX_VALUE);
-            globalBest = best;
+            iterateDepth(currentSearchDepth);
             currentSearchDepth++;
         }
+        movesNodes.add(moveNodes);
+        nodes += moveNodes;
+        moveNodes = 0;
+        currentSearchDepth = 1;
         return globalBest;
     }
 
+    private int iterateDepth(int depth) {
+        int depthScore = maximizer(depth,Integer.MIN_VALUE, Integer.MAX_VALUE);
+        globalBest = best;
+        return depthScore;
+    }
+
     private int maximizer(int depth, int alpha, int beta) {
-        if (depth == 0)return evaluationFunction.evaluate(isEvaluationBlue,searchDepth);
+        if (depth == 0 || board.lostGame(true) || board.lostGame(false))return evaluationFunction.evaluate(isEvaluationBlue,searchDepth);
         moveNodes++;
         List<Move> allMoves = moveGenerator.generateMoves(isBlue());
-        if (currentSearchDepth > 1 && depth == searchDepth){
+        if (currentSearchDepth > 1 && depth == currentSearchDepth){
             allMoves.remove(globalBest);
             allMoves.add(0,globalBest);
         }
@@ -44,7 +55,7 @@ public class IterativeDeepeningFixedDepth extends Player{
             unmakeMove(move);
             if (rating > alpha){
                 alpha = rating;
-                if (depth == searchDepth)best = move;
+                if (depth == currentSearchDepth) best = move;
             }
             if (alpha >= beta) return alpha;
         }
@@ -52,9 +63,8 @@ public class IterativeDeepeningFixedDepth extends Player{
     }
 
     private int minimizer(int depth, int alpha, int beta) {
-        if (depth == 0)return evaluationFunction.evaluate(isEvaluationBlue,searchDepth);
+        if (depth == 0 || board.lostGame(true) || board.lostGame(false))return evaluationFunction.evaluate(isEvaluationBlue,searchDepth);
         moveNodes++;
-        int minEval = Integer.MAX_VALUE;
         List<Move> allMoves = moveGenerator.generateMoves(isBlue());
         for (Move move : allMoves) {
             makeMove(move);
@@ -62,10 +72,10 @@ public class IterativeDeepeningFixedDepth extends Player{
             int rating = maximizer(depth-1, alpha, beta);
             switchColor();
             unmakeMove(move);
-            if (rating <= beta) beta = rating;
+            if (rating < beta) beta = rating;
             if (alpha >= beta) return beta;
         }
-        return minEval;
+        return beta;
     }
 
 }
