@@ -18,7 +18,6 @@ public class AlphaBeta extends Player{
 
     @Override
     public Move decideMove() {
-        //best = null;
         maximizer(searchDepth,Integer.MIN_VALUE, Integer.MAX_VALUE);
         movesNodes.add(moveNodes);
         nodes += moveNodes;
@@ -27,7 +26,7 @@ public class AlphaBeta extends Player{
     }
 
     private int maximizer(int depth, int alpha, int beta) {
-        if (depth == 0 || board.lostGame(true) || board.lostGame(false))return evaluationFunction.evaluate(isEvaluationBlue,searchDepth);
+        if (depth == 0 || board.lostGame(true) || board.lostGame(false))return evaluationFunction.evaluate(isEvaluationBlue,searchDepth - depth);
         moveNodes++;
         List<Move> allMoves = moveGenerator.generateMoves(isBlue());
         for (Move move : allMoves) {
@@ -46,7 +45,7 @@ public class AlphaBeta extends Player{
     }
 
     private int minimizer(int depth, int alpha, int beta) {
-        if (depth == 0 || board.lostGame(true) || board.lostGame(false))return evaluationFunction.evaluate(isEvaluationBlue,searchDepth);
+        if (depth == 0 || board.lostGame(true) || board.lostGame(false))return evaluationFunction.evaluate(isEvaluationBlue,searchDepth - depth);
         moveNodes++;
         List<Move> allMoves = moveGenerator.generateMoves(isBlue());
         for (Move move : allMoves) {

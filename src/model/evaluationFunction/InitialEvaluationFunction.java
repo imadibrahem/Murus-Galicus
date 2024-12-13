@@ -17,7 +17,7 @@ public class InitialEvaluationFunction extends EvaluationFunction{
      */
 
     public InitialEvaluationFunction(Board board) {
-        super(board, new int[]{1, 2, 3, 4, 6, 4, 0}, new int[]{0, 1, 2, 3}, new int[]{2, 4, 6, 8, 12, 8, 0},
+        super(board, new int[]{1, 2, 3, 4, 6, 4, 200}, new int[]{0, 1, 2, 3}, new int[]{2, 4, 6, 8, 12, 8, 400},
                 new int[]{0, 1, 4, 6}, new int[]{1, 2, 3, 3, 3, 4, 6}, new int[]{-50, -30, 0, -20, 0, 20, 30, 50},
                 6, 4, 10);
     }

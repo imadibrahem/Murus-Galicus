@@ -61,6 +61,11 @@ public class Move {
         return getTargetType() == 4;
     }
 
+    public boolean isWinnerMove(){
+       return ((((value >> 7) < 24 && (value >> 7) > 15) && ((value & 7) < 4)) || (((value >> 7) < 16) && ((value & 7) > 3)))
+               && ((((value >> 3) & 15) == 1) || (((value >> 3) & 15) == 2) || (((value >> 3) & 15) == 8));
+    }
+
     /*
 
     public int getTargetLocation() {

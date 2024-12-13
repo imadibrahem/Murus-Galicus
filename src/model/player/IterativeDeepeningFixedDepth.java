@@ -20,8 +20,6 @@ public class IterativeDeepeningFixedDepth extends Player{
 
     @Override
     public Move decideMove() {
-        //best = null;
-        //globalBest = null;
         while (currentSearchDepth < (searchDepth + 1)){
             iterateDepth(currentSearchDepth);
             currentSearchDepth++;
@@ -40,7 +38,7 @@ public class IterativeDeepeningFixedDepth extends Player{
     }
 
     private int maximizer(int depth, int alpha, int beta) {
-        if (depth == 0 || board.lostGame(true) || board.lostGame(false))return evaluationFunction.evaluate(isEvaluationBlue,searchDepth);
+        if (depth == 0 || board.lostGame(true) || board.lostGame(false))return evaluationFunction.evaluate(isEvaluationBlue, currentSearchDepth - depth);
         moveNodes++;
         List<Move> allMoves = moveGenerator.generateMoves(isBlue());
         if (currentSearchDepth > 1 && depth == currentSearchDepth){
@@ -63,7 +61,7 @@ public class IterativeDeepeningFixedDepth extends Player{
     }
 
     private int minimizer(int depth, int alpha, int beta) {
-        if (depth == 0 || board.lostGame(true) || board.lostGame(false))return evaluationFunction.evaluate(isEvaluationBlue,searchDepth);
+        if (depth == 0 || board.lostGame(true) || board.lostGame(false))return evaluationFunction.evaluate(isEvaluationBlue, currentSearchDepth - depth);
         moveNodes++;
         List<Move> allMoves = moveGenerator.generateMoves(isBlue());
         for (Move move : allMoves) {

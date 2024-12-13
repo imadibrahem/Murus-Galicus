@@ -29,7 +29,7 @@ public class MinMax extends Player{
     }
 
     private int maximizer(int depth) {
-        if (depth == 0 || board.lostGame(true) || board.lostGame(false))return evaluationFunction.evaluate(isEvaluationBlue,searchDepth);
+        if (depth == 0 || board.lostGame(true) || board.lostGame(false))return evaluationFunction.evaluate(isEvaluationBlue,searchDepth - depth);
         moveNodes++;
         int maxEval = Integer.MIN_VALUE;
         List<Move> allMoves = moveGenerator.generateMoves(isBlue());
@@ -48,7 +48,7 @@ public class MinMax extends Player{
     }
 
     private int minimizer(int depth) {
-        if (depth == 0 || board.lostGame(true) || board.lostGame(false))return evaluationFunction.evaluate(isEvaluationBlue,searchDepth);
+        if (depth == 0 || board.lostGame(true) || board.lostGame(false))return evaluationFunction.evaluate(isEvaluationBlue,searchDepth - depth);
         moveNodes++;
         int minEval = Integer.MAX_VALUE;
         List<Move> allMoves = moveGenerator.generateMoves(isBlue());

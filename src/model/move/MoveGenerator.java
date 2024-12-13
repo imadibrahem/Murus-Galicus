@@ -12,6 +12,10 @@ public abstract class MoveGenerator {
 
     public abstract List<Move> generateMoves (boolean isBlue);
 
+    public abstract List<Move> generateLoudMoves (boolean isBlue);
+
+    public abstract List<Move> generateWinningMoves(boolean isBlue);
+
     // TODO: 11/15/2024 delete it as an abstract method later..
     public abstract List<List<Move>> generateAllStyles (boolean isBlue);
 

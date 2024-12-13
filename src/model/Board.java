@@ -100,7 +100,5 @@ public abstract class Board {
         return moveGenerator.generateMoves(isBlue);
     }
 
-    // TODO: 12/6/2024 remove later
-
     public abstract String printBoard(boolean isBlue);
 }
