@@ -56,7 +56,8 @@ public class EvaluationFunction {
     protected int towersRatio(boolean isBlue, int[] towersRatioFactor){
         int towerDifference = board.towersNumber(isBlue) - board.towersNumber(!isBlue);
         if (towerDifference == 0) return 0;
-        return towerDifference > 0 ? towersRatioFactor[towerDifference] : - (towersRatioFactor[-towerDifference]);
+        if (towerDifference > 6 || towerDifference < -6) System.out.println("towerDifference: " + towerDifference);
+        return towerDifference > 0 ? towersRatioFactor[towerDifference - 1] : - (towersRatioFactor[-towerDifference + 1]);
     }
 
     public Board getBoard() {

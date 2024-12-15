@@ -12,8 +12,9 @@ public class Move {
 
     @Override
     public String toString() {
-        return (value >> 7) + "=>" + getDirection() + "(" +getTargetType() + ") | ";
+        return (value >> 7) + "=> |" + getDirection() + "| (" +getTargetType() + ") | ";
     }
+
 
     public short getValue() {
         return value;
@@ -36,6 +37,32 @@ public class Move {
         int location = getInitialLocation(isBlue);
         return (location % 8) + 1;
     }
+    public int getTargetRow(boolean isBlue) {
+        int initialRow = getInitialRow(isBlue);
+        if (getDirection() == 3 || getDirection() == 7) return initialRow;
+        if (isTargetEnemy()){
+            if (getDirection() == 1 || getDirection() == 2 || getDirection() == 8) return (isBlue ? initialRow + 1 : initialRow - 1) ;
+            else return (isBlue ? initialRow - 1 : initialRow + 1) ;
+        }
+        else{
+            if (getDirection() == 1 || getDirection() == 2 || getDirection() == 8) return (isBlue ? initialRow + 2 : initialRow - 2) ;
+            else return (isBlue ? initialRow - 2 : initialRow + 2) ;
+        }
+    }
+
+    public int getTargetRowSorting() {
+        int initialRow =  (((55 - (value >> 7)) / 8) + 1);
+        if (getDirection() == 3 || getDirection() == 7) return initialRow;
+        if (isTargetEnemy()){
+            if (getDirection() == 1 || getDirection() == 2 || getDirection() == 8) return (initialRow + 1) ;
+            else return (initialRow - 1) ;
+        }
+        else{
+            if (getDirection() == 1 || getDirection() == 2 || getDirection() == 8) return (initialRow + 2) ;
+            else return (initialRow - 2) ;
+        }
+    }
+
 
     public int getTargetType() {
         return value & 7;
@@ -65,6 +92,12 @@ public class Move {
        return ((((value >> 7) < 24 && (value >> 7) > 15) && ((value & 7) < 4)) || (((value >> 7) < 16) && ((value & 7) > 3)))
                && ((((value >> 3) & 15) == 1) || (((value >> 3) & 15) == 2) || (((value >> 3) & 15) == 8));
     }
+    public boolean isThreateningMove(){
+        return ((((value >> 7) < 40 && (value >> 7) > 31) && ((value & 7) < 4)  && ((value & 7) > 1))
+                || (((value >> 7) < 32 && (value >> 7) > 23) && (((value & 7) == 3)  || ((value & 7) == 1))))
+                && ((((value >> 3) & 15) == 1) || (((value >> 3) & 15) == 2) || (((value >> 3) & 15) == 8));
+    }
+
 
     /*
 

@@ -8,7 +8,7 @@ import model.move.MoveGenerator;
 
 import java.util.List;
 
-public class MoveSortingPlayer extends Player{
+public class ImprovedQuiescenceAndMoveSortingPlayer extends Player {
     private final int searchDepth;
     private int currentSearchDepth = 1;
     private Move best;
@@ -21,7 +21,7 @@ public class MoveSortingPlayer extends Player{
     private final MoveComparator maxComparator;
     private final MoveComparator minComparator;
 
-    public MoveSortingPlayer(boolean isBlue, Board board, MoveGenerator moveGenerator, EvaluationFunction evaluationFunction, int window, int windowMultiplier, int searchDepth) {
+    public ImprovedQuiescenceAndMoveSortingPlayer(boolean isBlue, Board board, MoveGenerator moveGenerator, EvaluationFunction evaluationFunction, int window, int windowMultiplier, int searchDepth) {
         super(isBlue, board, moveGenerator, evaluationFunction);
         this.searchDepth = searchDepth;
         this.window = window;
@@ -31,7 +31,7 @@ public class MoveSortingPlayer extends Player{
 
     }
 
-    public MoveSortingPlayer(boolean isBlue, Board board, MoveGenerator moveGenerator, EvaluationFunction evaluationFunction, int searchDepth) {
+    public ImprovedQuiescenceAndMoveSortingPlayer(boolean isBlue, Board board, MoveGenerator moveGenerator, EvaluationFunction evaluationFunction, int searchDepth) {
         super(isBlue, board, moveGenerator, evaluationFunction);
         this.searchDepth = searchDepth;
         this.window = 10;
@@ -39,6 +39,7 @@ public class MoveSortingPlayer extends Player{
         maxComparator = new MoveComparator(isEvaluationBlue(),board, maxHistoryTable, killerMoves);
         minComparator = new MoveComparator(!isEvaluationBlue(),board, minHistoryTable, killerMoves);
     }
+
 
     @Override
     public Move decideMove() {
@@ -191,5 +192,6 @@ public class MoveSortingPlayer extends Player{
         }
 
     }
+
 
 }

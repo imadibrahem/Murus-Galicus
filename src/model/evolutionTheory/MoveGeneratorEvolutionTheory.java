@@ -91,7 +91,9 @@ public class MoveGeneratorEvolutionTheory extends MoveGenerator {
     @Override
     public List<Move> generateLoudMoves(boolean isBlue) {
         List<Move> loudMoves = generateInteractiveMoves(isBlue);
-        loudMoves.addAll(generateEmptyWinningMoves(isBlue));
+        List<Move> winningMoves = generateEmptyWinningMoves(isBlue);
+        loudMoves.removeAll(winningMoves);
+        loudMoves.addAll(winningMoves);
         return loudMoves;
     }
 
