@@ -1,6 +1,8 @@
 package model.evaluationFunction;
 
 import model.Board;
+import view.DisplayBoard;
+import view.DisplayFrame;
 
 public class EvaluationFunction {
 
@@ -56,8 +58,15 @@ public class EvaluationFunction {
     protected int towersRatio(boolean isBlue, int[] towersRatioFactor){
         int towerDifference = board.towersNumber(isBlue) - board.towersNumber(!isBlue);
         if (towerDifference == 0) return 0;
-        if (towerDifference > 6 || towerDifference < -6) System.out.println("towerDifference: " + towerDifference);
-        return towerDifference > 0 ? towersRatioFactor[towerDifference - 1] : - (towersRatioFactor[-towerDifference + 1]);
+        /*if (towerDifference > 6 || towerDifference < -6){
+            System.out.println("towerDifference: " + towerDifference);
+            String Fen = board.generateFEN();
+            DisplayFrame displayFrame = new DisplayFrame(Fen);
+            DisplayBoard displayBoard = displayFrame.getDisplayBoard();
+
+        }
+         */
+        return towerDifference > 0 ? towersRatioFactor[towerDifference - 1] : - (towersRatioFactor[(-towerDifference) - 1]);
     }
 
     public Board getBoard() {

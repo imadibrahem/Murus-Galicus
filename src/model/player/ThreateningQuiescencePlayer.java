@@ -8,7 +8,7 @@ import model.move.MoveGenerator;
 
 import java.util.List;
 
-public class ImprovedQuiescenceAndMoveSortingPlayer extends Player {
+public class ThreateningQuiescencePlayer extends Player {
     private final int searchDepth;
     private int currentSearchDepth = 1;
     private Move best;
@@ -20,25 +20,22 @@ public class ImprovedQuiescenceAndMoveSortingPlayer extends Player {
     private final int[][] minHistoryTable = new int[56][8];
     private final MoveComparator maxComparator;
     private final MoveComparator minComparator;
-    private final int interactiveDepthRatio;
 
-    public ImprovedQuiescenceAndMoveSortingPlayer(boolean isBlue, Board board, MoveGenerator moveGenerator, EvaluationFunction evaluationFunction, int window, int windowMultiplier, int searchDepth, int interactiveDepthRatio) {
+    public ThreateningQuiescencePlayer(boolean isBlue, Board board, MoveGenerator moveGenerator, EvaluationFunction evaluationFunction, int window, int windowMultiplier, int searchDepth) {
         super(isBlue, board, moveGenerator, evaluationFunction);
         this.searchDepth = searchDepth;
         this.window = window;
         this.windowMultiplier = windowMultiplier;
-        this.interactiveDepthRatio = interactiveDepthRatio;
         maxComparator = new MoveComparator(isEvaluationBlue(),board, maxHistoryTable, killerMoves);
         minComparator = new MoveComparator(!isEvaluationBlue(),board, minHistoryTable, killerMoves);
 
     }
 
-    public ImprovedQuiescenceAndMoveSortingPlayer(boolean isBlue, Board board, MoveGenerator moveGenerator, EvaluationFunction evaluationFunction, int searchDepth) {
+    public ThreateningQuiescencePlayer(boolean isBlue, Board board, MoveGenerator moveGenerator, EvaluationFunction evaluationFunction, int searchDepth) {
         super(isBlue, board, moveGenerator, evaluationFunction);
         this.searchDepth = searchDepth;
         this.window = 10;
         this.windowMultiplier = 3;
-        this.interactiveDepthRatio = 4;
         maxComparator = new MoveComparator(isEvaluationBlue(),board, maxHistoryTable, killerMoves);
         minComparator = new MoveComparator(!isEvaluationBlue(),board, minHistoryTable, killerMoves);
     }
@@ -162,8 +159,7 @@ public class ImprovedQuiescenceAndMoveSortingPlayer extends Player {
             if (beta > standPat) beta = standPat;
         }
         List<Move> loudMoves;
-        if ((depth - currentSearchDepth) < (currentSearchDepth / interactiveDepthRatio)) loudMoves = moveGenerator.generateThreateningMoves(isBlue());
-        else loudMoves = moveGenerator.generateLoudMoves(isBlue());
+        loudMoves = moveGenerator.generateThreateningMoves(isBlue());
         if (isMaximizingPlayer) loudMoves = maxComparator.quiescenceFilterAndSortMoves( loudMoves, board.isInLosingPos(isEvaluationBlue), board.isInCheck(isEvaluationBlue));
         else loudMoves = minComparator.quiescenceFilterAndSortMoves( loudMoves,  board.isInLosingPos(!isEvaluationBlue), board.isInCheck(!isEvaluationBlue));
         for (Move move : loudMoves) {

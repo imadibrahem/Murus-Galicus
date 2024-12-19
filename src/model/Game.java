@@ -228,7 +228,7 @@ public class Game {
 
     public void printNodesAndDurations(){
         System.out.println();
-        System.out.println("++++++++++++ Blue Player played : "+ blue.getRounds() +" rounds ++++++++++++++");
+        System.out.println("++++++++++++ Blue Player played : "+ blue.getRounds() +" rounds ++++++++++++");
         System.out.println("++++++++++++ Blue Player Nodes: "+ blue.getNodes() +" ++++++++++++++++");
         System.out.println("Blue Player Moves Nodes: "+ blue.getMovesNodes());
         System.out.println();
@@ -236,7 +236,7 @@ public class Game {
         System.out.println("Blue Player Moves Durations: "+ blue.getMoveDurations());
         System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++");
         System.out.println();
-        System.out.println("++++++++++++ Red Player played : "+ red.getRounds() +" rounds ++++++++++++++");
+        System.out.println("++++++++++++ Red Player played : "+ red.getRounds() +" rounds ++++++++++++");
         System.out.println("++++++++++++ Red Player Nodes: "+ red.getNodes() +" ++++++++++++++++");
         System.out.println("Red Player Moves Nodes: "+ red.getMovesNodes());
         System.out.println();
@@ -386,8 +386,12 @@ public class Game {
         //Player blue2 = new IterativeDeepeningFixedDepth(true, blueBoard2,blueGenerator2, blueEvaluationFunction2,5);
         //Player blue2 = new QuiescencePlayer(true, blueBoard2,blueGenerator2, blueEvaluationFunction2,5);
         //Player blue2 = new Tester(true, blueBoard2,blueGenerator2, blueEvaluationFunction2,5);
-        Player blue2 = new NullWindowAspirationPlayer(true, blueBoard2,blueGenerator2, blueEvaluationFunction2,4);
-        //Player blue2 = new MoveSortingPlayer(true, blueBoard2,blueGenerator2, blueEvaluationFunction2,7);
+        //Player blue2 = new NullWindowAspirationPlayer(true, blueBoard2,blueGenerator2, blueEvaluationFunction2,6);
+        //Player blue2 = new MoveSortingPlayer(true, blueBoard2,blueGenerator2, blueEvaluationFunction2,6);
+        Player blue2 = new ImprovedQuiescenceAndMoveSortingPlayer(true, blueBoard2,blueGenerator2, blueEvaluationFunction2,7);
+        //Player blue2 = new ThreateningQuiescencePlayer(true, blueBoard2,blueGenerator2, blueEvaluationFunction2,7);
+        //Player blue2 = new NullMovePlayer(true, blueBoard2,blueGenerator2, blueEvaluationFunction2,6);
+        //Player blue2 = new LateMoveReductionPlayer(true, blueBoard2,blueGenerator2, blueEvaluationFunction2,8);
 
         Board redBoard2 = new BitBoard(FenTrimmer(FenInitial));
         MoveGenerator redGenerator2 = new MoveGeneratorEvolutionTheory(redBoard2, MoveGeneratingStyle.ALL_TYPE_MOVES_PIECE_BY_PIECE,moveTypes, directions, true );
@@ -398,7 +402,12 @@ public class Game {
         //Player red2 = new QuiescencePlayer(false, redBoard2,redGenerator2, redEvaluationFunction2, 4);
         //Player red2 = new Tester(false, redBoard2,redGenerator2, redEvaluationFunction2, 4);
         //Player red2 = new NullWindowAspirationPlayer(false, redBoard2,redGenerator2, redEvaluationFunction2,5);
-        Player red2 = new MoveSortingPlayer(false, redBoard2,redGenerator2, redEvaluationFunction2,5);
+        //Player red2 = new MoveSortingPlayer(false, redBoard2,redGenerator2, redEvaluationFunction2,6);
+        //Player red2 = new ImprovedQuiescenceAndMoveSortingPlayer(false, redBoard2,redGenerator2, redEvaluationFunction2,8);
+        //Player red2 = new ThreateningQuiescencePlayer(false, redBoard2,redGenerator2, redEvaluationFunction2,7);
+        //Player red2 = new NullMovePlayer(false, redBoard2,redGenerator2, redEvaluationFunction2,8);
+        Player red2 = new LateMoveReductionPlayer(false, redBoard2,redGenerator2, redEvaluationFunction2,7);
+
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -408,7 +417,7 @@ public class Game {
         //Player blue3 = new AlphaBeta(true, blueBoard3,blueGenerator3, blueEvaluationFunction3,4);
         //Player blue3 = new IterativeDeepeningFixedDepth(true, blueBoard3,blueGenerator3, blueEvaluationFunction3,5);
         //Player blue3 = new NullWindowAspirationPlayer(true, blueBoard3,blueGenerator3, blueEvaluationFunction3,5);
-        Player blue3 = new MoveSortingPlayer(true, blueBoard3,blueGenerator3, blueEvaluationFunction3,5);
+        Player blue3 = new MoveSortingPlayer(true, blueBoard3,blueGenerator3, blueEvaluationFunction3,6);
 
         Board redBoard3 = new BitBoard(FenTrimmer(FenInitial));
         MoveGenerator redGenerator3 = new MoveGeneratorEvolutionTheory(redBoard3, MoveGeneratingStyle.ALL_TYPE_MOVES_PIECE_BY_PIECE,moveTypes, directions, true );

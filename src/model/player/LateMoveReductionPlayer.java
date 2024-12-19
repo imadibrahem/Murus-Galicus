@@ -8,7 +8,7 @@ import model.move.MoveGenerator;
 
 import java.util.List;
 
-public class ImprovedQuiescenceAndMoveSortingPlayer extends Player {
+public class LateMoveReductionPlayer extends Player{
     private final int searchDepth;
     private int currentSearchDepth = 1;
     private Move best;
@@ -21,24 +21,32 @@ public class ImprovedQuiescenceAndMoveSortingPlayer extends Player {
     private final MoveComparator maxComparator;
     private final MoveComparator minComparator;
     private final int interactiveDepthRatio;
+    private boolean doNull = true;
+    private final int reduction;
+    private String nullMoveFen = "";
+    private final int fullDepthMoveNumber;
 
-    public ImprovedQuiescenceAndMoveSortingPlayer(boolean isBlue, Board board, MoveGenerator moveGenerator, EvaluationFunction evaluationFunction, int window, int windowMultiplier, int searchDepth, int interactiveDepthRatio) {
+    public LateMoveReductionPlayer(boolean isBlue, Board board, MoveGenerator moveGenerator, EvaluationFunction evaluationFunction, int window, int windowMultiplier, int interactiveDepthRatio, int searchDepth, int reduction, int fullDepthMoveNumber) {
         super(isBlue, board, moveGenerator, evaluationFunction);
         this.searchDepth = searchDepth;
         this.window = window;
         this.windowMultiplier = windowMultiplier;
         this.interactiveDepthRatio = interactiveDepthRatio;
+        this.reduction = reduction;
+        this.fullDepthMoveNumber = fullDepthMoveNumber;
         maxComparator = new MoveComparator(isEvaluationBlue(),board, maxHistoryTable, killerMoves);
         minComparator = new MoveComparator(!isEvaluationBlue(),board, minHistoryTable, killerMoves);
 
     }
 
-    public ImprovedQuiescenceAndMoveSortingPlayer(boolean isBlue, Board board, MoveGenerator moveGenerator, EvaluationFunction evaluationFunction, int searchDepth) {
+    public LateMoveReductionPlayer(boolean isBlue, Board board, MoveGenerator moveGenerator, EvaluationFunction evaluationFunction, int searchDepth) {
         super(isBlue, board, moveGenerator, evaluationFunction);
         this.searchDepth = searchDepth;
         this.window = 10;
         this.windowMultiplier = 3;
         this.interactiveDepthRatio = 4;
+        this.reduction = 3;
+        this.fullDepthMoveNumber = 7;
         maxComparator = new MoveComparator(isEvaluationBlue(),board, maxHistoryTable, killerMoves);
         minComparator = new MoveComparator(!isEvaluationBlue(),board, minHistoryTable, killerMoves);
     }
@@ -77,20 +85,44 @@ public class ImprovedQuiescenceAndMoveSortingPlayer extends Player {
     }
 
     private int maximizer(int depth, int alpha, int beta) {
-        if (board.lostGame(true) || board.lostGame(false))return evaluationFunction.evaluate(isEvaluationBlue, currentSearchDepth - depth);
-        if (depth == 0) return quiescenceSearch(currentSearchDepth, alpha, beta);
+        if (board.lostGame(true) || board.lostGame(false)){
+            doNull = true;
+            return evaluationFunction.evaluate(isEvaluationBlue, currentSearchDepth - depth);
+        }
+        if (depth == 0){
+            doNull = true;
+            return quiescenceSearch(currentSearchDepth, alpha, beta);
+        }
         moveNodes++;
         List<Move> allMoves = maxComparator.filterAndSortMoves( moveGenerator.generateMoves(isEvaluationBlue), globalBest, depth, depth == currentSearchDepth, board.isInLosingPos(isEvaluationBlue), board.isInCheck(isEvaluationBlue));
         boolean firstMove = true;
+        doNull = true;
+        int moveIndex = 0;
         for (Move move : allMoves) {
+            moveIndex++;
+            if (doNull && !firstMove && depth > (reduction + 1) && (!board.isInCheck(isEvaluationBlue)) && board.towersNumber(isEvaluationBlue) > 2){
+                doNull = false;
+                nullMoveFen = board.generateFEN();
+                switchColor();
+                int nullMoveScore  = minimizer(depth - 1 - reduction, beta - 1, beta);
+                switchColor();
+                board.build(nullMoveFen);
+                if (nullMoveScore >= beta) {
+                    return beta;
+                }
+            }
             makeMove(move);
             switchColor();
             int rating;
             if (firstMove) {
                 rating = minimizer(depth - 1, alpha, beta);
                 firstMove = false;
-            } else {
-                rating = minimizer(depth - 1, alpha, alpha + 1);
+            }
+            else {
+                int reducedDepth = depth - 1;
+                if (depth > 3 && moveIndex > fullDepthMoveNumber && board.towersNumber(isEvaluationBlue) > 2 && board.towersNumber(isEvaluationBlue) > 2
+                        && (!board.isInCheck(isEvaluationBlue))  && (!board.isInCheck(!isEvaluationBlue))) reducedDepth = depth - 2;
+                rating = minimizer( reducedDepth, alpha, alpha + 1);
                 if (rating > alpha && rating < beta) {
                     rating = minimizer(depth - 1, alpha, beta);
                 }
@@ -107,19 +139,41 @@ public class ImprovedQuiescenceAndMoveSortingPlayer extends Player {
                 if (move.isTargetEmpty()) type = 0;
                 else if (move.isTargetEnemy()) type = 2;
                 storeKillerMove(move, depth, type);
+                doNull = true;
                 return alpha;
             }
         }
+        doNull = true;
         return alpha;
     }
 
     private int minimizer(int depth, int alpha, int beta) {
-        if (board.lostGame(true) || board.lostGame(false))return evaluationFunction.evaluate(isEvaluationBlue, currentSearchDepth - depth);
-        if (depth == 0) return quiescenceSearch(currentSearchDepth, alpha, beta);
+        if (board.lostGame(true) || board.lostGame(false)){
+            doNull = true;
+            return evaluationFunction.evaluate(isEvaluationBlue, currentSearchDepth - depth);
+        }
+        if (depth == 0){
+            doNull = true;
+            return quiescenceSearch(currentSearchDepth, alpha, beta);
+        }
         moveNodes++;
         List<Move> allMoves = minComparator.filterAndSortMoves( moveGenerator.generateMoves(!isEvaluationBlue), globalBest, depth,false ,board.isInLosingPos(!isEvaluationBlue), board.isInCheck(!isEvaluationBlue));
         boolean firstMove = true;
+        doNull = true;
+        int moveIndex = 0;
         for (Move move : allMoves) {
+            moveIndex++;
+            if (doNull && !firstMove && depth > (reduction + 1) && (!board.isInCheck(!isEvaluationBlue)) && board.towersNumber(!isEvaluationBlue) > 2){
+                doNull = false;
+                nullMoveFen = board.generateFEN();
+                switchColor();
+                int nullMoveScore  = maximizer(depth - 1 - reduction, alpha, alpha + 1);
+                switchColor();
+                board.build(nullMoveFen);
+                if (nullMoveScore <= alpha) {
+                    return alpha;
+                }
+            }
             makeMove(move);
             switchColor();
             int rating;
@@ -127,7 +181,10 @@ public class ImprovedQuiescenceAndMoveSortingPlayer extends Player {
                 rating = maximizer(depth - 1, alpha, beta);
                 firstMove = false;
             } else {
-                rating = maximizer(depth - 1, beta - 1, beta);
+                int reducedDepth = depth - 1;
+                if (depth > 3 && moveIndex > fullDepthMoveNumber && board.towersNumber(isEvaluationBlue) > 2 && board.towersNumber(isEvaluationBlue) > 2
+                        && (!board.isInCheck(isEvaluationBlue))  && (!board.isInCheck(!isEvaluationBlue))) reducedDepth = depth - 2;
+                rating = maximizer(reducedDepth, beta - 1, beta);
                 if (rating > alpha && rating < beta) {
                     rating = maximizer(depth - 1, alpha, beta);
                 }
@@ -143,9 +200,11 @@ public class ImprovedQuiescenceAndMoveSortingPlayer extends Player {
                 if (move.isTargetEmpty()) type = 0;
                 else if (move.isTargetEnemy()) type = 2;
                 storeKillerMove(move, depth, type);
+                doNull = true;
                 return beta;
             }
         }
+        doNull = true;
         return beta;
     }
 
@@ -197,6 +256,5 @@ public class ImprovedQuiescenceAndMoveSortingPlayer extends Player {
         }
 
     }
-
 
 }
