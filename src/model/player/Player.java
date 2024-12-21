@@ -1,6 +1,7 @@
 package model.player;
 
 import model.Board;
+import model.transpositionTable.ZobristHashing;
 import model.evaluationFunction.EvaluationFunction;
 import model.move.Move;
 import model.move.MoveGenerator;
@@ -26,6 +27,7 @@ public abstract class Player {
     protected List<Double> moveDurations = new ArrayList<>();
     protected Map<Integer, Integer> directionMap = new HashMap<>();
     protected MoveGenerator moveGenerator;
+    protected final ZobristHashing zobristHashing;
     protected static final int MAX_DEPTH = 15;
 
 
@@ -35,6 +37,7 @@ public abstract class Player {
         this.board = board;
         this.isEvaluationBlue = isBlue;
         this.evaluationFunction = evaluationFunction;
+        zobristHashing = new ZobristHashing(board, isEvaluationBlue);
         directionMap.put(-9, 8);
         directionMap.put(-8, 1);
         directionMap.put(-7, 2);
@@ -51,6 +54,7 @@ public abstract class Player {
         this.isEvaluationBlue = isBlue;
         this.moveGenerator = moveGenerator;
         this.evaluationFunction = evaluationFunction;
+        zobristHashing = new ZobristHashing(board, isEvaluationBlue);
         directionMap.put(-9, 8);
         directionMap.put(-8, 1);
         directionMap.put(-7, 2);
@@ -103,6 +107,10 @@ public abstract class Player {
 
     public EvaluationFunction getEvaluationFunction() {
         return evaluationFunction;
+    }
+
+    public ZobristHashing getZobristHashing() {
+        return zobristHashing;
     }
 
     public void switchColor() {

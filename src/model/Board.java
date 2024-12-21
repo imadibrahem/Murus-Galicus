@@ -101,4 +101,6 @@ public abstract class Board {
     }
 
     public abstract String printBoard(boolean isBlue);
+
+    public abstract int[] computeHashPositions(boolean isBlue);
 }

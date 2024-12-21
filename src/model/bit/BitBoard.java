@@ -470,8 +470,8 @@ public class BitBoard extends Board {
         return wallsNumber(isBlue) - Long.bitCount(notIsolatedWalls);
     }
 
+    @Override
     public String printBoard(boolean isBlue){
-
         String color = isBlue ? "Blue" : "Red";
         long walls = isBlue ? bw : rw;
         long towers = isBlue ? bt : rt;
@@ -495,6 +495,23 @@ public class BitBoard extends Board {
                 boardString.toString() +
                 "-------------------------\n";
 
+    }
+
+    @Override
+    public int[] computeHashPositions(boolean isBlue) {
+        int []values = isBlue ? new int []{0, 1, 2, 3} : new int []{2, 3, 0, 1};
+        int[] positions = new int[56];
+        long allPieces = bt|rt|rw|bw;
+        int index;
+        while (allPieces != 0){
+            index = Long.numberOfLeadingZeros(allPieces) - 8;
+            if ((bw & Long.highestOneBit(allPieces)) != 0) positions [index] = values[0];
+            else if ((rw & Long.highestOneBit(allPieces)) != 0) positions [index] = values[2];
+            else if ((bt & Long.highestOneBit(allPieces)) != 0) positions [index] = values[1];
+            else positions [index] = values[3];
+            allPieces ^= Long.highestOneBit(allPieces);
+        }
+        return positions;
     }
 
     ///////////////////////////////////////////////////////////////////////

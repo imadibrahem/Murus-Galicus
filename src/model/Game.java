@@ -33,6 +33,9 @@ public class Game {
     Deque<Move> moves;
     List<Move> blueMoves;
     List<Move> redMoves;
+    List<Long> hashes;
+    List<Long> blueHashes;
+    List<Long> redHashes;
     int rounds = 0;
     Player winner;
     short oldMoveInitial = 0;
@@ -51,6 +54,9 @@ public class Game {
         moves = new ArrayDeque<>();
         blueMoves = new ArrayList<>();
         redMoves = new ArrayList<>();
+        hashes = new ArrayList<>();
+        blueHashes = new ArrayList<>();
+        redHashes = new ArrayList<>();
         setFenAndPlayerOn();
         displayFrame = new DisplayFrame(FEN);
         displayBoard = displayFrame.getDisplayBoard();
@@ -105,6 +111,7 @@ public class Game {
         addMove(move);
         history.add(move.getValue());
         playerOn.makeMove(move);
+        addHashes();
         FEN = playerOn.getBoard().generateFEN();
         colorOldMove(playerOn.isEvaluationBlue(), move);
         displayBoard.updateBoard(FEN);
@@ -212,7 +219,7 @@ public class Game {
             System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++");
             System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++");
             System.out.println();
-            printNodesAndDurations();
+            printGameResults();
         }
         else if (redBoard.lostGame(false)){
             winner = blue;
@@ -221,12 +228,12 @@ public class Game {
             System.out.println("+++++++++++ GAME OVER BLUE PLAYER WON!! ++++++++++++++");
             System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++");
             System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++");;
-            printNodesAndDurations();
+            printGameResults();
         }
 
     }
 
-    public void printNodesAndDurations(){
+    public void printGameResults(){
         System.out.println();
         System.out.println("++++++++++++ Blue Player played : "+ blue.getRounds() +" rounds ++++++++++++");
         System.out.println("++++++++++++ Blue Player Nodes: "+ blue.getNodes() +" ++++++++++++++++");
@@ -259,6 +266,13 @@ public class Game {
         System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++");
         System.out.println("Blue Moved: " + blueMoves);
         System.out.println("Red Moved: " + redMoves);
+        System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+        System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+        System.out.println();
+        System.out.println("+++++++++++++++++++ Game Hashes ++++++++++++++++++++++ ");
+        System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+        System.out.println("Blue Hashes: " + blueHashes);
+        System.out.println("Red Hashes: " + redHashes);
         System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++");
         System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++");
         System.out.println();
@@ -321,6 +335,16 @@ public class Game {
         moves.add(move);
     }
 
+    public void addHashes(){
+        if (playerOn.isEvaluationBlue()) {
+            blueHashes.add(playerOn.getZobristHashing().getHash());
+        } else {
+            redHashes.add(playerOn.getZobristHashing().getHash());
+        }
+        hashes.add(playerOn.getZobristHashing().getHash());
+    }
+
+
     public void colorOldMove(boolean isBlue, Move move){
         displayBoard.displaySquare[oldMoveInitial].returnOldColor();
         displayBoard.displaySquare[oldMoveFirst].returnOldColor();
@@ -362,9 +386,10 @@ public class Game {
         //Player blue = new FunctionPlayer(true, blueBoard,blueGenerator, blueEvaluationFunction);
         //Player blue = new MinMax(true, blueBoard,blueGenerator, blueEvaluationFunction,4);
         //Player blue = new AlphaBeta(true, blueBoard,blueGenerator, blueEvaluationFunction,4);
-        Player blue = new IterativeDeepeningFixedDepth(true, blueBoard,blueGenerator, blueEvaluationFunction,4);
+        //Player blue = new IterativeDeepeningFixedDepth(true, blueBoard,blueGenerator, blueEvaluationFunction,4);
         //Player blue = new QuiescencePlayer(true, blueBoard,blueGenerator, blueEvaluationFunction,4);
         //Player blue = new Tester(true, blueBoard,blueGenerator, blueEvaluationFunction,4);
+        Player blue = new HashTester(true, blueBoard,blueGenerator, blueEvaluationFunction,6);
 
         Board redBoard = new ObjectBoard(FenTrimmer(FenInitial));
         MoveGenerator redGenerator = new MoveGeneratorEvolutionTheory(redBoard, MoveGeneratingStyle.ALL_TYPE_MOVES_PIECE_BY_PIECE,moveTypes, directions, true );
@@ -373,8 +398,9 @@ public class Game {
         //Player red = new MinMax(false, redBoard,redGenerator, redEvaluationFunction,4);
         //Player red = new AlphaBeta(false, redBoard,redGenerator, redEvaluationFunction,4);
         //Player red = new IterativeDeepeningFixedDepth(false, redBoard,redGenerator, redEvaluationFunction,4);
-        Player red = new QuiescencePlayer(false, redBoard,redGenerator, redEvaluationFunction,4);
+        //Player red = new QuiescencePlayer(false, redBoard,redGenerator, redEvaluationFunction,4);
         //Player red = new Tester(false, redBoard,redGenerator, redEvaluationFunction,2);
+        Player red = new HashTester(false, redBoard,redGenerator, redEvaluationFunction,6);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -388,10 +414,11 @@ public class Game {
         //Player blue2 = new Tester(true, blueBoard2,blueGenerator2, blueEvaluationFunction2,5);
         //Player blue2 = new NullWindowAspirationPlayer(true, blueBoard2,blueGenerator2, blueEvaluationFunction2,6);
         //Player blue2 = new MoveSortingPlayer(true, blueBoard2,blueGenerator2, blueEvaluationFunction2,6);
-        Player blue2 = new ImprovedQuiescenceAndMoveSortingPlayer(true, blueBoard2,blueGenerator2, blueEvaluationFunction2,7);
+        //Player blue2 = new ImprovedQuiescenceAndMoveSortingPlayer(true, blueBoard2,blueGenerator2, blueEvaluationFunction2,7);
         //Player blue2 = new ThreateningQuiescencePlayer(true, blueBoard2,blueGenerator2, blueEvaluationFunction2,7);
         //Player blue2 = new NullMovePlayer(true, blueBoard2,blueGenerator2, blueEvaluationFunction2,6);
-        //Player blue2 = new LateMoveReductionPlayer(true, blueBoard2,blueGenerator2, blueEvaluationFunction2,8);
+        //Player blue2 = new LateMoveReductionPlayer(true, blueBoard2,blueGenerator2, blueEvaluationFunction2,7);
+        Player blue2 = new HashTester(true, blueBoard2,blueGenerator2, blueEvaluationFunction2,6);
 
         Board redBoard2 = new BitBoard(FenTrimmer(FenInitial));
         MoveGenerator redGenerator2 = new MoveGeneratorEvolutionTheory(redBoard2, MoveGeneratingStyle.ALL_TYPE_MOVES_PIECE_BY_PIECE,moveTypes, directions, true );
@@ -406,8 +433,8 @@ public class Game {
         //Player red2 = new ImprovedQuiescenceAndMoveSortingPlayer(false, redBoard2,redGenerator2, redEvaluationFunction2,8);
         //Player red2 = new ThreateningQuiescencePlayer(false, redBoard2,redGenerator2, redEvaluationFunction2,7);
         //Player red2 = new NullMovePlayer(false, redBoard2,redGenerator2, redEvaluationFunction2,8);
-        Player red2 = new LateMoveReductionPlayer(false, redBoard2,redGenerator2, redEvaluationFunction2,7);
-
+        //Player red2 = new LateMoveReductionPlayer(false, redBoard2,redGenerator2, redEvaluationFunction2,5);
+        Player red2 = new HashTester(false, redBoard2,redGenerator2, redEvaluationFunction2,6);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -437,13 +464,13 @@ public class Game {
         //Game game = new Game(userInput, red, blue, FenInitial);
         //game.playGame();
 
-        Game game2 = new Game(userInput2, red2, blue2, FenInitial);
-        game2.playGame();
+        //Game game2 = new Game(userInput2, red2, blue2, FenInitial);
+        //game2.playGame();
 
         //GameComparator gameComparator = new GameComparator(game, game2);
         //gameComparator.compareBoardsFunctions(false);
-        //PlayerComparator playerComparator = new PlayerComparator(userInput2, blue2, red2, userInput3, blue3, red3, FenInitial);
-        //playerComparator.playGames();
+        PlayerComparator playerComparator = new PlayerComparator(userInput2, blue2, red2, userInput, blue, red, FenInitial);
+        playerComparator.playGames();
     }
 
 }

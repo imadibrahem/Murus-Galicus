@@ -31,6 +31,7 @@ public class GameComparator {
             compareDistancesAndColumns();
             compareIsolatedPieces();
             compareEvaluation();
+            //compareHashing();
             color = firstGame.playerOn.isEvaluationBlue() ? "Blue Player" : "Red Player";
         }
         //secondGame.rewindGame();
@@ -303,6 +304,19 @@ public class GameComparator {
                 System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
                 System.out.println();
             }
+        }
+    }
+
+    public void compareHashing(){
+        long firstBlueHash = firstGame.blue.getZobristHashing().getHash();
+        long secondBlueHash = secondGame.blue.getZobristHashing().getHash();
+        long firstRedHash = firstGame.red.getZobristHashing().getHash();
+        long secondRedHash = secondGame.red.getZobristHashing().getHash();
+        if (firstBlueHash != firstRedHash || secondBlueHash != secondRedHash || firstBlueHash != secondBlueHash){
+            System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+            System.out.println("!!!!firstBlueHash = "+ firstBlueHash +"!!!!firstRedHash = "+ firstRedHash +"!!!");
+            System.out.println("!!!!secondBlueHash = "+ secondBlueHash +"!!!!secondRedHash = "+ secondRedHash +"!!!");
+            System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
         }
     }
 

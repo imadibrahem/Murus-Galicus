@@ -31,5 +31,9 @@ public class PlayerComparator {
         second.playGame();
         System.out.println(first.moves);
         System.out.println(second.moves);
+        //if (first.hashes != second.hashes) System.out.println("!!!!!!!!!!!!!!! Problem with Hashing !!!!!!!!!!!!!!!");
+        System.out.println(first.hashes);
+        System.out.println(second.hashes);
+
     }
 }
