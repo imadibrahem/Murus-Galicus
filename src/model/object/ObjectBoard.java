@@ -497,14 +497,27 @@ public class ObjectBoard extends Board {
     public int[] computeHashPositions(boolean isBlue) {
         int []values = isBlue ? new int []{0, 1, 2, 3} : new int []{2, 3, 0, 1};
         int[] positions = new int[56];
+        int index;
         List<Piece> blueWalls = blueArmy.getWalls();
         List<Piece> redWalls = redArmy.getWalls();
         List<Piece> blueTowers = blueArmy.getTowers();
         List<Piece> redTowers = redArmy.getTowers();
-        for (Piece piece : blueWalls) positions[piece.getSquare().getLocation()] = values[0];
-        for (Piece piece : redWalls) positions[piece.getSquare().getLocation()] = values[2];
-        for (Piece piece : blueTowers) positions[piece.getSquare().getLocation()] = values[1];
-        for (Piece piece : redTowers) positions[piece.getSquare().getLocation()] = values[3];
+        for (Piece piece : blueWalls){
+            index = isBlue ? piece.getSquare().getLocation() : 55 - (piece.getSquare().getLocation());
+            positions[index] = values[0];
+        }
+        for (Piece piece : redWalls){
+            index = isBlue ? piece.getSquare().getLocation() : 55 - (piece.getSquare().getLocation());
+            positions[index] = values[2];
+        }
+        for (Piece piece : blueTowers){
+            index = isBlue ? piece.getSquare().getLocation() : 55 - (piece.getSquare().getLocation());
+            positions[index] = values[1];
+        }
+        for (Piece piece : redTowers){
+            index = isBlue ? piece.getSquare().getLocation() : 55 - (piece.getSquare().getLocation());
+            positions[index] = values[3];
+        }
         return positions;
     }
 

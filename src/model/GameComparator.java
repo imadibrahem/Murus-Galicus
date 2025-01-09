@@ -38,6 +38,52 @@ public class GameComparator {
         //firstGame.rewindGame();
     }
 
+    public void compareHashingSymmetry(){
+        secondGame.switchPlayer();
+        long firstBlueHash;
+        long secondBlueHash;
+        long firstRedHash;
+        long secondRedHash;
+        firstGame.blue.getZobristHashing().computeHash();
+        secondGame.blue.getZobristHashing().computeHash();
+        firstGame.red.getZobristHashing().computeHash();
+        secondGame.red.getZobristHashing().computeHash();
+        firstBlueHash = firstGame.blue.getZobristHashing().getHash();
+        secondBlueHash = secondGame.blue.getZobristHashing().getHash();
+        firstRedHash = firstGame.red.getZobristHashing().getHash();
+        secondRedHash = secondGame.red.getZobristHashing().getHash();
+        if (firstBlueHash != firstRedHash || secondBlueHash != secondRedHash || firstBlueHash != secondRedHash){
+            System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+            System.out.println("!!!!firstBlueHash = "+ firstBlueHash +"!!!!firstRedHash = "+ firstRedHash +"!!!");
+            System.out.println("!!!!secondBlueHash = "+ secondBlueHash +"!!!!secondRedHash = "+ secondRedHash +"!!!");
+            System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+        }
+        System.out.println("-------------------------------------------------");
+        while (firstGame.winner == null){
+            firstGame.playRound();
+            secondGame.makeRound(firstGame.moves.peekLast());
+            firstGame.switchPlayer();
+            secondGame.switchPlayer();
+            firstGame.checkForWinner();
+            firstGame.blue.getZobristHashing().computeHash();
+            secondGame.blue.getZobristHashing().computeHash();
+            firstGame.red.getZobristHashing().computeHash();
+            secondGame.red.getZobristHashing().computeHash();
+            firstBlueHash = firstGame.blue.getZobristHashing().getHash();
+            secondBlueHash = secondGame.blue.getZobristHashing().getHash();
+            firstRedHash = firstGame.red.getZobristHashing().getHash();
+            secondRedHash = secondGame.red.getZobristHashing().getHash();
+            if (firstBlueHash != firstRedHash || secondBlueHash != secondRedHash || firstBlueHash != secondRedHash){
+                System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+                System.out.println("!!!!firstBlueHash = "+ firstBlueHash +"!!!!firstRedHash = "+ firstRedHash +"!!!");
+                System.out.println("!!!!secondBlueHash = "+ secondBlueHash +"!!!!secondRedHash = "+ secondRedHash +"!!!");
+                System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+            }
+
+            color = firstGame.playerOn.isEvaluationBlue() ? "Blue Player" : "Red Player";
+        }
+    }
+
     public void compareMoveGenerating(){
         firstGamePlayerOnAllStyles = firstGame.playerOn.getMoveGenerator().generateAllStyles(firstGame.playerOn.isEvaluationBlue());
         secondGamePlayerOnAllStyles = secondGame.playerOn.getMoveGenerator().generateAllStyles(secondGame.playerOn.isEvaluationBlue());

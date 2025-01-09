@@ -6,10 +6,7 @@ import model.evaluationFunction.EvaluationFunction;
 import model.move.Move;
 import model.move.MoveGenerator;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public abstract class Player {
     protected boolean isBlue;
@@ -29,7 +26,8 @@ public abstract class Player {
     protected MoveGenerator moveGenerator;
     protected final ZobristHashing zobristHashing;
     protected static final int MAX_DEPTH = 15;
-
+    protected boolean doNull = true;
+    Scanner scanner = new Scanner(System.in);
 
 
     public Player(boolean isBlue,Board board, EvaluationFunction evaluationFunction) {
@@ -101,6 +99,10 @@ public abstract class Player {
         return board;
     }
 
+    public boolean isDoNull() {
+        return doNull;
+    }
+
     public MoveGenerator getMoveGenerator() {
         return moveGenerator;
     }
@@ -133,6 +135,42 @@ public abstract class Player {
         board.unmakeMove(move, isBlue);
     }
 
+    public int priority(int depth, float roundsFactor, float towersFactor, float distancesFactor){
+        int roundsPlayed = rounds + depth;
+        int towersNumber = board.towersNumber(isEvaluationBlue) + board.towersNumber(!isEvaluationBlue);
+        int[] values = new int[]{0, 1, 2, 3, 4, 5, 6};
+        int piecesNumber = towersNumber + board.wallsNumber(isEvaluationBlue) + board.wallsNumber(!isEvaluationBlue);
+        int distances = board.towersDistances(isEvaluationBlue, values) + board.wallsDistances(isEvaluationBlue, values)
+                + board.towersDistances(!isEvaluationBlue, values) + board.wallsDistances(!isEvaluationBlue, values);
+        int distancesMean = distances / piecesNumber;
+        int result = (int) ((roundsPlayed * roundsFactor) + (towersNumber * towersFactor) + (distancesMean * distancesFactor));
+        if (result > 15) result = 15;
+        else if (result < 0) result = 0;
+        return result;
+    }
+
+    public int memoryPriority(int depth, float roundsFactor, float towersFactor, float distancesFactor){
+        float roundResult = depth - (roundsFactor * rounds);
+        int towersNumber = board.towersNumber(isEvaluationBlue) + board.towersNumber(!isEvaluationBlue);
+        int[] values = new int[]{0, 1, 2, 3, 4, 5, 6};
+        int piecesNumber = towersNumber + board.wallsNumber(isEvaluationBlue) + board.wallsNumber(!isEvaluationBlue);
+        int distances = board.towersDistances(isEvaluationBlue, values) + board.wallsDistances(isEvaluationBlue, values)
+                + board.towersDistances(!isEvaluationBlue, values) + board.wallsDistances(!isEvaluationBlue, values);
+        int distancesMean = distances / piecesNumber;
+        int result = (int) (roundResult + (towersNumber * towersFactor) + (distancesMean * distancesFactor));
+        if (result > 15) result = 15;
+        else if (result < 0) result = 0;
+        return result;
+    }
+
+    public String tableUsageReport(){
+        return "No table found for this player..";
+    }
+
+    public void updateTables(){
+
+    }
+
     public Move recieveCords(int initial , int targetNear, int targetFar){
         int location = this.isEvaluationBlue() ? initial : 55 - initial;
         int distance = isEvaluationBlue() ? targetNear - initial :initial - targetNear;
@@ -156,6 +194,7 @@ public abstract class Player {
     public Move findMove(){
         rounds++;
         moveStartTime = System.currentTimeMillis();
+        //scanner.nextLine();
         Move move = decideMove();
         moveDuration = (System.currentTimeMillis() - moveStartTime) / 1000;
         moveDurations.add(moveDuration);

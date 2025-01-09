@@ -58,14 +58,14 @@ public class EvaluationFunction {
     protected int towersRatio(boolean isBlue, int[] towersRatioFactor){
         int towerDifference = board.towersNumber(isBlue) - board.towersNumber(!isBlue);
         if (towerDifference == 0) return 0;
-        /*if (towerDifference > 6 || towerDifference < -6){
+        if (towerDifference > 8 || towerDifference < -8){
             System.out.println("towerDifference: " + towerDifference);
             String Fen = board.generateFEN();
             DisplayFrame displayFrame = new DisplayFrame(Fen);
             DisplayBoard displayBoard = displayFrame.getDisplayBoard();
 
         }
-         */
+
         return towerDifference > 0 ? towersRatioFactor[towerDifference - 1] : - (towersRatioFactor[(-towerDifference) - 1]);
     }
 

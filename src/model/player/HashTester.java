@@ -65,7 +65,7 @@ public class HashTester extends Player{
         nodes += moveNodes;
         moveNodes = 0;
         currentSearchDepth = 1;
-        zobristHashing.updateHashFMoves(globalBest,isEvaluationBlue);
+        zobristHashing.updateHashForMoves(globalBest,isEvaluationBlue);
         //System.out.println(zobristHashing.getHash());
         return globalBest;
     }
@@ -117,7 +117,7 @@ public class HashTester extends Player{
             //System.out.println("================================");
             long beforeMake = zobristHashing.getHash();
             //System.out.println(beforeMake);
-            zobristHashing.updateHashFMoves(move,isEvaluationBlue);
+            zobristHashing.updateHashForMoves(move,isEvaluationBlue);
             long afterMake = zobristHashing.getHash();
             //System.out.println(afterMake);
             //System.out.println("================================");
@@ -142,7 +142,7 @@ public class HashTester extends Player{
             //System.out.println(beforeUnmake);
             switchColor();
             unmakeMove(move);
-            zobristHashing.updateHashFMoves(move,isEvaluationBlue);
+            zobristHashing.updateHashForMoves(move,isEvaluationBlue);
             long afterUnmake = zobristHashing.getHash();
             //System.out.println(afterUnmake);
             //System.out.println("================================");
@@ -194,7 +194,7 @@ public class HashTester extends Player{
                 }
             }
             long beforeMake = zobristHashing.getHash();
-            zobristHashing.updateHashFMoves(move,!isEvaluationBlue);
+            zobristHashing.updateHashForMoves(move,!isEvaluationBlue);
             long afterMake = zobristHashing.getHash();
             makeMove(move);
             switchColor();
@@ -214,7 +214,7 @@ public class HashTester extends Player{
             switchColor();
             unmakeMove(move);
             long beforeUnmake = zobristHashing.getHash();
-            zobristHashing.updateHashFMoves(move,!isEvaluationBlue);
+            zobristHashing.updateHashForMoves(move,!isEvaluationBlue);
             long afterUnmake = zobristHashing.getHash();
             if (beforeMake != afterUnmake || afterMake != beforeUnmake) System.out.println("beforeMake = " + beforeMake + " | afterUnmake = " + afterUnmake + " ||| " + "afterMake = " + afterMake + " | beforeUnmake = " + beforeUnmake);
             if (rating < beta) {

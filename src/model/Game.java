@@ -219,6 +219,8 @@ public class Game {
             System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++");
             System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++");
             System.out.println();
+            blue.updateTables();
+            red.updateTables();
             printGameResults();
         }
         else if (redBoard.lostGame(false)){
@@ -228,9 +230,11 @@ public class Game {
             System.out.println("+++++++++++ GAME OVER BLUE PLAYER WON!! ++++++++++++++");
             System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++");
             System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++");;
+            System.out.println();
+            blue.updateTables();
+            red.updateTables();
             printGameResults();
         }
-
     }
 
     public void printGameResults(){
@@ -276,6 +280,14 @@ public class Game {
         System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++");
         System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++");
         System.out.println();
+        System.out.println();
+        System.out.println("++++++++++++++++++ Tables report +++++++++++++++++++++ ");
+        System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+        System.out.println("Blue Table: " + blue.tableUsageReport());
+        System.out.println("Red Table: " + red.tableUsageReport());
+        System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+        System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+        System.out.println();
        /*
         for (Move move : blueMoves){
             System.out.println("Blue player Move: " + move + "Initial Row: " + move.getInitialRow(true) + " | Target Row: " + move.getTargetRow(true));
@@ -316,7 +328,6 @@ public class Game {
                 System.out.println("!!!!!!!!!!!!!!!!!!!! AFTER !!!!!!!!!!!!!!!!!!!!!!!!!!");
                 System.out.println(after);
                 System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-
             }
             System.out.println();
         }
@@ -332,6 +343,7 @@ public class Game {
         } else {
             redMoves.add(move);
         }
+        //System.out.println(move);
         moves.add(move);
     }
 
@@ -367,7 +379,6 @@ public class Game {
     }
 
     public static void main (String[] args){
-
         UserInput userInput = new UserInput();
         UserInput userInput2 = new UserInput();
         UserInput userInput3 = new UserInput();
@@ -389,7 +400,7 @@ public class Game {
         //Player blue = new IterativeDeepeningFixedDepth(true, blueBoard,blueGenerator, blueEvaluationFunction,4);
         //Player blue = new QuiescencePlayer(true, blueBoard,blueGenerator, blueEvaluationFunction,4);
         //Player blue = new Tester(true, blueBoard,blueGenerator, blueEvaluationFunction,4);
-        Player blue = new HashTester(true, blueBoard,blueGenerator, blueEvaluationFunction,6);
+        //Player blue = new DoubleTabledPlayer(true, blueBoard,blueGenerator, blueEvaluationFunction,6);
 
         Board redBoard = new ObjectBoard(FenTrimmer(FenInitial));
         MoveGenerator redGenerator = new MoveGeneratorEvolutionTheory(redBoard, MoveGeneratingStyle.ALL_TYPE_MOVES_PIECE_BY_PIECE,moveTypes, directions, true );
@@ -400,7 +411,7 @@ public class Game {
         //Player red = new IterativeDeepeningFixedDepth(false, redBoard,redGenerator, redEvaluationFunction,4);
         //Player red = new QuiescencePlayer(false, redBoard,redGenerator, redEvaluationFunction,4);
         //Player red = new Tester(false, redBoard,redGenerator, redEvaluationFunction,2);
-        Player red = new HashTester(false, redBoard,redGenerator, redEvaluationFunction,6);
+        //Player red = new DoubleTabledPlayer(false, redBoard,redGenerator, redEvaluationFunction,6);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -417,8 +428,10 @@ public class Game {
         //Player blue2 = new ImprovedQuiescenceAndMoveSortingPlayer(true, blueBoard2,blueGenerator2, blueEvaluationFunction2,7);
         //Player blue2 = new ThreateningQuiescencePlayer(true, blueBoard2,blueGenerator2, blueEvaluationFunction2,7);
         //Player blue2 = new NullMovePlayer(true, blueBoard2,blueGenerator2, blueEvaluationFunction2,6);
-        //Player blue2 = new LateMoveReductionPlayer(true, blueBoard2,blueGenerator2, blueEvaluationFunction2,7);
-        Player blue2 = new HashTester(true, blueBoard2,blueGenerator2, blueEvaluationFunction2,6);
+        //Player blue2 = new HashTester(true, blueBoard2,blueGenerator2, blueEvaluationFunction2,6);
+        Player blue2 = new LateMoveReductionPlayer(true, blueBoard2,blueGenerator2, blueEvaluationFunction2,6);
+        //Player blue2 = new TranspositionTablePlayer(true, blueBoard2,blueGenerator2, blueEvaluationFunction2, 6);
+        //Player blue2 = new DoubleTabledPlayer(true, blueBoard2,blueGenerator2, blueEvaluationFunction2,8);
 
         Board redBoard2 = new BitBoard(FenTrimmer(FenInitial));
         MoveGenerator redGenerator2 = new MoveGeneratorEvolutionTheory(redBoard2, MoveGeneratingStyle.ALL_TYPE_MOVES_PIECE_BY_PIECE,moveTypes, directions, true );
@@ -433,8 +446,10 @@ public class Game {
         //Player red2 = new ImprovedQuiescenceAndMoveSortingPlayer(false, redBoard2,redGenerator2, redEvaluationFunction2,8);
         //Player red2 = new ThreateningQuiescencePlayer(false, redBoard2,redGenerator2, redEvaluationFunction2,7);
         //Player red2 = new NullMovePlayer(false, redBoard2,redGenerator2, redEvaluationFunction2,8);
-        //Player red2 = new LateMoveReductionPlayer(false, redBoard2,redGenerator2, redEvaluationFunction2,5);
-        Player red2 = new HashTester(false, redBoard2,redGenerator2, redEvaluationFunction2,6);
+        //Player red2 = new HashTester(false, redBoard2,redGenerator2, redEvaluationFunction2,6);
+        //Player red2 = new LateMoveReductionPlayer(false, redBoard2,redGenerator2, redEvaluationFunction2,6);
+        //Player red2 = new TranspositionTablePlayer(false, redBoard2,redGenerator2, redEvaluationFunction2,6);
+        Player red2 = new DoubleTabledPlayer(false, redBoard2,redGenerator2, redEvaluationFunction2,8);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -444,7 +459,8 @@ public class Game {
         //Player blue3 = new AlphaBeta(true, blueBoard3,blueGenerator3, blueEvaluationFunction3,4);
         //Player blue3 = new IterativeDeepeningFixedDepth(true, blueBoard3,blueGenerator3, blueEvaluationFunction3,5);
         //Player blue3 = new NullWindowAspirationPlayer(true, blueBoard3,blueGenerator3, blueEvaluationFunction3,5);
-        Player blue3 = new MoveSortingPlayer(true, blueBoard3,blueGenerator3, blueEvaluationFunction3,6);
+        //Player blue3 = new MoveSortingPlayer(true, blueBoard3,blueGenerator3, blueEvaluationFunction3,6);
+        //Player blue3 = new DoubleTabledPlayer(true, blueBoard3,blueGenerator3, blueEvaluationFunction3,6);
 
         Board redBoard3 = new BitBoard(FenTrimmer(FenInitial));
         MoveGenerator redGenerator3 = new MoveGeneratorEvolutionTheory(redBoard3, MoveGeneratingStyle.ALL_TYPE_MOVES_PIECE_BY_PIECE,moveTypes, directions, true );
@@ -453,8 +469,9 @@ public class Game {
         //Player red3 = new AlphaBeta(false, redBoard3,redGenerator3, redEvaluationFunction3, 4);
         //Player red3 = new IterativeDeepeningFixedDepth(false, redBoard3,redGenerator3, redEvaluationFunction3, 4);
         //Player red3 = new QuiescencePlayer(false, redBoard3,redGenerator3, redEvaluationFunction3, 4);
-        Player red3 = new NullWindowAspirationPlayer(false, redBoard3,redGenerator3, redEvaluationFunction3, 5);
+        //Player red3 = new NullWindowAspirationPlayer(false, redBoard3,redGenerator3, redEvaluationFunction3, 5);
         //Player red3 = new MoveSortingPlayer(false, redBoard3,redGenerator3, redEvaluationFunction3, 5);
+        //Player red3 = new DoubleTabledPlayer(false, redBoard3,redGenerator3, redEvaluationFunction3, 6);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -464,13 +481,14 @@ public class Game {
         //Game game = new Game(userInput, red, blue, FenInitial);
         //game.playGame();
 
-        //Game game2 = new Game(userInput2, red2, blue2, FenInitial);
-        //game2.playGame();
+        Game game2 = new Game(userInput2, red2, blue2, FenInitial);
+        game2.playGame();
 
         //GameComparator gameComparator = new GameComparator(game, game2);
         //gameComparator.compareBoardsFunctions(false);
-        PlayerComparator playerComparator = new PlayerComparator(userInput2, blue2, red2, userInput, blue, red, FenInitial);
-        playerComparator.playGames();
+        //gameComparator.compareHashingSymmetry();
+        //PlayerComparator playerComparator = new PlayerComparator(userInput2, blue2, red2, userInput3, blue3, red3, FenInitial);
+        //playerComparator.playGames();
     }
 
 }

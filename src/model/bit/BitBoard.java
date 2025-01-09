@@ -505,6 +505,7 @@ public class BitBoard extends Board {
         int index;
         while (allPieces != 0){
             index = Long.numberOfLeadingZeros(allPieces) - 8;
+            if (!isBlue) index = 55 - index;
             if ((bw & Long.highestOneBit(allPieces)) != 0) positions [index] = values[0];
             else if ((rw & Long.highestOneBit(allPieces)) != 0) positions [index] = values[2];
             else if ((bt & Long.highestOneBit(allPieces)) != 0) positions [index] = values[1];

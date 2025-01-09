@@ -65,7 +65,7 @@ public class ZobristHashing {
         this.hash = hash;
     }
 
-    public void updateHashFMoves(Move move, boolean isBlue) {
+    public void updateHashForMoves(Move move, boolean isBlue) {
         int []values = isBlue == isBoardBlue ? new int []{0, 1, 2, 3} : new int []{2, 3, 0, 1};
         int initialLocation = move.getInitialLocation(isBlue);
         short nearTarget;
