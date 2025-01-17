@@ -3,7 +3,7 @@ package model;
 import model.bit.BitBoard;
 import model.evaluationFunction.EvaluationFunction;
 import model.evaluationFunction.InitialEvaluationFunction;
-import model.evolutionTheory.MoveGeneratorEvolutionTheory;
+import model.move.MoveGeneratorEvolutionTheory;
 import model.move.Move;
 import model.move.MoveGeneratingStyle;
 import model.move.MoveGenerator;
@@ -25,6 +25,7 @@ public class Game {
     DisplayBoard displayBoard;
     Board blueBoard;
     Board redBoard;
+    Board generalBoard;
     Player red;
     Player blue;
     Player playerOn;
@@ -45,11 +46,14 @@ public class Game {
     double redDurationMean = 0;
     double blueNodesMean = 0;
     double redNodesMean = 0;
+    double gameDuration = 0;
+    Scanner scanner = new Scanner(System.in);
 
     public Game(UserInput userInput, Player red, Player blue, String initialFEN) {
         this.red = red;
         this.blue = blue;
         this.initialFEN =initialFEN;
+        generalBoard = new BitBoard(FenTrimmer(initialFEN));
         history = new ArrayList<>();
         moves = new ArrayDeque<>();
         blueMoves = new ArrayList<>();
@@ -107,14 +111,21 @@ public class Game {
     public void playRound() {
         rounds++;
         Move move = playerOn.findMove();
-        //System.out.println(move + "|||||||||||||||||||||||||||");
-        addMove(move);
-        history.add(move.getValue());
-        playerOn.makeMove(move);
-        addHashes();
-        FEN = playerOn.getBoard().generateFEN();
-        colorOldMove(playerOn.isEvaluationBlue(), move);
-        displayBoard.updateBoard(FEN);
+        if (!generalBoard.generateMoves(playerOn.isEvaluationBlue()).contains(move)) {
+            System.out.println("Invalid Move!! Player lost");
+            winner = playerOn.isEvaluationBlue()? red : blue;
+        }
+        else{
+            addMove(move);
+            history.add(move.getValue());
+            playerOn.makeMove(move);
+            addHashes();
+            generalBoard.makeMove(move,playerOn.isEvaluationBlue());
+            FEN = generalBoard.generateFEN();
+            colorOldMove(playerOn.isEvaluationBlue(), move);
+            displayBoard.updateBoard(FEN);
+        }
+
     }
 
     public void withdrawRound() {
@@ -193,13 +204,17 @@ public class Game {
         blue.getBoard().build(FEN);
         displayBoard.updateBoard(FEN);
         while (!moves.isEmpty()){
+            /*
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
+
+             */
             Move move = moves.pollFirst();
             // System.out.println(move);
+            scanner.nextLine();
             playerOn.makeMove(move);
             FEN = playerOn.getBoard().generateFEN();
             displayBoard.updateBoard(FEN);
@@ -211,26 +226,15 @@ public class Game {
     }
 
     public void checkForWinner(){
-        if (blueBoard.lostGame(true)){
-            winner = red;
+        if (blueBoard.lostGame(true)) winner = red;
+        else if (redBoard.lostGame(false)) winner = blue;
+        if (winner != null){
             System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++");
             System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++");
-            System.out.println("+++++++++++ GAME OVER RED PLAYER WON!! +++++++++++++++");
+            if (winner == blue) System.out.println("+++++++++++ GAME OVER BLUE PLAYER WON!! ++++++++++++++");
+            else System.out.println("+++++++++++ GAME OVER RED PLAYER WON!! +++++++++++++++");
             System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++");
             System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++");
-            System.out.println();
-            blue.updateTables();
-            red.updateTables();
-            printGameResults();
-        }
-        else if (redBoard.lostGame(false)){
-            winner = blue;
-            System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++");
-            System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++");
-            System.out.println("+++++++++++ GAME OVER BLUE PLAYER WON!! ++++++++++++++");
-            System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++");
-            System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++");;
-            System.out.println();
             blue.updateTables();
             red.updateTables();
             printGameResults();
@@ -259,6 +263,10 @@ public class Game {
         redDurationMean = red.getDuration()/red.getRounds();
         blueNodesMean =  blue.getNodes()/(double)blue.getRounds();
         redNodesMean = red.getNodes()/(double)red.getRounds();
+        gameDuration = blue.getDuration() + red.getDuration();
+        int gameDurationHours = (int) (gameDuration / 3600);
+        int gameDurationMinutes = (int) ((gameDuration % 3600) / 60);
+        double gameDurationSeconds = gameDuration % 60;
         System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++");
         System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++");
         System.out.println("Blue Duration Mean: " + blueDurationMean + " ||| Red Duration Mean: " + redDurationMean);
@@ -266,6 +274,11 @@ public class Game {
         System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++");
         System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++");
         System.out.println();
+        System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+        System.out.println("gameDuration: " + gameDurationHours + " hours, " + gameDurationMinutes + " minutes, " + String.format("%.2f", gameDurationSeconds) + " seconds");
+        System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+        System.out.println();
+        /*
         System.out.println("++++++++++++++++++++ Game Moves ++++++++++++++++++++++ ");
         System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++");
         System.out.println("Blue Moved: " + blueMoves);
@@ -280,7 +293,9 @@ public class Game {
         System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++");
         System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++");
         System.out.println();
-        System.out.println();
+
+         */
+
         System.out.println("++++++++++++++++++ Tables report +++++++++++++++++++++ ");
         System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++");
         System.out.println("Blue Table: " + blue.tableUsageReport());
@@ -288,6 +303,8 @@ public class Game {
         System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++");
         System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++");
         System.out.println();
+
+        /////////////////////////////////////////////////////////////////////////////////
        /*
         for (Move move : blueMoves){
             System.out.println("Blue player Move: " + move + "Initial Row: " + move.getInitialRow(true) + " | Target Row: " + move.getTargetRow(true));
@@ -429,9 +446,9 @@ public class Game {
         //Player blue2 = new ThreateningQuiescencePlayer(true, blueBoard2,blueGenerator2, blueEvaluationFunction2,7);
         //Player blue2 = new NullMovePlayer(true, blueBoard2,blueGenerator2, blueEvaluationFunction2,6);
         //Player blue2 = new HashTester(true, blueBoard2,blueGenerator2, blueEvaluationFunction2,6);
-        Player blue2 = new LateMoveReductionPlayer(true, blueBoard2,blueGenerator2, blueEvaluationFunction2,6);
-        //Player blue2 = new TranspositionTablePlayer(true, blueBoard2,blueGenerator2, blueEvaluationFunction2, 6);
-        //Player blue2 = new DoubleTabledPlayer(true, blueBoard2,blueGenerator2, blueEvaluationFunction2,8);
+        //Player blue2 = new LateMoveReductionPlayer(true, blueBoard2,blueGenerator2, blueEvaluationFunction2,9);
+        Player blue2 = new TranspositionTablePlayer(true, blueBoard2,blueGenerator2, blueEvaluationFunction2, 10);
+        //Player blue2 = new DoubleTabledPlayer(true, blueBoard2,blueGenerator2, blueEvaluationFunction2,9);
 
         Board redBoard2 = new BitBoard(FenTrimmer(FenInitial));
         MoveGenerator redGenerator2 = new MoveGeneratorEvolutionTheory(redBoard2, MoveGeneratingStyle.ALL_TYPE_MOVES_PIECE_BY_PIECE,moveTypes, directions, true );
@@ -448,8 +465,8 @@ public class Game {
         //Player red2 = new NullMovePlayer(false, redBoard2,redGenerator2, redEvaluationFunction2,8);
         //Player red2 = new HashTester(false, redBoard2,redGenerator2, redEvaluationFunction2,6);
         //Player red2 = new LateMoveReductionPlayer(false, redBoard2,redGenerator2, redEvaluationFunction2,6);
-        //Player red2 = new TranspositionTablePlayer(false, redBoard2,redGenerator2, redEvaluationFunction2,6);
-        Player red2 = new DoubleTabledPlayer(false, redBoard2,redGenerator2, redEvaluationFunction2,8);
+        Player red2 = new TranspositionTablePlayer(false, redBoard2,redGenerator2, redEvaluationFunction2,10);
+        //Player red2 = new DoubleTabledPlayer(false, redBoard2,redGenerator2, redEvaluationFunction2,9);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -483,6 +500,7 @@ public class Game {
 
         Game game2 = new Game(userInput2, red2, blue2, FenInitial);
         game2.playGame();
+        //game2.replayGame();
 
         //GameComparator gameComparator = new GameComparator(game, game2);
         //gameComparator.compareBoardsFunctions(false);

@@ -36,6 +36,8 @@ public class DoubleTabledPlayer extends Player{
     private final TranspositionTable memoryTable;
     private final List<TranspositionTable.TranspositionEntry> newEntries = new ArrayList<>();
     private String result;
+    String fen = "";
+    List<Move> moves;
 
     public DoubleTabledPlayer(boolean isBlue, Board board, MoveGenerator moveGenerator, EvaluationFunction evaluationFunction,
                               int window, int windowMultiplier, int interactiveDepthRatio, int searchDepth, int reduction, int fullDepthMoveNumber,
@@ -83,6 +85,8 @@ public class DoubleTabledPlayer extends Player{
         zobristHashing.computeHash();
         globalBest = null;
         best = null;
+        fen = this.board.generateFEN();
+        moves = maxComparator.filterAndSortMoves( moveGenerator.generateMoves(isEvaluationBlue), globalBest, currentSearchDepth, true, board.isInLosingPos(isEvaluationBlue), board.isInCheck(isEvaluationBlue));
         int aspirationScore = evaluationFunction.evaluate(isEvaluationBlue, 0);
         while (currentSearchDepth < (searchDepth + 1)){
             iterateDepth(currentSearchDepth, aspirationScore);
@@ -92,12 +96,20 @@ public class DoubleTabledPlayer extends Player{
         nodes += moveNodes;
         moveNodes = 0;
         currentSearchDepth = 1;
+        if (globalBest == null || globalBest.getValue() == 0 || !moves.contains(globalBest)){
+            if (best != null && moves.contains(best)) globalBest = best;
+            else globalBest = moves.get(0);
+        }
         return globalBest;
     }
 
     private int iterateDepth(int depth, int score) {
         int aspirationScore = aspirationWindowsSearch(depth, score, window, windowMultiplier);
-        globalBest = best;
+        if (best == null){
+            if (globalBest == null) globalBest = moves.get(0);
+        }
+        else globalBest = best;
+        best = null;
         return aspirationScore;
     }
 
@@ -121,43 +133,24 @@ public class DoubleTabledPlayer extends Player{
         Move pvs = null;
         if (entry != null && entry.getDepth() >= depth) {
             if (entry.getFlag() == TranspositionTable.TranspositionEntry.EXACT){
-                if (!doNull){
-                    board.build(nullMoveFen);
-                    doNull = true;
-                    zobristHashing.computeHash();
-                }
-                if (depth == currentSearchDepth)best = new Move(entry.getBestMoveValue());
+                if (depth == currentSearchDepth && entry.getBestMoveValue() != 0)  best = new Move(entry.getBestMoveValue());
                 return entry.getScore();
             }
             else if (entry.getFlag() == TranspositionTable.TranspositionEntry.LOWERBOUND) {
-                if (entry.getScore() > alpha) pvs = new Move(entry.getBestMoveValue());
+                if (entry.getScore() > alpha && entry.getBestMoveValue() != 0) pvs = new Move(entry.getBestMoveValue());
                 alpha = Math.max(alpha, entry.getScore());
             }
             else if (entry.getFlag() == TranspositionTable.TranspositionEntry.UPPERBOUND) {
-                if (entry.getFlag() < beta) pvs = new Move(entry.getBestMoveValue());
+                if (entry.getFlag() < beta && entry.getBestMoveValue() != 0) pvs = new Move(entry.getBestMoveValue());
                 beta = Math.min(beta, entry.getScore());
             }
             if (alpha >= beta){
-                if (!doNull){
-                    board.build(nullMoveFen);
-                    doNull = true;
-                    zobristHashing.computeHash();
-                }
-                if (depth == currentSearchDepth)best = new Move(entry.getBestMoveValue());
+                if (depth == currentSearchDepth && entry.getBestMoveValue() != 0)  best = new Move(entry.getBestMoveValue());
                 return entry.getScore();
             }
         }
-
-        if (board.lostGame(true) || board.lostGame(false)){
-            doNull = true;
-            return evaluationFunction.evaluate(isEvaluationBlue, currentSearchDepth - depth);
-        }
-
-        if (depth == 0){
-            doNull = true;
-            return quiescenceSearch(currentSearchDepth, alpha, beta);
-        }
-
+        if (board.lostGame(true) || board.lostGame(false)) return evaluationFunction.evaluate(isEvaluationBlue, currentSearchDepth - depth);
+        if (depth == 0) return quiescenceSearch(currentSearchDepth, alpha, beta);
         moveNodes++;
         List<Move> allMoves = maxComparator.filterAndSortMoves( moveGenerator.generateMoves(isEvaluationBlue), globalBest, depth, depth == currentSearchDepth, board.isInLosingPos(isEvaluationBlue), board.isInCheck(isEvaluationBlue));
         if (entry != null && pvs != null ){
@@ -165,21 +158,9 @@ public class DoubleTabledPlayer extends Player{
             allMoves.add(0, pvs);
         }
         boolean firstMove = true;
-        doNull = true;
         int moveIndex = 0;
         for (Move move : allMoves) {
             moveIndex++;
-            if (doNull && !firstMove && depth > (reduction + 1) && (!board.isInCheck(isEvaluationBlue)) && board.towersNumber(isEvaluationBlue) > 2){
-                doNull = false;
-                nullMoveFen = board.generateFEN();
-                switchColor();
-                int nullMoveScore  = minimizer(depth - 1 - reduction, beta - 1, beta);
-                switchColor();
-                board.build(nullMoveFen);
-                zobristHashing.computeHash();
-                doNull = true;
-                if (nullMoveScore >= beta) return beta;
-            }
             zobristHashing.updateHashForMoves(move,isEvaluationBlue);
             makeMove(move);
             switchColor();
@@ -193,9 +174,7 @@ public class DoubleTabledPlayer extends Player{
                 if (depth > 3 && moveIndex > fullDepthMoveNumber && board.towersNumber(isEvaluationBlue) > 2 && board.towersNumber(isEvaluationBlue) > 2
                         && (!board.isInCheck(isEvaluationBlue))  && (!board.isInCheck(!isEvaluationBlue))) reducedDepth = depth - 2;
                 rating = minimizer( reducedDepth, alpha, alpha + 1);
-                if (rating > alpha && rating < beta) {
-                    rating = minimizer(depth - 1, alpha, beta);
-                }
+                if (rating > alpha && rating < beta) rating = minimizer(depth - 1, alpha, beta);
             }
             zobristHashing.updateHashForMoves(move,isEvaluationBlue);
             switchColor();
@@ -210,7 +189,6 @@ public class DoubleTabledPlayer extends Player{
                     if (move.isTargetEmpty()) type = 0;
                     else if (move.isTargetEnemy()) type = 2;
                     storeKillerMove(move, depth, type);
-                    doNull = true;
                     transpositionTable.put(zobristHashing.getHash(),depth, alpha, entryPriority(depth), TranspositionTable.TranspositionEntry.LOWERBOUND, move);
                     newEntries.add(memoryTable.buildEntry(zobristHashing.getHash(),depth, alpha, memoryEntryPriority(depth), TranspositionTable.TranspositionEntry.LOWERBOUND, move));
                     return alpha;
@@ -225,7 +203,6 @@ public class DoubleTabledPlayer extends Player{
         else move = allMoves.get(0);
         transpositionTable.put(zobristHashing.getHash(), depth, alpha, entryPriority(depth), TranspositionTable.TranspositionEntry.UPPERBOUND, move);
         newEntries.add(memoryTable.buildEntry(zobristHashing.getHash(), depth, alpha, memoryEntryPriority(depth), TranspositionTable.TranspositionEntry.UPPERBOUND, move));
-        doNull = true;
         return alpha;
     }
 
@@ -237,14 +214,8 @@ public class DoubleTabledPlayer extends Player{
         }
         Move pvs = null;
         if (entry != null && entry.getDepth() >= depth) {
-            if (entry.getFlag() == TranspositionTable.TranspositionEntry.EXACT){
-                if (!doNull){
-                    board.build(nullMoveFen);
-                    zobristHashing.computeHash();
-                    doNull = true;
-                }
-                return entry.getScore();
-            }
+            if (entry.getFlag() == TranspositionTable.TranspositionEntry.EXACT) return entry.getScore();
+
             else if (entry.getFlag() == TranspositionTable.TranspositionEntry.LOWERBOUND) {
                 if (entry.getScore() > alpha) pvs = new Move(entry.getBestMoveValue());
                 alpha = Math.max(alpha, entry.getScore());
@@ -253,23 +224,10 @@ public class DoubleTabledPlayer extends Player{
                 if (entry.getScore() < beta) pvs = new Move(entry.getBestMoveValue());
                 beta = Math.min(beta, entry.getScore());
             }
-            if (alpha >= beta) {
-                if (!doNull){
-                    board.build(nullMoveFen);
-                    zobristHashing.computeHash();
-                    doNull = true;
-                }
-                return entry.getScore();
-            }
+            if (alpha >= beta) return entry.getScore();
         }
-        if (board.lostGame(true) || board.lostGame(false)){
-            doNull = true;
-            return evaluationFunction.evaluate(isEvaluationBlue, currentSearchDepth - depth);
-        }
-        if (depth == 0){
-            doNull = true;
-            return quiescenceSearch(currentSearchDepth, alpha, beta);
-        }
+        if (board.lostGame(true) || board.lostGame(false)) return evaluationFunction.evaluate(isEvaluationBlue, currentSearchDepth - depth);
+        if (depth == 0) return quiescenceSearch(currentSearchDepth, alpha, beta);
         moveNodes++;
         List<Move> allMoves = minComparator.filterAndSortMoves( moveGenerator.generateMoves(!isEvaluationBlue), globalBest, depth,false ,board.isInLosingPos(!isEvaluationBlue), board.isInCheck(!isEvaluationBlue));
         if (entry != null && pvs != null ){
@@ -277,21 +235,9 @@ public class DoubleTabledPlayer extends Player{
             allMoves.add(0, pvs);
         }
         boolean firstMove = true;
-        doNull = true;
         int moveIndex = 0;
         for (Move move : allMoves) {
             moveIndex++;
-            if (doNull && !firstMove && depth > (reduction + 1) && (!board.isInCheck(!isEvaluationBlue)) && board.towersNumber(!isEvaluationBlue) > 2){
-                doNull = false;
-                nullMoveFen = board.generateFEN();
-                switchColor();
-                int nullMoveScore  = maximizer(depth - 1 - reduction, alpha, alpha + 1);
-                switchColor();
-                board.build(nullMoveFen);
-                zobristHashing.computeHash();
-                doNull = true;
-                if (nullMoveScore <= alpha) return alpha;
-            }
             zobristHashing.updateHashForMoves(move,!isEvaluationBlue);
             makeMove(move);
             switchColor();
@@ -320,7 +266,6 @@ public class DoubleTabledPlayer extends Player{
                     if (move.isTargetEmpty()) type = 0;
                     else if (move.isTargetEnemy()) type = 2;
                     storeKillerMove(move, depth, type);
-                    doNull = true;
                     transpositionTable.put(zobristHashing.getHash(),depth, beta, entryPriority(depth), TranspositionTable.TranspositionEntry.UPPERBOUND, move);
                     newEntries.add(memoryTable.buildEntry(zobristHashing.getHash(),depth, beta, memoryEntryPriority(depth), TranspositionTable.TranspositionEntry.UPPERBOUND, move));
                     return beta;
@@ -335,7 +280,6 @@ public class DoubleTabledPlayer extends Player{
         else move = allMoves.get(0);
         transpositionTable.put(zobristHashing.getHash(), depth, beta, entryPriority(depth), TranspositionTable.TranspositionEntry.LOWERBOUND, move);
         newEntries.add(memoryTable.buildEntry(zobristHashing.getHash(), depth, beta, memoryEntryPriority(depth), TranspositionTable.TranspositionEntry.LOWERBOUND, move));
-        doNull = true;
         return beta;
     }
 

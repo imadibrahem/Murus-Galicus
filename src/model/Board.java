@@ -1,15 +1,11 @@
 package model;
 
-import model.evolutionTheory.MoveGeneratorEvolutionTheory;
+import model.move.MoveGeneratorEvolutionTheory;
 import model.move.Move;
 import model.move.MoveGeneratingStyle;
 import model.move.MoveGenerator;
 import model.move.MoveType;
-import model.object.Piece;
-import model.object.Square;
-import model.player.Player;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public abstract class Board {

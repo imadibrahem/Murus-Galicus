@@ -55,6 +55,7 @@ public class LateMoveReductionPlayer extends Player{
     @Override
     public Move decideMove() {
         globalBest = null;
+        best = null;
         int aspirationScore = evaluationFunction.evaluate(isEvaluationBlue, 0);
         while (currentSearchDepth < (searchDepth + 1)){
             iterateDepth(currentSearchDepth, aspirationScore);
@@ -69,7 +70,8 @@ public class LateMoveReductionPlayer extends Player{
 
     private int iterateDepth(int depth, int score) {
         int aspirationScore = aspirationWindowsSearch(depth, score, window, windowMultiplier);
-        globalBest = best;
+        if (best != null) globalBest = best;
+        best = null;
         return aspirationScore;
     }
 

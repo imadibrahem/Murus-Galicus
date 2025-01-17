@@ -26,9 +26,8 @@ public abstract class Player {
     protected MoveGenerator moveGenerator;
     protected final ZobristHashing zobristHashing;
     protected static final int MAX_DEPTH = 15;
-    protected boolean doNull = true;
     Scanner scanner = new Scanner(System.in);
-
+    boolean doNull = true;
 
     public Player(boolean isBlue,Board board, EvaluationFunction evaluationFunction) {
         this.isBlue = isBlue;
@@ -97,10 +96,6 @@ public abstract class Player {
 
     public Board getBoard() {
         return board;
-    }
-
-    public boolean isDoNull() {
-        return doNull;
     }
 
     public MoveGenerator getMoveGenerator() {
@@ -174,9 +169,6 @@ public abstract class Player {
     public Move recieveCords(int initial , int targetNear, int targetFar){
         int location = this.isEvaluationBlue() ? initial : 55 - initial;
         int distance = isEvaluationBlue() ? targetNear - initial :initial - targetNear;
-        // TODO: 11/28/2024 remove later:
-        if (directionMap.get(distance) == null) System.out.println("Problem is with the distance: " + distance
-                + "initial is: " + initial + "near target is : " + targetNear + "far target is : " + targetFar);
         int direction = directionMap.get(distance);
         int targetType;
         if (targetFar < 0) targetType = 4;

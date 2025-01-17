@@ -62,8 +62,6 @@ public class EvaluationFunction {
             System.out.println("towerDifference: " + towerDifference);
             String Fen = board.generateFEN();
             DisplayFrame displayFrame = new DisplayFrame(Fen);
-            DisplayBoard displayBoard = displayFrame.getDisplayBoard();
-
         }
 
         return towerDifference > 0 ? towersRatioFactor[towerDifference - 1] : - (towersRatioFactor[(-towerDifference) - 1]);

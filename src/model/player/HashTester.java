@@ -56,6 +56,7 @@ public class HashTester extends Player{
     public Move decideMove() {
         zobristHashing.computeHash();
         globalBest = null;
+        best = null;
         int aspirationScore = evaluationFunction.evaluate(isEvaluationBlue, 0);
         while (currentSearchDepth < (searchDepth + 1)){
             iterateDepth(currentSearchDepth, aspirationScore);
@@ -73,6 +74,7 @@ public class HashTester extends Player{
     private int iterateDepth(int depth, int score) {
         int aspirationScore = aspirationWindowsSearch(depth, score, window, windowMultiplier);
         globalBest = best;
+        best = null;
         return aspirationScore;
     }
 
