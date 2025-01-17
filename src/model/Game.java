@@ -447,7 +447,7 @@ public class Game {
         //Player blue2 = new NullMovePlayer(true, blueBoard2,blueGenerator2, blueEvaluationFunction2,6);
         //Player blue2 = new HashTester(true, blueBoard2,blueGenerator2, blueEvaluationFunction2,6);
         //Player blue2 = new LateMoveReductionPlayer(true, blueBoard2,blueGenerator2, blueEvaluationFunction2,9);
-        Player blue2 = new TranspositionTablePlayer(true, blueBoard2,blueGenerator2, blueEvaluationFunction2, 10);
+        Player blue2 = new TranspositionTablePlayer(true, blueBoard2,blueGenerator2, blueEvaluationFunction2, 9);
         //Player blue2 = new DoubleTabledPlayer(true, blueBoard2,blueGenerator2, blueEvaluationFunction2,9);
 
         Board redBoard2 = new BitBoard(FenTrimmer(FenInitial));
@@ -465,7 +465,7 @@ public class Game {
         //Player red2 = new NullMovePlayer(false, redBoard2,redGenerator2, redEvaluationFunction2,8);
         //Player red2 = new HashTester(false, redBoard2,redGenerator2, redEvaluationFunction2,6);
         //Player red2 = new LateMoveReductionPlayer(false, redBoard2,redGenerator2, redEvaluationFunction2,6);
-        Player red2 = new TranspositionTablePlayer(false, redBoard2,redGenerator2, redEvaluationFunction2,10);
+        Player red2 = new TranspositionTablePlayer(false, redBoard2,redGenerator2, redEvaluationFunction2,9);
         //Player red2 = new DoubleTabledPlayer(false, redBoard2,redGenerator2, redEvaluationFunction2,9);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
