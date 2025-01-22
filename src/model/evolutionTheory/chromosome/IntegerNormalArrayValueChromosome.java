@@ -3,12 +3,12 @@ package model.evolutionTheory.chromosome;
 import java.util.Random;
 
 public abstract class IntegerNormalArrayValueChromosome extends NormalArrayValueChromosome{
-    private int upperLimit;
-    private int lowerLimit;
-    private int length;
-    private float mutationRate;
+    protected final int upperLimit;
+    protected final int lowerLimit;
+    protected final int length;
+    protected float mutationRate;
     public int [] value;
-    Random random = new Random();
+    protected Random random = new Random();
 
     public IntegerNormalArrayValueChromosome(int upperLimit, int lowerLimit, int length, float mutationRate) {
         this.upperLimit = upperLimit;
@@ -16,9 +16,6 @@ public abstract class IntegerNormalArrayValueChromosome extends NormalArrayValue
         this.length = length;
         this.mutationRate = mutationRate;
         this.value = new int[length];
-        for (int i = 0; i < length; i++){
-            value[i] = random.nextInt(upperLimit - lowerLimit + 1) + lowerLimit;
-        }
     }
 
     public int getUpperLimit() {
@@ -49,13 +46,32 @@ public abstract class IntegerNormalArrayValueChromosome extends NormalArrayValue
         this.value = value;
     }
 
+    @Override
+    public void produceValue (){
+        for (int i = 0; i < length; i++){
+            value[i] = random.nextInt(upperLimit - lowerLimit + 1) + lowerLimit;
+        }
+    }
+
     public int highLevelMutation(){
-         return random.nextInt(upperLimit - lowerLimit + 1) + lowerLimit;
+        int gene = random.nextInt(upperLimit - lowerLimit + 1) + lowerLimit;
+        if (gene > upperLimit) gene = upperLimit;
+        else if (gene < lowerLimit) gene = lowerLimit;
+        return gene;
     }
 
-
-    public int rangeMutation(int range){
-        return random.nextInt(2 * range + 1) - range;
+    public int fixedMutation(int amount, int gene){
+        gene += amount;
+        if (gene > upperLimit) gene = upperLimit;
+        else if (gene < lowerLimit) gene = lowerLimit;
+        return gene;
     }
 
+    public int rangeMutation(int range, int gene){
+        int amount = random.nextInt(2 * range + 1) - range;
+        gene += amount;
+        if (gene > upperLimit) gene = upperLimit;
+        else if (gene < lowerLimit) gene = lowerLimit;
+        return gene;
+    }
 }

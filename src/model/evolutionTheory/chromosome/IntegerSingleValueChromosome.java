@@ -3,9 +3,8 @@ package model.evolutionTheory.chromosome;
 import java.util.Random;
 
 public abstract class IntegerSingleValueChromosome extends SingleValueChromosome{
-    private int upperLimit;
-    private int lowerLimit;
-    private float mutationRate;
+    private final int upperLimit;
+    private final int lowerLimit;
     public int value;
     Random random = new Random();
 
@@ -13,7 +12,6 @@ public abstract class IntegerSingleValueChromosome extends SingleValueChromosome
         this.upperLimit = upperLimit;
         this.lowerLimit = lowerLimit;
         this.mutationRate = mutationRate;
-        this.value = random.nextInt(upperLimit - lowerLimit + 1) + lowerLimit;
     }
 
     public int getUpperLimit() {
@@ -40,17 +38,26 @@ public abstract class IntegerSingleValueChromosome extends SingleValueChromosome
         this.value = value;
     }
 
+    @Override
+    public void produceValue (){
+        this.value = random.nextInt(upperLimit - lowerLimit + 1) + lowerLimit;
+    }
+
     public void highLevelMutation(){
         this.value = random.nextInt(upperLimit - lowerLimit + 1) + lowerLimit;
     }
 
     public void fixedMutation(int amount){
         this.value += amount;
+        if (value > upperLimit) value = upperLimit;
+        else if (value < lowerLimit) value = lowerLimit;
     }
 
     public void rangeMutation(int range){
         int amount = random.nextInt(2 * range + 1) - range;
         this.value += amount;
+        if (value > upperLimit) value = upperLimit;
+        else if (value < lowerLimit) value = lowerLimit;
     }
 
 }

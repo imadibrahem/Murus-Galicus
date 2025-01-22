@@ -46,7 +46,10 @@ public class EvaluationFunction {
         int mobility = mobilityFactor * (board.generateMoves(isBlue).size() - board.generateMoves(!isBlue).size());
         int isolatedTowers = isolatedTowersFactor * (board.isolatedTowersNumber(isBlue) - board.isolatedTowersNumber(!isBlue));
         int isolatedWalls = isolatedWallsFactor * (board.isolatedWallsNumber(isBlue) - board.isolatedWallsNumber(!isBlue));
-        return gameState + towersRatio + wallsDistances + wallsColumns + towersDistances + towersColumns + mobility + isolatedTowers + isolatedWalls;
+        int score = gameState + towersRatio + wallsDistances + wallsColumns + towersDistances + towersColumns + mobility + isolatedTowers + isolatedWalls;
+        if (score > winScore) score = winScore;
+        else if (score < loseScore) score = loseScore;
+        return score;
     }
 
     protected int gameState(boolean isBlue, int[] gameStateFactor){
