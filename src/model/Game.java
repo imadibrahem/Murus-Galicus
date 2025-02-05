@@ -3,6 +3,7 @@ package model;
 import model.bit.BitBoard;
 import model.evaluationFunction.EvaluationFunction;
 import model.evaluationFunction.InitialEvaluationFunction;
+import model.evolutionTheory.evaluationFunction.FirstHabitatEvaluationFunction;
 import model.move.MoveGeneratorEvolutionTheory;
 import model.move.Move;
 import model.move.MoveGeneratingStyle;
@@ -47,6 +48,8 @@ public class Game {
     double blueNodesMean = 0;
     double redNodesMean = 0;
     double gameDuration = 0;
+    int [] winnerReport = new int[3];
+
     Scanner scanner = new Scanner(System.in);
 
     public Game(UserInput userInput, Player red, Player blue, String initialFEN) {
@@ -238,6 +241,7 @@ public class Game {
             blue.updateTables();
             red.updateTables();
             printGameResults();
+            displayFrame.dispose();
         }
     }
 
@@ -278,24 +282,6 @@ public class Game {
         System.out.println("gameDuration: " + gameDurationHours + " hours, " + gameDurationMinutes + " minutes, " + String.format("%.2f", gameDurationSeconds) + " seconds");
         System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++");
         System.out.println();
-        /*
-        System.out.println("++++++++++++++++++++ Game Moves ++++++++++++++++++++++ ");
-        System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++");
-        System.out.println("Blue Moved: " + blueMoves);
-        System.out.println("Red Moved: " + redMoves);
-        System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++");
-        System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++");
-        System.out.println();
-        System.out.println("+++++++++++++++++++ Game Hashes ++++++++++++++++++++++ ");
-        System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++");
-        System.out.println("Blue Hashes: " + blueHashes);
-        System.out.println("Red Hashes: " + redHashes);
-        System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++");
-        System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++");
-        System.out.println();
-
-         */
-
         System.out.println("++++++++++++++++++ Tables report +++++++++++++++++++++ ");
         System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++");
         System.out.println("Blue Table: " + blue.tableUsageReport());
@@ -303,27 +289,16 @@ public class Game {
         System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++");
         System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++");
         System.out.println();
-
-        /////////////////////////////////////////////////////////////////////////////////
-       /*
-        for (Move move : blueMoves){
-            System.out.println("Blue player Move: " + move + "Initial Row: " + move.getInitialRow(true) + " | Target Row: " + move.getTargetRow(true));
-            System.out.println("Blue player Move: " + move + "Initial Row: " + "--" + " | Target Row: " + move.getTargetRowSorting());
-
-            System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++");
-            System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++");
-            System.out.println();
+        if (winner == blue){
+            winnerReport[0] = blue.getRounds();
+            winnerReport[1] = (int) blueNodesMean;
+            winnerReport[2] = (int) (blueDurationMean * 1000);
         }
-        for (Move move : redMoves){
-            System.out.println("Red player Move: " + move + "Initial Row: " + move.getInitialRow(false) + "Target Row: " + move.getTargetRow(false));
-            System.out.println("Red player Move: " + move + "Initial Row: " + " --" + "Target Row: " + move.getTargetRowSorting());
-            System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++");
-            System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++");
-            System.out.println();
-
+        else {
+            winnerReport[0] = red.getRounds();
+            winnerReport[1] = (int) redNodesMean;
+            winnerReport[2] = (int) (redDurationMean * 1000);
         }
-
-        */
     }
 
     public void makeAndUnmakeAllMoves(){
@@ -395,6 +370,14 @@ public class Game {
 
     }
 
+    public Player getWinner() {
+        return winner;
+    }
+
+    public int[] getWinnerReport() {
+        return winnerReport;
+    }
+
     public static void main (String[] args){
         UserInput userInput = new UserInput();
         UserInput userInput2 = new UserInput();
@@ -434,7 +417,8 @@ public class Game {
 
         Board blueBoard2 = new BitBoard(FenTrimmer(FenInitial));
         MoveGenerator blueGenerator2 = new MoveGeneratorEvolutionTheory(blueBoard2, MoveGeneratingStyle.ALL_TYPE_MOVES_PIECE_BY_PIECE,moveTypes, directions, true );
-        EvaluationFunction blueEvaluationFunction2 = new InitialEvaluationFunction(blueBoard2);
+        //EvaluationFunction blueEvaluationFunction2 = new InitialEvaluationFunction(blueBoard2);
+        EvaluationFunction blueEvaluationFunction2 = new FirstHabitatEvaluationFunction(blueBoard2);
         //Player blue2 = new User(true, blueBoard2,blueGenerator2, blueEvaluationFunction2,userInput2);
         //Player blue2 = new AlphaBeta(true, blueBoard2,blueGenerator2, blueEvaluationFunction2,4);
         //Player blue2 = new IterativeDeepeningFixedDepth(true, blueBoard2,blueGenerator2, blueEvaluationFunction2,5);
@@ -447,7 +431,7 @@ public class Game {
         //Player blue2 = new NullMovePlayer(true, blueBoard2,blueGenerator2, blueEvaluationFunction2,6);
         //Player blue2 = new HashTester(true, blueBoard2,blueGenerator2, blueEvaluationFunction2,6);
         //Player blue2 = new LateMoveReductionPlayer(true, blueBoard2,blueGenerator2, blueEvaluationFunction2,9);
-        Player blue2 = new TranspositionTablePlayer(true, blueBoard2,blueGenerator2, blueEvaluationFunction2, 2);
+        Player blue2 = new TranspositionTablePlayer(true, blueBoard2,blueGenerator2, blueEvaluationFunction2, 8);
         //Player blue2 = new DoubleTabledPlayer(true, blueBoard2,blueGenerator2, blueEvaluationFunction2,9);
 
         Board redBoard2 = new BitBoard(FenTrimmer(FenInitial));
@@ -465,7 +449,7 @@ public class Game {
         //Player red2 = new NullMovePlayer(false, redBoard2,redGenerator2, redEvaluationFunction2,8);
         //Player red2 = new HashTester(false, redBoard2,redGenerator2, redEvaluationFunction2,6);
         //Player red2 = new LateMoveReductionPlayer(false, redBoard2,redGenerator2, redEvaluationFunction2,6);
-        Player red2 = new TranspositionTablePlayer(false, redBoard2,redGenerator2, redEvaluationFunction2,2);
+        Player red2 = new TranspositionTablePlayer(false, redBoard2,redGenerator2, redEvaluationFunction2,8);
         //Player red2 = new DoubleTabledPlayer(false, redBoard2,redGenerator2, redEvaluationFunction2,9);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

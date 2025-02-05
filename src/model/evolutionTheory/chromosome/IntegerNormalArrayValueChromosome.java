@@ -1,13 +1,16 @@
 package model.evolutionTheory.chromosome;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.Random;
 
-public abstract class IntegerNormalArrayValueChromosome extends NormalArrayValueChromosome{
+public abstract class IntegerNormalArrayValueChromosome extends NormalArrayValueChromosome implements Serializable {
+    @Serial
+    protected static final long serialVersionUID = 1L;
     protected final int upperLimit;
     protected final int lowerLimit;
     protected final int length;
     protected float mutationRate;
-    public int [] value;
     protected Random random = new Random();
 
     public IntegerNormalArrayValueChromosome(int upperLimit, int lowerLimit, int length, float mutationRate) {
@@ -68,6 +71,7 @@ public abstract class IntegerNormalArrayValueChromosome extends NormalArrayValue
     }
 
     public int rangeMutation(int range, int gene){
+        if (range < 0) range *= -1;
         int amount = random.nextInt(2 * range + 1) - range;
         gene += amount;
         if (gene > upperLimit) gene = upperLimit;

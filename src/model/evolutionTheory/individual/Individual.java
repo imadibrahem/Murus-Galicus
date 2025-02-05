@@ -2,10 +2,20 @@ package model.evolutionTheory.individual;
 
 import model.evolutionTheory.chromosome.Chromosome;
 
-public abstract class Individual {
+import java.io.Serial;
+import java.io.Serializable;
+import java.util.Arrays;
+import java.util.Random;
+
+public abstract class Individual implements Serializable {
+    @Serial
+    protected static final long serialVersionUID = 1L;
     protected boolean exploration = false;
     protected boolean exploitation = false;
     protected float mutationRate;
+    protected int genomeLength;
+    protected Random random = new Random();
+
     public Chromosome[] genome;
 
     public abstract void mutate();
@@ -17,19 +27,32 @@ public abstract class Individual {
     public void explore(){
         exploration = true;
         exploitation = false;
-        for (Chromosome chromosome: genome) chromosome.explore();
+        mutationRate *= 1.05;
+        for (Chromosome chromosome: genome){
+            chromosome.explore();
+            chromosome.setMutationRate(mutationRate);
+        }
     }
 
     public void exploit(){
         exploration = false;
         exploitation = true;
-        for (Chromosome chromosome: genome) chromosome.exploit();
+        mutationRate *= 0.95;
+        for (Chromosome chromosome: genome){
+            chromosome.exploit();
+            chromosome.setMutationRate(mutationRate);
+
+        }
     }
 
     public void normalMode(){
         exploration = false;
         exploitation = false;
-        for (Chromosome chromosome: genome) chromosome.normalMode();
+        mutationRate = 0.1f;
+        for (Chromosome chromosome: genome){
+            chromosome.normalMode();
+            chromosome.setMutationRate(0.1f);
+        }
     }
 
     public void setGenome(Chromosome[] genome) {
@@ -50,5 +73,23 @@ public abstract class Individual {
 
     public float getMutationRate() {
         return mutationRate;
+    }
+
+    public void setExploration(boolean exploration) {
+        this.exploration = exploration;
+    }
+
+    public void setExploitation(boolean exploitation) {
+        this.exploitation = exploitation;
+    }
+
+    @Override
+    public String toString() {
+        return "Individual{" +
+                "exploration=" + exploration +
+                ", exploitation=" + exploitation +
+                ", mutationRate=" + mutationRate +
+                ", genome=" + Arrays.toString(genome) +
+                '}';
     }
 }

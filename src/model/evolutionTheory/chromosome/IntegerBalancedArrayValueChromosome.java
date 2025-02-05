@@ -1,12 +1,15 @@
 package model.evolutionTheory.chromosome;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.Random;
 
-public abstract class IntegerBalancedArrayValueChromosome extends BalancedArrayValueChromosome{
+public abstract class IntegerBalancedArrayValueChromosome extends BalancedArrayValueChromosome implements Serializable {
+    @Serial
+    protected static final long serialVersionUID = 1L;
     protected final int upperLimit;
     protected final int lowerLimit;
     protected final int length;
-    public int [] value;
     protected Random random = new Random();
 
 
