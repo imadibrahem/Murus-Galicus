@@ -69,8 +69,8 @@ public class GameStateChromosome extends IntegerBalancedArrayValueChromosome imp
         int amount = (int) (positiveValue * mutationRate);
         if (amountSign < 0.5) amount *= -1;
         positiveValue += amount;
-        if (positiveValue > upperLimit) positiveValue = upperLimit;
-        else if (positiveValue < lowerLimit) positiveValue = lowerLimit;
+        if (positiveValue > upperLimit) amount = upperLimit - (value[7] + value[6] + value[5]);
+        else if (positiveValue < lowerLimit) amount = -((value[7] + value[6] + value[5]) - lowerLimit);
         value[7] += (amount/3);
         value[6] += (amount/3);
         value[5] += (amount/3);
@@ -82,7 +82,9 @@ public class GameStateChromosome extends IntegerBalancedArrayValueChromosome imp
     public void rangeMutation(){
         System.out.println("applying range mutation");
         int positiveValue = value[7] + value[6] + value[5];
-        int difference = upperLimit - positiveValue > 0 ? upperLimit - positiveValue : 1;
+        int difference = upperLimit - positiveValue > lowerLimit ? upperLimit - positiveValue : lowerLimit + 1;
+        int difference_2 = positiveValue - lowerLimit < upperLimit ? positiveValue - lowerLimit : upperLimit - 1;
+        if (difference_2 < difference) difference = difference_2;
         int range = difference < positiveValue ? (int) ((difference / 3) * mutationRate) : (int) ((positiveValue / 3) * mutationRate);
         int amount_1, amount_2, amount_3;
         int currentPositiveValue;
