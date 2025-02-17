@@ -38,10 +38,21 @@ public class EvaluationFunctionIndividual extends Individual  implements Seriali
     @Override
     public void mutate() {
         float mutationChance;
-        for (Chromosome chromosome: genome){
+        String result = this +"\n";
+        for (int i = 0; i < genomeLength; i++){
             mutationChance = random.nextFloat();
-            if (mutationChance > 0.5f) chromosome.mutate();
+            System.out.println("Chromosome sub mutation chance is: " + mutationChance + " mutation rate is: " + (1 - mutationRate));
+            if (mutationChance >  (mutationRate * 2)) {
+                genome[i].mutate();
+            }
+            System.out.println();
         }
+        result += this.toString();
+        System.out.println();
+        System.out.println("++++++++++++++++++ Mutation Result +++++++++++++++++++++");
+        System.out.println(result);
+        System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+
     }
 
     @Override
@@ -52,17 +63,67 @@ public class EvaluationFunctionIndividual extends Individual  implements Seriali
         Individual secondChild = new EvaluationFunctionIndividual(mutationRate);
         Individual thirdChild = new EvaluationFunctionIndividual(mutationRate);
         Individual fourthChild = new EvaluationFunctionIndividual(mutationRate);
+        firstChild.produceChromosomes();
+        secondChild.produceChromosomes();
         float randomIndex;
+        System.out.println("child #1 & child #2: (Full Chromosomes crossover):");
         for (int i = 0; i < genomeLength; i++){
+            System.out.println("Chromosome #" + i);
             randomIndex = random.nextFloat();
             if (randomIndex < 0.5){
-                firstChild.genome[i] = genome[i];
-                secondChild.genome[i] = partner.genome[i];
+                firstChild.genome[i].value = genome[i].value;
+                secondChild.genome[i].value = partner.genome[i].value;
             }
             else {
-                firstChild.genome[i] = partner.genome[i];
-                secondChild.genome[i] = genome[i];
+                firstChild.genome[i].value = partner.genome[i].value;
+                secondChild.genome[i].value = genome[i].value;
             }
+        }
+        System.out.println();
+        offspring[0] = firstChild;
+        offspring[1] = secondChild;
+        System.out.println("adjusting First child & Second child modes and checking for mutations..");
+        for (int i = 0; i < 2; i++){
+            System.out.println();
+            randomIndex = random.nextFloat();
+            if (i == 0){
+                System.out.println("First child mode..");
+            }
+            else {
+                System.out.println("Second child mode..");
+            }
+            if (isExploration()) offspring[i].setExploration(true);
+            else if (isExploitation()) offspring[i].setExploitation(true);
+            System.out.println("checking for mutation..");
+            System.out.println("mutation chance is: " + randomIndex + "mutation rate is: " + mutationRate + "=> Full Chromosomes crossover mutation rate is: " + (mutationRate * 2));
+            if (randomIndex < (mutationRate * 2)) {
+                System.out.println("mutation is being applied ");
+                System.out.println();
+                offspring[i].mutate();
+            }
+        }
+        System.out.println();
+        System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+        System.out.println();
+        System.out.println("child #3 & child #4: (Single Gene crossover):");
+        System.out.println("adjusting Third child & Forth child modes..");
+        offspring[2] = thirdChild;
+        offspring[3] = fourthChild;
+        for (int i = 0; i < 2; i++){
+            if (i == 0){
+                System.out.println("Third child mode..");
+            }
+            else {
+                System.out.println("Fourth child mode..");
+            }
+            if (isExploration()) offspring[i + 2].setExploration(true);
+            else if (isExploitation()) offspring[i + 2].setExploitation(true);
+        }
+        System.out.println("applying crossover for Third child & Forth child and checking for mutations..");
+        System.out.println();
+        for (int i = 0; i < genomeLength; i++){
+            System.out.println("Chromosome #" + i);
+            System.out.println();
             crossover = genome[i].crossover(partner.genome[i]);
             randomIndex = random.nextFloat();
             if (randomIndex < 0.5){
@@ -73,18 +134,15 @@ public class EvaluationFunctionIndividual extends Individual  implements Seriali
                 fourthChild.genome[i] = crossover[0];
                 thirdChild.genome[i] = crossover[1];
             }
+            System.out.println();
         }
 
-        offspring[0] = firstChild;
-        offspring[1] = secondChild;
-        offspring[2] = thirdChild;
-        offspring[3] = fourthChild;
-        for (int i = 0; i < 2; i++){
-            randomIndex = random.nextFloat();
-            if (isExploration()) offspring[i].setExploration(true);
-            else if (isExploitation()) offspring[i].setExploitation(true);
-            if (randomIndex < mutationRate) offspring[i].mutate();
+        System.out.println("+++++++++++ Children ++++++++++");
+        for (Individual child : offspring){
+            System.out.println(child);
         }
+        System.out.println("+++++++++++ Children ++++++++++");
+
         return offspring;
     }
 }

@@ -56,9 +56,12 @@ public abstract class IntegerSingleValueChromosome extends SingleValueChromosome
     public void rangeMutation(int range){
         if (range < 0) range *= -1;
         int amount = random.nextInt(2 * range + 1) - range;
-        this.value[0] += amount;
-        if (value[0] > upperLimit) value[0] = upperLimit;
-        else if (value[0] < lowerLimit) value[0] = lowerLimit;
+        if (amount != 0){
+            this.value[0] += amount;
+            if (value[0] > upperLimit) value[0] = upperLimit;
+            else if (value[0] < lowerLimit) value[0] = lowerLimit;
+        }
+        else rangeMutation(range);
     }
 
 }

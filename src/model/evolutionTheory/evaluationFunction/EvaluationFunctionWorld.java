@@ -15,10 +15,7 @@ import view.UserInput;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 public class EvaluationFunctionWorld implements Serializable {
     @Serial
@@ -42,16 +39,27 @@ public class EvaluationFunctionWorld implements Serializable {
     }
 
     public void explore(){
-        for (Individual individual : population)individual.explore();
+        System.out.println("Explore Mode on..");
+        for (Individual individual : population){
+            individual.explore();
+        }
+        printPopulation();
     }
 
     public void exploit(){
-        for (Individual individual : population)individual.exploit();
-
+        System.out.println("Exploit Mode on..");
+        for (Individual individual : population){
+            individual.exploit();
+        }
+        printPopulation();
     }
 
     public void normalMode(){
-        for (Individual individual : population)individual.normalMode();
+        System.out.println("Normal Mode on..");
+        for (Individual individual : population){
+            individual.normalMode();
+        }
+        printPopulation();
     }
 
     public int[] findTopIndices(int[][] arrays, int topCount) {
@@ -109,7 +117,9 @@ public class EvaluationFunctionWorld implements Serializable {
     public void printPopulation(){
         System.out.println("++++++++++++++++++++++++++++++++++++++++++");
         System.out.println("++++++++++++++++++++++++++++++++++++++++++");
-        for (Individual individual : population) System.out.println(individual);
+        for (Individual individual : population) {
+            System.out.println(individual);
+        }
         System.out.println("++++++++++++++++++++++++++++++++++++++++++");
         System.out.println("++++++++++++++++++++++++++++++++++++++++++");
 
@@ -212,6 +222,7 @@ public class EvaluationFunctionWorld implements Serializable {
             }
             System.out.println(s);
         }
+        printPopulation();
         populationNew = new ArrayList<>();
         int[]populationBest = findTopIndices(populationResults,elitismNum);
         int[]poolIndices = findTopIndices(populationResults,poolNum);
@@ -230,19 +241,39 @@ public class EvaluationFunctionWorld implements Serializable {
         pool.addAll(population);
         families = new ArrayList<>();
         population = new ArrayList<>();
-        while (!pool.isEmpty()){
+        Individual[] offspring;
+        System.out.println("Mating started..");
+        Collections.shuffle(pool, random);
+        for (int i = 0; i < pool.size() - 1; i += 2) {
+            Individual firstParent = pool.get(i);
+            Individual secondParent = pool.get(i + 1);
             family = new ArrayList<>();
-            int index = random.nextInt(pool.size());
-            Individual firstParent = pool.remove(index);
-            index = random.nextInt(pool.size());
-            Individual secondParent = pool.remove(index);
             family.add(firstParent);
             family.add(secondParent);
-            Individual[] offspring = firstParent.crossover(secondParent);
-            family.addAll(Arrays.asList(offspring));
-            families.add(family);
+            offspring = firstParent.crossover(secondParent);
+            if (offspring != null && offspring.length > 0) {
+                family.addAll(Arrays.asList(offspring));
+                families.add(family);
+            } else {
+                System.out.println("Crossover failed for pair: " + i + " and " + (i + 1));
+                while (true){
+                    offspring = firstParent.crossover(secondParent);
+                    if (offspring != null && offspring.length > 0) {
+                        family.addAll(Arrays.asList(offspring));
+                        families.add(family);
+                        System.out.println("Problem fixed!");
+                        break;
+                    }
+                    System.out.println("Crossover failed for pair: " + i + " and " + (i + 1));
+                }
+            }
         }
+        pool = new ArrayList<>();
+        System.out.println("Mating done..");
         fullFamilySelection(depth);
+        System.out.println("-------------firstScarcitySeason -------------");
+        printPopulation();
+        System.out.println("-------------firstScarcitySeason -------------");
     }
 
     public void fullFamilySelection(int depth){
@@ -281,7 +312,6 @@ public class EvaluationFunctionWorld implements Serializable {
             }
             System.out.println("////////////////////////");
         }
-
     }
 
     public void famine(){

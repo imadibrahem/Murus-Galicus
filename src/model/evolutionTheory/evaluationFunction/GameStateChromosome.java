@@ -22,6 +22,8 @@ public class GameStateChromosome extends IntegerBalancedArrayValueChromosome imp
 
     @Override
     public void mutate() {
+        System.out.println("mutation for Chromosome #5 is being applied ");
+        System.out.println(this);
         float mutationType = random.nextFloat();
         float highLevelMutationChance;
         float rangeMutationChance;
@@ -40,24 +42,28 @@ public class GameStateChromosome extends IntegerBalancedArrayValueChromosome imp
         if (mutationType > highLevelMutationChance) highLevelMutation();
         else if (mutationType > rangeMutationChance) rangeMutation();
         else fixedMutation();
+        System.out.println(this);
     }
 
     @Override
     public void produceValue() {
         int positiveValue = random.nextInt(upperLimit - lowerLimit + 1) + lowerLimit;
-        value[7] = random.nextInt(positiveValue);
+        value[7] = positiveValue > 1 ? random.nextInt(positiveValue) : random.nextInt(positiveValue + 1);
         value[0] = -value[7];
         positiveValue -= value[7];
+        if (positiveValue < 1) positiveValue = 1;
         value[6] = random.nextInt(positiveValue);
         value[1] = -value[6];
         value[5] = positiveValue - value[6];
         value[3] = -value[5];
     }
     public void highLevelMutation(){
+        System.out.println("applying High level mutation");
         produceValue();
     }
 
     public void fixedMutation(){
+        System.out.println("applying fixed mutation");
         int positiveValue = value[7] + value[6] + value[5];
         float amountSign = random.nextFloat();
         int amount = (int) (positiveValue * mutationRate);
@@ -65,34 +71,54 @@ public class GameStateChromosome extends IntegerBalancedArrayValueChromosome imp
         positiveValue += amount;
         if (positiveValue > upperLimit) positiveValue = upperLimit;
         else if (positiveValue < lowerLimit) positiveValue = lowerLimit;
-        value[7] += (positiveValue/3);
-        value[6] += (positiveValue/3);
-        value[5] += (positiveValue/3);
-        value[0] -= (positiveValue/3);
-        value[1] -= (positiveValue/3);
-        value[3] -= (positiveValue/3);
+        value[7] += (amount/3);
+        value[6] += (amount/3);
+        value[5] += (amount/3);
+        value[0] -= (amount/3);
+        value[1] -= (amount/3);
+        value[3] -= (amount/3);
     }
 
     public void rangeMutation(){
+        System.out.println("applying range mutation");
         int positiveValue = value[7] + value[6] + value[5];
-        int range = (int) ((upperLimit / 3) * mutationRate);
-        int amount_1;
-        int amount_2;
-        int amount_3;
+        int difference = upperLimit - positiveValue > 0 ? upperLimit - positiveValue : 1;
+        int range = difference < positiveValue ? (int) ((difference / 3) * mutationRate) : (int) ((positiveValue / 3) * mutationRate);
+        int amount_1, amount_2, amount_3;
         int currentPositiveValue;
-        while (true){
+
+        int maxRetries = 100;
+        int attempts = 0;
+        boolean success = false;
+        while(true) {
             amount_1 = random.nextInt(2 * range + 1) - range;
             amount_2 = random.nextInt(2 * range + 1) - range;
             amount_3 = random.nextInt(2 * range + 1) - range;
             currentPositiveValue = positiveValue + amount_1 + amount_2 + amount_3;
-            if (currentPositiveValue < upperLimit && currentPositiveValue > lowerLimit) break;
+            attempts++;
+            if (currentPositiveValue >= upperLimit &&  currentPositiveValue <= lowerLimit){
+                success = true;
+                break;
+            }
+            if (attempts >= maxRetries) {
+                System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+                System.out.println("Warning: rangeMutation reached max retries! applying highLevelMutation");
+                System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+
+                break;
+            }
         }
-        value[7] += amount_1;
-        value[6] += amount_2;
-        value[5] += amount_3;
-        value[0] -= amount_1;
-        value[1] -= amount_2;
-        value[3] -= amount_3;
+        if (success){
+            value[7] += amount_1;
+            value[6] += amount_2;
+            value[5] += amount_3;
+            value[0] -= amount_1;
+            value[1] -= amount_2;
+            value[3] -= amount_3;
+        }
+        else {
+            highLevelMutation();
+        }
     }
 
     @Override
@@ -103,7 +129,7 @@ public class GameStateChromosome extends IntegerBalancedArrayValueChromosome imp
         Chromosome firstChild = new GameStateChromosome(mutationRate);
         Chromosome secondChild = new GameStateChromosome(mutationRate);
         for (int i = 5; i < 8; i++){
-            difference = value[i] > partner.value[i] ? value[i] - partner.value[i] : partner.value[i];
+            difference = value[i] > partner.value[i] ? value[i] - partner.value[i] : partner.value[i] -  value[i];
             if (value[i] > partner.value[i]){
                 firstChild.value[i] = value[i] - (difference / 3);
                 secondChild.value[i] = partner.value[i] + (difference / 3);
@@ -122,10 +148,16 @@ public class GameStateChromosome extends IntegerBalancedArrayValueChromosome imp
         offspring[0] = firstChild;
         offspring[1] = secondChild;
         for (int i = 0; i < 2; i++){
+            System.out.println("offspring #" + i + " mode..");
             randomIndex = random.nextFloat();
             if (isExploration()) offspring[i].setExploration(true);
             else if (isExploitation()) offspring[i].setExploitation(true);
-            if (randomIndex < mutationRate) offspring[i].mutate();
+            System.out.println("checking for mutation..");
+            System.out.println("Chromosome mutation chance is: " + randomIndex + " mutation rate is: " + mutationRate);
+            if (randomIndex < mutationRate){
+                offspring[i].mutate();
+            }
+            System.out.println();
         }
         return offspring;
     }

@@ -14,10 +14,7 @@ import model.player.TranspositionTablePlayer;
 import view.UserInput;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 public class EvaluationFunctionHabitat implements Serializable {
     @Serial
@@ -33,6 +30,7 @@ public class EvaluationFunctionHabitat implements Serializable {
     MoveType[] moveTypes = {MoveType.FRIEND_ON_BOTH, MoveType.FRIEND_ON_NEAR, MoveType.FRIEND_ON_FAR, MoveType.QUIET, MoveType.SACRIFICE};
     int [] directions = {1, 8, 2, 3, 7, 6, 4, 5};
     int generation = 0;
+    int index;
     public Individual best;
 
 
@@ -78,57 +76,98 @@ public class EvaluationFunctionHabitat implements Serializable {
         pool.addAll(population);
         families = new ArrayList<>();
         population = new ArrayList<>();
-        while (!pool.isEmpty()){
+        Individual[] offspring;
+        System.out.println("Mating started..");
+        Collections.shuffle(pool, random);
+        for (int i = 0; i < pool.size() - 1; i += 2) {
+            System.out.println("-------------------------------");
+            System.out.println("pair: " + i + " and " + (i + 1));
+            Individual firstParent = pool.get(i);
+            Individual secondParent = pool.get(i + 1);
+            System.out.println("parents were chosen..");
+            System.out.println("+++++++++++ Parents +++++++++++");
+            System.out.println(firstParent);
+            System.out.println(secondParent);
+            System.out.println("+++++++++++ Parents +++++++++++");
             family = new ArrayList<>();
-            int index = random.nextInt(pool.size());
-            Individual firstParent = pool.remove(index);
-            index = random.nextInt(pool.size());
-            Individual secondParent = pool.remove(index);
             family.add(firstParent);
             family.add(secondParent);
-            Individual[] offspring = firstParent.crossover(secondParent);
-            family.addAll(Arrays.asList(offspring));
-            families.add(family);
+            System.out.println("applying crossover..");
+            offspring = firstParent.crossover(secondParent);
+            if (offspring != null && offspring.length > 0) {
+                family.addAll(Arrays.asList(offspring));
+                families.add(family);
+            } else {
+                System.out.println("Crossover failed for pair: " + i + " and " + (i + 1));
+                while (true){
+                    offspring = firstParent.crossover(secondParent);
+                    if (offspring != null && offspring.length > 0) {
+                        family.addAll(Arrays.asList(offspring));
+                        families.add(family);
+                        System.out.println("Problem fixed!");
+                        break;
+                    }
+                    System.out.println("Crossover failed for pair: " + i + " and " + (i + 1));
+                }
+            }
+            System.out.println("+++++++++++ Parents +++++++++++");
+            System.out.println(firstParent);
+            System.out.println(secondParent);
+            System.out.println("+++++++++++ Parents +++++++++++");
+            System.out.println("-------------------------------");
         }
+        pool = new ArrayList<>();
+        System.out.println("Mating done..");
         fullFamilySelection(depth);
         System.out.println("-------------firstScarcitySeason -------------");
         printPopulation();
         System.out.println("-------------firstScarcitySeason -------------");
     }
 
-    public void firstAbundanceSeason(int depth, int elitismNum, int poolNum){
-        rankPopulation(depth, elitismNum, poolNum);
-        offspringSelection(depth);
-        pool.addAll(population);
-        System.out.println("-------------firstAbundanceSeason -------------");
-        printPopulation();
-        System.out.println("-------------firstAbundanceSeason -------------");
-    }
-
-    public void secondAbundanceSeason(int depth, int elitismNum, int poolNum){
-        rankPopulation(depth, elitismNum, poolNum);
-        fullGenerationSelection(depth);
-        System.out.println("-------------secondAbundanceSeason -------------");
-        printPopulation();
-        System.out.println("-------------secondAbundanceSeason -------------");
-    }
-
     public void secondScarcitySeason(int depth){
         families = new ArrayList<>();
         population = new ArrayList<>();
         int pair = 0;
-        while (!pool.isEmpty()){
+        System.out.println("Mating and Selection started..");
+        Collections.shuffle(pool, random);
+        Individual[] offspring;
+        for (int h = 0; h < pool.size() - 1; h += 2) {
+            System.out.println("-------------------------------");
+            System.out.println("pair: " + h + " and " + (h + 1));
             pair++;
             family = new ArrayList<>();
             children = new ArrayList<>();
-            int index = random.nextInt(pool.size());
-            Individual firstParent = pool.remove(index);
-            index = random.nextInt(pool.size());
-            Individual secondParent = pool.remove(index);
+            Individual firstParent = pool.get(h);
+            Individual secondParent = pool.get(h + 1);
+            System.out.println("parents were chosen..");
             family.add(firstParent);
             family.add(secondParent);
-            Individual[] offspring = firstParent.crossover(secondParent);
-            children.addAll(Arrays.asList(offspring));
+            System.out.println("+++++++++++ Parents +++++++++++");
+            System.out.println(firstParent);
+            System.out.println(secondParent);
+            System.out.println("+++++++++++ Parents +++++++++++");
+            System.out.println("applying crossover..");
+            offspring = firstParent.crossover(secondParent);
+            if (offspring != null && offspring.length > 0) {
+                children.addAll(Arrays.asList(offspring));
+
+            } else {
+                System.out.println("Crossover failed for pair: " + h + " and " + (h + 1));
+                while (true){
+                    offspring = firstParent.crossover(secondParent);
+                    if (offspring != null && offspring.length > 0) {
+                        children.addAll(Arrays.asList(offspring));
+                        System.out.println("Problem fixed!");
+                        break;
+                    }
+                    System.out.println("Crossover failed for pair: " + h + " and " + (h + 1));
+                }
+            }
+            System.out.println("+++++++++++ Parents +++++++++++");
+            System.out.println(firstParent);
+            System.out.println(secondParent);
+            System.out.println("+++++++++++ Parents +++++++++++");
+            System.out.println("-------------------------------");
             int [][] pairResults;
             int [][] childrenResults= new int[children.size()][4];
             for (int i = 0; i < (children.size() - 1); i++){
@@ -167,23 +206,75 @@ public class EvaluationFunctionHabitat implements Serializable {
                 population.add(family.get(place));
             }
         }
+        pool = new ArrayList<>();
+        System.out.println("Mating and Selection done..");
         System.out.println("-------------secondScarcitySeason -------------");
         printPopulation();
         System.out.println("-------------secondScarcitySeason -------------");
     }
 
+    public void firstAbundanceSeason(int depth, int elitismNum, int poolNum){
+        rankPopulation(depth, elitismNum, poolNum);
+        System.out.println("ranking done..");
+        offspringSelection(depth);
+        pool.addAll(population);
+        System.out.println("-------------firstAbundanceSeason -------------");
+        printPopulation();
+        System.out.println("-------------firstAbundanceSeason -------------");
+    }
+
+    public void secondAbundanceSeason(int depth, int elitismNum, int poolNum){
+        rankPopulation(depth, elitismNum, poolNum);
+        System.out.println("ranking done..");
+        fullGenerationSelection(depth);
+        System.out.println("-------------secondAbundanceSeason -------------");
+        printPopulation();
+        System.out.println("-------------secondAbundanceSeason -------------");
+    }
+
     public void offspringSelection(int depth){
+        System.out.println("Offspring Selection started..");
         families = new ArrayList<>();
-        while (!pool.isEmpty()){
+        System.out.println("Mating started..");
+        Individual[] offspring;
+        Collections.shuffle(pool, random);
+        for (int i = 0; i < pool.size() - 1; i += 2) {
+            System.out.println("-------------------------------");
+            System.out.println("pair: " + i + " and " + (i + 1));
+            Individual firstParent = pool.get(i);
+            Individual secondParent = pool.get(i + 1);
+            System.out.println("parents were chosen..");
             family = new ArrayList<>();
-            int index = random.nextInt(pool.size());
-            Individual firstParent = pool.remove(index);
-            index = random.nextInt(pool.size());
-            Individual secondParent = pool.remove(index);
-            Individual[] offspring = firstParent.crossover(secondParent);
-            family.addAll(Arrays.asList(offspring));
-            families.add(family);
+            System.out.println("+++++++++++ Parents +++++++++++");
+            System.out.println(firstParent);
+            System.out.println(secondParent);
+            System.out.println("+++++++++++ Parents +++++++++++");
+            System.out.println("applying crossover..");
+            offspring = firstParent.crossover(secondParent);
+            if (offspring != null && offspring.length > 0) {
+                family.addAll(Arrays.asList(offspring));
+                families.add(family);
+            } else {
+                System.out.println("Crossover failed for pair: " + i + " and " + (i + 1));
+                while (true){
+                    offspring = firstParent.crossover(secondParent);
+                    if (offspring != null && offspring.length > 0) {
+                        family.addAll(Arrays.asList(offspring));
+                        families.add(family);
+                        System.out.println("Problem fixed!");
+                        break;
+                    }
+                    System.out.println("Crossover failed for pair: " + i + " and " + (i + 1));
+                }
+            }
+            System.out.println("+++++++++++ Parents +++++++++++");
+            System.out.println(firstParent);
+            System.out.println(secondParent);
+            System.out.println("+++++++++++ Parents +++++++++++");
+            System.out.println("-------------------------------");
         }
+        pool = new ArrayList<>();
+        System.out.println("Mating done..");
         int [][] familyResults;
         int [][] pairResults;
         for (int i = 0; i < families.size(); i++){
@@ -216,20 +307,49 @@ public class EvaluationFunctionHabitat implements Serializable {
                 }
                 System.out.println(s);
             }
-            printPopulation();
             System.out.println("////////////////////////");
         }
     }
     public void fullGenerationSelection(int depth){
+        System.out.println("Full Generation Selection started..");
         children = new ArrayList<>();
-        while (!pool.isEmpty()){
-            int index = random.nextInt(pool.size());
-            Individual firstParent = pool.remove(index);
-            index = random.nextInt(pool.size());
-            Individual secondParent = pool.remove(index);
-            Individual[] offspring = firstParent.crossover(secondParent);
-            children.addAll(Arrays.asList(offspring));
+        System.out.println("Mating started..");
+        Individual[] offspring;
+        Collections.shuffle(pool, random);
+        for (int i = 0; i < pool.size() - 1; i += 2) {
+            System.out.println("-------------------------------");
+            System.out.println("pair: " + i + " and " + (i + 1));
+            Individual firstParent = pool.get(i);
+            Individual secondParent = pool.get(i + 1);
+            System.out.println("parents were chosen..");
+            System.out.println("+++++++++++ Parents +++++++++++");
+            System.out.println(firstParent);
+            System.out.println(secondParent);
+            System.out.println("+++++++++++ Parents +++++++++++");
+            System.out.println("applying crossover..");
+            offspring = firstParent.crossover(secondParent);
+            if (offspring != null && offspring.length > 0) {
+                children.addAll(Arrays.asList(offspring));
+            } else {
+                System.out.println("Crossover failed for pair: " + i + " and " + (i + 1));
+                while (true){
+                    offspring = firstParent.crossover(secondParent);
+                    if (offspring != null && offspring.length > 0) {
+                        children.addAll(Arrays.asList(offspring));
+                        System.out.println("Problem fixed!");
+                        break;
+                    }
+                    System.out.println("Crossover failed for pair: " + i + " and " + (i + 1));
+                }
+            }
+            System.out.println("+++++++++++ Parents +++++++++++");
+            System.out.println(firstParent);
+            System.out.println(secondParent);
+            System.out.println("+++++++++++ Parents +++++++++++");
+            System.out.println("-------------------------------");
         }
+        pool = new ArrayList<>();
+        System.out.println("Mating done..");
         int [][] generationResults = new int[children.size()][4];
         int [][] pairResults;
         for (int i = 0; i < (children.size() - 1); i++){
@@ -323,11 +443,6 @@ public class EvaluationFunctionHabitat implements Serializable {
             System.out.println(s);
         }
         printPopulation();
-        try {
-            Thread.sleep(500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
         populationNew = new ArrayList<>();
         int[]populationBest = findTopIndices(populationResults,elitismNum);
         int[]poolIndices = findTopIndices(populationResults,poolNum);
@@ -337,18 +452,8 @@ public class EvaluationFunctionHabitat implements Serializable {
         for (int index : poolIndices){
             pool.add(population.get(index));
         }
-        try {
-            Thread.sleep(500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
         population = populationNew;
         populationNew = new ArrayList<>();
-        try {
-            Thread.sleep(500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
         System.out.println("////////////////////////");
     }
 
@@ -368,7 +473,9 @@ public class EvaluationFunctionHabitat implements Serializable {
     public void printPopulation(){
         System.out.println("++++++++++++++++++++++++++++++++++++++++++");
         System.out.println("++++++++++++++++++++++++++++++++++++++++++");
-        for (Individual individual : population) System.out.println(individual);
+        for (Individual individual : population){
+            System.out.println(individual);
+        }
         System.out.println("++++++++++++++++++++++++++++++++++++++++++");
         System.out.println("++++++++++++++++++++++++++++++++++++++++++");
 
@@ -493,13 +600,7 @@ public class EvaluationFunctionHabitat implements Serializable {
             printGenerationNumber();
             firstScarcitySeason(depth);
             generation++;
-            saveCheckpoint("checkpoint_" + generation + ".ser");
-
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            saveCheckpoint("checkpoint_5_" + generation + ".ser");
         }
 
         if (this.generation % 4 == 1){
@@ -507,14 +608,7 @@ public class EvaluationFunctionHabitat implements Serializable {
             printGenerationNumber();
             firstAbundanceSeason(depth, elitismNum, poolNum);
             generation++;
-            saveCheckpoint("checkpoint_" + generation + ".ser");
-
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-
+            saveCheckpoint("checkpoint_5_" + generation + ".ser");
         }
 
         if (this.generation % 4 == 2){
@@ -522,13 +616,7 @@ public class EvaluationFunctionHabitat implements Serializable {
             printGenerationNumber();
             secondScarcitySeason(depth);
             generation++;
-            saveCheckpoint("checkpoint_" + generation + ".ser");
-
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            saveCheckpoint("checkpoint_5_" + generation + ".ser");
         }
 
         if (this.generation % 4 == 3){
@@ -536,37 +624,46 @@ public class EvaluationFunctionHabitat implements Serializable {
             printGenerationNumber();
             secondAbundanceSeason(depth, elitismNum, poolNum);
             generation++;
-            saveCheckpoint("checkpoint_" + generation + ".ser");
-
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            saveCheckpoint("checkpoint_5_" + generation + ".ser");
         }
         printPopulation();
     }
 
     public void explore(){
-        for (Individual individual : population)individual.explore();
+        System.out.println("Explore Mode on..");
+        for (Individual individual : population){
+            individual.explore();
+        }
+        printPopulation();
     }
 
     public void exploit(){
-        for (Individual individual : population)individual.exploit();
-
+        System.out.println("Exploit Mode on..");
+        for (Individual individual : population){
+            individual.exploit();
+        }
+        printPopulation();
     }
 
     public void normalMode(){
-        for (Individual individual : population)individual.normalMode();
+        System.out.println("Normal Mode on..");
+        for (Individual individual : population){
+            individual.normalMode();
+        }
+        printPopulation();
     }
 
     public void firstHundredOptimization(){
         if (this.generation < 1) initiatePopulation();
-        System.out.println("000000000000000000000");
+        System.out.println("0000000000000000000000000000000000000000000000");
         printPopulation();
         for (int i = this.generation; i < 40; i += 4){
-            if (i == 20) explore();
-            else if (i == 24) normalMode();
+            if (i == 8 || i == 12 || i == 24 || i == 28){
+                explore();
+            }
+            else if (i == 16 || i == 32) {
+                normalMode();
+            }
             fullYear(2,6,4);
         }
 
@@ -575,9 +672,10 @@ public class EvaluationFunctionHabitat implements Serializable {
             fullYear(2,6,4);
          }
         for (int m = this.generation; m < 52; m += 4){
-            if (this.generation == 48) normalMode();
+            if (this.generation == 48) {
+                normalMode();
+            }
             fullYear(2,6,4);
-
         }
 
         for (int k = this.generation; k < 60; k += 4){
@@ -586,93 +684,159 @@ public class EvaluationFunctionHabitat implements Serializable {
         }
 
         for (int l = this.generation; l < 100; l += 4){
-            if (l == 72 || l == 84) explore();
-            else if (l == 60 ||l == 76 || l == 88) normalMode();
+            if (l == 68 || l == 72 || l == 84 || l == 88){
+                explore();
+            }
+            else if (l == 60 ||l == 76 || l == 92){
+                normalMode();
+            }
             fullYear(2,6,4);
         }
+        System.out.println();
+        System.out.println("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+        System.out.println("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+        System.out.println("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+        System.out.println("||||||||||||||||||| Survival of the fittest 8 |||||||||||||||||||||");
+        System.out.println("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+        System.out.println("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+        System.out.println("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+        System.out.println();
         rankPopulation(3,8,0);
-        saveCheckpoint("checkpoint_" + generation + ".ser");
+        saveCheckpoint("checkpoint_5_" + generation + ".ser");
     }
 
     public void secondFortyEight(){
         for (int i = this.generation; i < 148; i += 4){
-            if (i == 116 || i == 132) explore();
-            else if (i == 124)exploit();
-            else if (i == 120 || i == 128 || i == 136) normalMode();
+            if (i == 112 ||  i == 116 || i == 132 || i == 136){
+                explore();
+            }
+            else if (i == 124){
+                exploit();
+            }
+            else if (i == 120 || i == 128 || i == 140){
+                normalMode();
+            }
             fullYear(3,4,4);
         }
+        System.out.println();
+        System.out.println("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+        System.out.println("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+        System.out.println("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+        System.out.println("||||||||||||||||||| Survival of the fittest 6 |||||||||||||||||||||");
+        System.out.println("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+        System.out.println("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+        System.out.println("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+        System.out.println();
         rankPopulation(4,6,0);
-        saveCheckpoint("checkpoint_" + generation + ".ser");
-
+        saveCheckpoint("checkpoint_5_" + generation + ".ser");
     }
 
     public void thirdTwentyFour(){
         for (int i = this.generation; i < 172; i += 4){
-            if (i == 156 || i == 164) explore();
-            else if (i == 160 || i == 168) normalMode();
+            printPopulation();
+            if (i == 152 || i == 156 || i == 164){
+                explore();
+            }
+            else if (i == 160 || i == 168){
+                normalMode();
+            }
             fullYear(4,4,2);
         }
+        System.out.println();
+        System.out.println("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+        System.out.println("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+        System.out.println("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+        System.out.println("||||||||||||||||||| Survival of the fittest 4 |||||||||||||||||||||");
+        System.out.println("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+        System.out.println("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+        System.out.println("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+        System.out.println();
         rankPopulation(5,4,0);
     }
 
     public void fourthTwelve(){
         for (int i = this.generation; i < 184; i += 4){
-            if (i == 176) explore();
-            else if (i == 180) normalMode();
+            printPopulation();
+            if (i == 176){
+                explore();
+            }
+            else if (i == 180){
+                explore();
+            }
             fullYear(5,2,2);
         }
+        normalMode();
+        System.out.println();
+        System.out.println("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+        System.out.println("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+        System.out.println("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+        System.out.println("||||||||||||||||||| Survival of the fittest 2 |||||||||||||||||||||");
+        System.out.println("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+        System.out.println("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+        System.out.println("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+        System.out.println();
         rankPopulation(6,2,0);
     }
 
     public void famine(){
-        for (int i = this.generation; i < 188; i++){
-            generation++;
+        System.out.println();
+        System.out.println("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+        System.out.println("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+        System.out.println("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+        System.out.println("||||||||||||||||||| !!!!!!!! FAMINE !!!!!!!!! |||||||||||||||||||||");
+        System.out.println("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+        System.out.println("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+        System.out.println("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+        System.out.println();
+
+        for (int i = this.generation; i < 190; i++){
             printGenerationNumber();
-            if (i < 186) explore();
-            else if (i == 186)normalMode();
-            else exploit();
+            if (i < 188){
+                explore();
+            }
+            else if (i == 188){
+                normalMode();
+            }
+            else{
+                exploit();
+            }
             firstScarcitySeason(6);
-            saveCheckpoint("checkpoint_" + generation + ".ser");
+            generation++;
+            saveCheckpoint("checkpoint_5_" + generation + ".ser");
             printPopulation();
         }
 
-        if (this.generation < 189){
-            generation++;
+
+        for (int i = this.generation; i < 192; i++){
             printGenerationNumber();
-            exploit();
+            if (i == 191){
+                exploit();
+            }
             firstScarcitySeason(7);
-            saveCheckpoint("checkpoint_" + generation + ".ser");
+            generation++ ;
+            saveCheckpoint("checkpoint_5_" + generation + ".ser");
             printPopulation();
         }
 
-        if (this.generation < 190){
-            generation++;
+        if (this.generation < 193){
             printGenerationNumber();
             exploit();
             firstScarcitySeason(8);
-            saveCheckpoint("checkpoint_" + generation + ".ser");
-            printPopulation();
-
-        }
-
-        if (this.generation < 191){
             generation++;
-            printGenerationNumber();
-            exploit();
-            firstScarcitySeason(9);
-            saveCheckpoint("checkpoint_" + generation + ".ser");
+            saveCheckpoint("checkpoint_5_" + generation + ".ser");
             printPopulation();
         }
 
-        generation++;
         printGenerationNumber();
-        rankPopulation(10,1,0);
-        saveCheckpoint("checkpoint_" + generation + ".ser");
+        rankPopulation(9,1,0);
+        generation++;
+        saveCheckpoint("checkpoint_5_" + generation + ".ser");
         printPopulation();
 
+        printGenerationNumber();
         normalMode();
         best = population.get(0);
-        saveCheckpoint("checkpoint_done.ser");
+        saveCheckpoint("checkpoint_5_" + generation + ".ser");
 
         System.out.println("00000000000000000000000000000000000000000000000");
         System.out.println("0000000000000000000  BEST  00000000000000000000");
@@ -693,8 +857,8 @@ public class EvaluationFunctionHabitat implements Serializable {
     }
 
     public static void main (String[] args){
-        EvaluationFunctionHabitat evaluationFunctionHabitat = loadCheckpoint("checkpoint_190.ser");
-        //EvaluationFunctionHabitat evaluationFunctionHabitat = new EvaluationFunctionHabitat();
+        //EvaluationFunctionHabitat evaluationFunctionHabitat = loadCheckpoint("checkpoint_5_2.ser");
+        EvaluationFunctionHabitat evaluationFunctionHabitat = new EvaluationFunctionHabitat();
         evaluationFunctionHabitat.fullOptimization();
     }
 

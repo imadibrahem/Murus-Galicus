@@ -21,10 +21,10 @@ public class MobilityFactorChromosome extends IntegerSingleValueChromosome imple
 
     @Override
     public void mutate() {
+        System.out.println("mutation for Chromosome #6 is being applied ");
+        System.out.println(this);
         float mutationType = random.nextFloat();
-        float amountSign;
-        float highLevelMutationChance;
-        float rangeMutationChance;
+        float amountSign, highLevelMutationChance, rangeMutationChance;
 
         if (isExploration()){
             highLevelMutationChance = 0.9f;
@@ -38,15 +38,23 @@ public class MobilityFactorChromosome extends IntegerSingleValueChromosome imple
             highLevelMutationChance = 0.95f;
             rangeMutationChance = 0.45f;
         }
-
-        if (mutationType > highLevelMutationChance) highLevelMutation();
-        else if (mutationType > rangeMutationChance) rangeMutation((int) (upperLimit * mutationRate));
+        if (mutationType > highLevelMutationChance){
+            System.out.println("applying High level mutation");
+            highLevelMutation();
+        }
+        else if (mutationType > rangeMutationChance){
+            System.out.println("applying range mutation");
+            int amount = Math.max(1, (int) (upperLimit * mutationRate));
+            rangeMutation(amount);
+        }
         else {
-            int amount = (int) (value[0] * mutationRate);
+            System.out.println("applying fixed mutation");
+            int amount = Math.max(1, (int) (value[0] * mutationRate));
             amountSign = random.nextFloat();
             if (amountSign < 0.5) amount *= -1;
             fixedMutation(amount);
         }
+        System.out.println(this );
     }
 
     @Override
@@ -75,10 +83,16 @@ public class MobilityFactorChromosome extends IntegerSingleValueChromosome imple
         offspring[0] = firstChild;
         offspring[1] = secondChild;
         for (int i = 0; i < 2; i++){
+            System.out.println("offspring #" + i + " mode..");
             mutationChance = random.nextFloat();
             if (isExploration()) offspring[i].setExploration(true);
             else if (isExploitation()) offspring[i].setExploitation(true);
-            if (mutationChance < mutationRate) offspring[i].mutate();
+            System.out.println("checking for mutation..");
+            System.out.println("Chromosome mutation chance is: " + mutationChance + " mutation rate is: " + mutationRate);
+            if (mutationChance < mutationRate){
+                offspring[i].mutate();
+            }
+            System.out.println();
         }
         return offspring;
     }

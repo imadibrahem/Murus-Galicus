@@ -3,7 +3,8 @@ package model;
 import model.bit.BitBoard;
 import model.evaluationFunction.EvaluationFunction;
 import model.evaluationFunction.InitialEvaluationFunction;
-import model.evolutionTheory.evaluationFunction.FirstHabitatEvaluationFunction;
+import model.evolutionTheory.habitat.FirstHabitatEvaluationFunction;
+import model.evolutionTheory.habitat.SecondHabitatEvaluationFunction;
 import model.move.MoveGeneratorEvolutionTheory;
 import model.move.Move;
 import model.move.MoveGeneratingStyle;
@@ -229,8 +230,14 @@ public class Game {
     }
 
     public void checkForWinner(){
-        if (blueBoard.lostGame(true)) winner = red;
-        else if (redBoard.lostGame(false)) winner = blue;
+        if (playerOn.isEvaluationBlue()){
+            if (blueBoard.lostGame(true)) winner = red;
+            else if (redBoard.lostGame(false)) winner = blue;
+        }
+        else {
+            if (redBoard.lostGame(false)) winner = blue;
+            else if (blueBoard.lostGame(true)) winner = red;
+        }
         if (winner != null){
             System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++");
             System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++");
@@ -417,8 +424,8 @@ public class Game {
 
         Board blueBoard2 = new BitBoard(FenTrimmer(FenInitial));
         MoveGenerator blueGenerator2 = new MoveGeneratorEvolutionTheory(blueBoard2, MoveGeneratingStyle.ALL_TYPE_MOVES_PIECE_BY_PIECE,moveTypes, directions, true );
-        //EvaluationFunction blueEvaluationFunction2 = new InitialEvaluationFunction(blueBoard2);
-        EvaluationFunction blueEvaluationFunction2 = new FirstHabitatEvaluationFunction(blueBoard2);
+        EvaluationFunction blueEvaluationFunction2 = new InitialEvaluationFunction(blueBoard2);
+        //EvaluationFunction blueEvaluationFunction2 = new FirstHabitatEvaluationFunction(blueBoard2);
         //Player blue2 = new User(true, blueBoard2,blueGenerator2, blueEvaluationFunction2,userInput2);
         //Player blue2 = new AlphaBeta(true, blueBoard2,blueGenerator2, blueEvaluationFunction2,4);
         //Player blue2 = new IterativeDeepeningFixedDepth(true, blueBoard2,blueGenerator2, blueEvaluationFunction2,5);
@@ -431,12 +438,13 @@ public class Game {
         //Player blue2 = new NullMovePlayer(true, blueBoard2,blueGenerator2, blueEvaluationFunction2,6);
         //Player blue2 = new HashTester(true, blueBoard2,blueGenerator2, blueEvaluationFunction2,6);
         //Player blue2 = new LateMoveReductionPlayer(true, blueBoard2,blueGenerator2, blueEvaluationFunction2,9);
-        Player blue2 = new TranspositionTablePlayer(true, blueBoard2,blueGenerator2, blueEvaluationFunction2, 8);
+        Player blue2 = new TranspositionTablePlayer(true, blueBoard2,blueGenerator2, blueEvaluationFunction2, 7);
         //Player blue2 = new DoubleTabledPlayer(true, blueBoard2,blueGenerator2, blueEvaluationFunction2,9);
 
         Board redBoard2 = new BitBoard(FenTrimmer(FenInitial));
         MoveGenerator redGenerator2 = new MoveGeneratorEvolutionTheory(redBoard2, MoveGeneratingStyle.ALL_TYPE_MOVES_PIECE_BY_PIECE,moveTypes, directions, true );
-        EvaluationFunction redEvaluationFunction2 = new InitialEvaluationFunction(redBoard2);
+        //EvaluationFunction redEvaluationFunction2 = new InitialEvaluationFunction(redBoard2);
+        EvaluationFunction redEvaluationFunction2 = new SecondHabitatEvaluationFunction(redBoard2);
         //Player red2 = new MinMax(false, redBoard2,redGenerator2, redEvaluationFunction2, 4);
         //Player red2 = new AlphaBeta(false, redBoard2,redGenerator2, redEvaluationFunction2, 4);
         //Player red2 = new IterativeDeepeningFixedDepth(false, redBoard2,redGenerator2, redEvaluationFunction2, 6);
@@ -449,7 +457,7 @@ public class Game {
         //Player red2 = new NullMovePlayer(false, redBoard2,redGenerator2, redEvaluationFunction2,8);
         //Player red2 = new HashTester(false, redBoard2,redGenerator2, redEvaluationFunction2,6);
         //Player red2 = new LateMoveReductionPlayer(false, redBoard2,redGenerator2, redEvaluationFunction2,6);
-        Player red2 = new TranspositionTablePlayer(false, redBoard2,redGenerator2, redEvaluationFunction2,8);
+        Player red2 = new TranspositionTablePlayer(false, redBoard2,redGenerator2, redEvaluationFunction2,7);
         //Player red2 = new DoubleTabledPlayer(false, redBoard2,redGenerator2, redEvaluationFunction2,9);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

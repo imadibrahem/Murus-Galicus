@@ -13,7 +13,6 @@ public class WallsColumnsFactorChromosome extends IntegerNormalArrayValueChromos
     public WallsColumnsFactorChromosome() {
         super(15, -2, 4, 0.1f);
         produceValue();
-
     }
 
     public WallsColumnsFactorChromosome(float mutationRate) {
@@ -22,10 +21,9 @@ public class WallsColumnsFactorChromosome extends IntegerNormalArrayValueChromos
 
     @Override
     public void mutate() {
-        float mutationType;
-        float amountSign;
-        float highLevelMutationChance;
-        float rangeMutationChance;
+        System.out.println("mutation for Chromosome #1 is being applied ");
+        System.out.println(this);
+        float mutationType, amountSign, highLevelMutationChance, rangeMutationChance;
 
         if (isExploration()){
             highLevelMutationChance = 0.9f;
@@ -40,16 +38,27 @@ public class WallsColumnsFactorChromosome extends IntegerNormalArrayValueChromos
             rangeMutationChance = 0.45f;
         }
         for (int i = 0; i < value.length; i++){
+            System.out.print("mutation for Gene #" + i + " is being applied: ");
             mutationType = random.nextFloat();
-            if (mutationType > highLevelMutationChance) value[i] = highLevelMutation();
-            else if (mutationType > rangeMutationChance) value[i] = rangeMutation(value[i], (int) (upperLimit * mutationRate));
+            if (mutationType > highLevelMutationChance){
+                System.out.print("applying High level mutation | ");
+                value[i] = highLevelMutation();
+            }
+            else if (mutationType > rangeMutationChance){
+                System.out.print("applying range mutation | ");
+                int range = Math.max(1, (int) (upperLimit * mutationRate));
+                value[i] = rangeMutation(value[i], range);
+            }
             else {
-                int amount = (int) (value[i] * mutationRate);
+                System.out.print("applying fixed mutation | ");
+                int amount = Math.max(1, (int) (value[i] * mutationRate));
                 amountSign = random.nextFloat();
                 if (amountSign < 0.5) amount *= -1;
                 value[i] = fixedMutation(value[i],amount);
             }
         }
+        System.out.println();
+        System.out.println(this);
     }
 
     @Override
@@ -72,10 +81,16 @@ public class WallsColumnsFactorChromosome extends IntegerNormalArrayValueChromos
         offspring[0] = firstChild;
         offspring[1] = secondChild;
         for (int i = 0; i < 2; i++){
+            System.out.println("offspring #" + i + " mode..");
             randomIndex = random.nextFloat();
             if (isExploration()) offspring[i].setExploration(true);
             else if (isExploitation()) offspring[i].setExploitation(true);
-            if (randomIndex < mutationRate) offspring[i].mutate();
+            System.out.println("checking for mutation..");
+            System.out.println("Chromosome mutation chance is: " + randomIndex + " mutation rate is: " + mutationRate);
+            if (randomIndex < mutationRate){
+                offspring[i].mutate();
+            }
+            System.out.println();
         }
         return offspring;
     }

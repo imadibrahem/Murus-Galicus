@@ -27,7 +27,7 @@ public abstract class Individual implements Serializable {
     public void explore(){
         exploration = true;
         exploitation = false;
-        mutationRate *= 1.05;
+        mutationRate *= 1.2;
         for (Chromosome chromosome: genome){
             chromosome.explore();
             chromosome.setMutationRate(mutationRate);
@@ -37,7 +37,7 @@ public abstract class Individual implements Serializable {
     public void exploit(){
         exploration = false;
         exploitation = true;
-        mutationRate *= 0.95;
+        mutationRate *= 0.8;
         for (Chromosome chromosome: genome){
             chromosome.exploit();
             chromosome.setMutationRate(mutationRate);
