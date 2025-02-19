@@ -83,22 +83,23 @@ public class GameStateChromosome extends IntegerBalancedArrayValueChromosome imp
         System.out.println("applying range mutation");
         int positiveValue = value[7] + value[6] + value[5];
         int difference = upperLimit - positiveValue > lowerLimit ? upperLimit - positiveValue : lowerLimit + 1;
-        int difference_2 = positiveValue - lowerLimit < upperLimit ? positiveValue - lowerLimit : upperLimit - 1;
-        if (difference_2 < difference) difference = difference_2;
-        int range = difference < positiveValue ? (int) ((difference / 3) * mutationRate) : (int) ((positiveValue / 3) * mutationRate);
+        int range = difference < positiveValue ? (difference / 3) : (positiveValue / 3);
         int amount_1, amount_2, amount_3;
+        int range_1, range_2, range_3;
         int currentPositiveValue;
-
-        int maxRetries = 100;
+        range_1 = Math.min(range, value[7]);
+        range_2 = Math.min(range, value[6]);
+        range_3 = Math.min(range, value[5]);
+        int maxRetries = 3;
         int attempts = 0;
         boolean success = false;
         while(true) {
-            amount_1 = random.nextInt(2 * range + 1) - range;
-            amount_2 = random.nextInt(2 * range + 1) - range;
-            amount_3 = random.nextInt(2 * range + 1) - range;
+            amount_1 = random.nextInt(2 * range_1 + 1) - range_1;
+            amount_2 = random.nextInt(2 * range_2 + 1) - range_2;
+            amount_3 = random.nextInt(2 * range_3 + 1) - range_3;
             currentPositiveValue = positiveValue + amount_1 + amount_2 + amount_3;
             attempts++;
-            if (currentPositiveValue >= upperLimit &&  currentPositiveValue <= lowerLimit){
+            if (currentPositiveValue >= lowerLimit &&  currentPositiveValue <= upperLimit){
                 success = true;
                 break;
             }
@@ -121,6 +122,7 @@ public class GameStateChromosome extends IntegerBalancedArrayValueChromosome imp
         else {
             highLevelMutation();
         }
+
     }
 
     @Override

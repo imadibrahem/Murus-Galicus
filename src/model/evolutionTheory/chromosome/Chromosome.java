@@ -10,7 +10,7 @@ public abstract class Chromosome implements Serializable {
     protected boolean exploration = false;
     protected boolean exploitation = false;
     protected float mutationRate;
-    public int [] value;
+    public int[] value;
 
 
     public abstract void mutate();

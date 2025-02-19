@@ -600,7 +600,7 @@ public class EvaluationFunctionHabitat implements Serializable {
             printGenerationNumber();
             firstScarcitySeason(depth);
             generation++;
-            saveCheckpoint("checkpoint_5_" + generation + ".ser");
+            saveCheckpoint("checkpoint_6_" + generation + ".ser");
         }
 
         if (this.generation % 4 == 1){
@@ -608,7 +608,7 @@ public class EvaluationFunctionHabitat implements Serializable {
             printGenerationNumber();
             firstAbundanceSeason(depth, elitismNum, poolNum);
             generation++;
-            saveCheckpoint("checkpoint_5_" + generation + ".ser");
+            saveCheckpoint("checkpoint_6_" + generation + ".ser");
         }
 
         if (this.generation % 4 == 2){
@@ -616,7 +616,7 @@ public class EvaluationFunctionHabitat implements Serializable {
             printGenerationNumber();
             secondScarcitySeason(depth);
             generation++;
-            saveCheckpoint("checkpoint_5_" + generation + ".ser");
+            saveCheckpoint("checkpoint_6_" + generation + ".ser");
         }
 
         if (this.generation % 4 == 3){
@@ -624,7 +624,7 @@ public class EvaluationFunctionHabitat implements Serializable {
             printGenerationNumber();
             secondAbundanceSeason(depth, elitismNum, poolNum);
             generation++;
-            saveCheckpoint("checkpoint_5_" + generation + ".ser");
+            saveCheckpoint("checkpoint_6_" + generation + ".ser");
         }
         printPopulation();
     }
@@ -702,7 +702,7 @@ public class EvaluationFunctionHabitat implements Serializable {
         System.out.println("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
         System.out.println();
         rankPopulation(3,8,0);
-        saveCheckpoint("checkpoint_5_" + generation + ".ser");
+        saveCheckpoint("checkpoint_6_" + generation + ".ser");
     }
 
     public void secondFortyEight(){
@@ -728,7 +728,7 @@ public class EvaluationFunctionHabitat implements Serializable {
         System.out.println("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
         System.out.println();
         rankPopulation(4,6,0);
-        saveCheckpoint("checkpoint_5_" + generation + ".ser");
+        saveCheckpoint("checkpoint_6_" + generation + ".ser");
     }
 
     public void thirdTwentyFour(){
@@ -802,7 +802,7 @@ public class EvaluationFunctionHabitat implements Serializable {
             }
             firstScarcitySeason(6);
             generation++;
-            saveCheckpoint("checkpoint_5_" + generation + ".ser");
+            saveCheckpoint("checkpoint_6_" + generation + ".ser");
             printPopulation();
         }
 
@@ -814,7 +814,7 @@ public class EvaluationFunctionHabitat implements Serializable {
             }
             firstScarcitySeason(7);
             generation++ ;
-            saveCheckpoint("checkpoint_5_" + generation + ".ser");
+            saveCheckpoint("checkpoint_6_" + generation + ".ser");
             printPopulation();
         }
 
@@ -823,20 +823,20 @@ public class EvaluationFunctionHabitat implements Serializable {
             exploit();
             firstScarcitySeason(8);
             generation++;
-            saveCheckpoint("checkpoint_5_" + generation + ".ser");
+            saveCheckpoint("checkpoint_6_" + generation + ".ser");
             printPopulation();
         }
 
         printGenerationNumber();
         rankPopulation(9,1,0);
         generation++;
-        saveCheckpoint("checkpoint_5_" + generation + ".ser");
+        saveCheckpoint("checkpoint_6_" + generation + ".ser");
         printPopulation();
 
         printGenerationNumber();
         normalMode();
         best = population.get(0);
-        saveCheckpoint("checkpoint_5_" + generation + ".ser");
+        saveCheckpoint("checkpoint_6_" + generation + ".ser");
 
         System.out.println("00000000000000000000000000000000000000000000000");
         System.out.println("0000000000000000000  BEST  00000000000000000000");
@@ -857,8 +857,8 @@ public class EvaluationFunctionHabitat implements Serializable {
     }
 
     public static void main (String[] args){
-        //EvaluationFunctionHabitat evaluationFunctionHabitat = loadCheckpoint("checkpoint_5_2.ser");
-        EvaluationFunctionHabitat evaluationFunctionHabitat = new EvaluationFunctionHabitat();
+        EvaluationFunctionHabitat evaluationFunctionHabitat = loadCheckpoint("checkpoint_6_1.ser");
+        //EvaluationFunctionHabitat evaluationFunctionHabitat = new EvaluationFunctionHabitat();
         evaluationFunctionHabitat.fullOptimization();
     }
 

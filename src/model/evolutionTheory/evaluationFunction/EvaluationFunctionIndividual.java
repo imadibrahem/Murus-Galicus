@@ -5,6 +5,7 @@ import model.evolutionTheory.individual.Individual;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.Arrays;
 
 public class EvaluationFunctionIndividual extends Individual  implements Serializable {
     @Serial
@@ -71,12 +72,13 @@ public class EvaluationFunctionIndividual extends Individual  implements Seriali
             System.out.println("Chromosome #" + i);
             randomIndex = random.nextFloat();
             if (randomIndex < 0.5){
-                firstChild.genome[i].value = genome[i].value;
-                secondChild.genome[i].value = partner.genome[i].value;
+                firstChild.genome[i].value = Arrays.copyOf(genome[i].value, genome[i].value.length);
+                secondChild.genome[i].value = Arrays.copyOf(partner.genome[i].value, partner.genome[i].value.length);
+
             }
             else {
-                firstChild.genome[i].value = partner.genome[i].value;
-                secondChild.genome[i].value = genome[i].value;
+                firstChild.genome[i].value = Arrays.copyOf(partner.genome[i].value, partner.genome[i].value.length);
+                secondChild.genome[i].value = Arrays.copyOf(genome[i].value, genome[i].value.length);
             }
         }
         System.out.println();
