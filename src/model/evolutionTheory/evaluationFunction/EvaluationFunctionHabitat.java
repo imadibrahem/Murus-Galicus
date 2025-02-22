@@ -857,7 +857,7 @@ public class EvaluationFunctionHabitat implements Serializable {
     }
 
     public static void main (String[] args){
-        EvaluationFunctionHabitat evaluationFunctionHabitat = loadCheckpoint("checkpoint_6_1.ser");
+        EvaluationFunctionHabitat evaluationFunctionHabitat = loadCheckpoint("checkpoint_6_141.ser");
         //EvaluationFunctionHabitat evaluationFunctionHabitat = new EvaluationFunctionHabitat();
         evaluationFunctionHabitat.fullOptimization();
     }
