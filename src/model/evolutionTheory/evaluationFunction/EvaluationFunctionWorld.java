@@ -4,6 +4,7 @@ import model.Board;
 import model.Game;
 import model.bit.BitBoard;
 import model.evaluationFunction.EvaluationFunction;
+import model.evolutionTheory.habitats.*;
 import model.evolutionTheory.individual.Individual;
 import model.move.MoveGeneratingStyle;
 import model.move.MoveGenerator;
@@ -13,19 +14,18 @@ import model.player.Player;
 import model.player.TranspositionTablePlayer;
 import view.UserInput;
 
-import java.io.Serial;
-import java.io.Serializable;
+import java.io.*;
 import java.util.*;
 
 public class EvaluationFunctionWorld implements Serializable {
     @Serial
     protected static final long serialVersionUID = 1L;
     Random random = new Random();
-    List<Individual> population = new ArrayList<>();
-    List<Individual> populationNew = new ArrayList<>();
     List<Individual> pool = new ArrayList<>();
     List<List<Individual>> families;
     List<Individual> family;
+    List<Individual> population = new ArrayList<>();
+    List<Individual> populationNew = new ArrayList<>();
     String FenInitial = "tttttttt/8/8/8/8/8/TTTTTTTT,b";
     MoveType[] moveTypes = {MoveType.FRIEND_ON_BOTH, MoveType.FRIEND_ON_NEAR, MoveType.FRIEND_ON_FAR, MoveType.QUIET, MoveType.SACRIFICE};
     int [] directions = {1, 8, 2, 3, 7, 6, 4, 5};
@@ -33,9 +33,49 @@ public class EvaluationFunctionWorld implements Serializable {
     public Individual bestOfBest;
 
     public void doMigration(){
-        for (int i = 0; i < 4; i++) {
-            // TODO: 1/29/2025 HERE!!!!!
+        population.add(new EvaluationFunctionIndividual(new FirstHabitatEvaluationFunction()));
+        population.add(new EvaluationFunctionIndividual(new SecondHabitatEvaluationFunction()));
+        population.add(new EvaluationFunctionIndividual(new ThirdHabitatEvaluationFunction()));
+        population.add(new EvaluationFunctionIndividual(new FourthHabitatEvaluationFunction()));
+        population.add(new EvaluationFunctionIndividual(new FifthHabitatEvaluationFunction()));
+        population.add(new EvaluationFunctionIndividual(new SixthHabitatEvaluationFunction()));
+        population.add(new EvaluationFunctionIndividual(new SeventhHabitatEvaluationFunction()));
+        population.add(new EvaluationFunctionIndividual(new EighthHabitatEvaluationFunction()));
+        population.add(new EvaluationFunctionIndividual(new NinthHabitatEvaluationFunction()));
+        population.add(new EvaluationFunctionIndividual(new TenthHabitatEvaluationFunction()));
+        printPopulation();
+    }
+
+
+    public void saveCheckpoint(String filename) {
+        try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(filename))) {
+            out.writeObject(pool);
+            out.writeObject(families);
+            out.writeObject(family);
+            out.writeObject(population);
+            out.writeObject(populationNew);
+            out.writeObject(bestOfBest);
+            out.writeInt(generation);
+            out.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+    }
+
+    public static EvaluationFunctionWorld loadCheckpoint(String filename) {
+        EvaluationFunctionWorld evaluationFunctionWorld = new EvaluationFunctionWorld();
+        try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(filename))) {
+            evaluationFunctionWorld.pool = (List<Individual>) in.readObject();
+            evaluationFunctionWorld.families = (List<List<Individual>>) in.readObject();
+            evaluationFunctionWorld.family = (List<Individual>) in.readObject();
+            evaluationFunctionWorld.population = (List<Individual>) in.readObject();
+            evaluationFunctionWorld.populationNew = (List<Individual>) in.readObject();
+            evaluationFunctionWorld.bestOfBest = (Individual)in.readObject();
+            evaluationFunctionWorld.generation = in.readInt();
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return evaluationFunctionWorld;
     }
 
     public void explore(){
@@ -117,7 +157,7 @@ public class EvaluationFunctionWorld implements Serializable {
     public void printPopulation(){
         System.out.println("++++++++++++++++++++++++++++++++++++++++++");
         System.out.println("++++++++++++++++++++++++++++++++++++++++++");
-        for (Individual individual : population) {
+        for (Individual individual : population){
             System.out.println(individual);
         }
         System.out.println("++++++++++++++++++++++++++++++++++++++++++");
@@ -245,11 +285,19 @@ public class EvaluationFunctionWorld implements Serializable {
         System.out.println("Mating started..");
         Collections.shuffle(pool, random);
         for (int i = 0; i < pool.size() - 1; i += 2) {
+            System.out.println("-------------------------------");
+            System.out.println("pair: " + i + " and " + (i + 1));
             Individual firstParent = pool.get(i);
             Individual secondParent = pool.get(i + 1);
+            System.out.println("parents were chosen..");
+            System.out.println("+++++++++++ Parents +++++++++++");
+            System.out.println(firstParent);
+            System.out.println(secondParent);
+            System.out.println("+++++++++++ Parents +++++++++++");
             family = new ArrayList<>();
             family.add(firstParent);
             family.add(secondParent);
+            System.out.println("applying crossover..");
             offspring = firstParent.crossover(secondParent);
             if (offspring != null && offspring.length > 0) {
                 family.addAll(Arrays.asList(offspring));
@@ -267,6 +315,11 @@ public class EvaluationFunctionWorld implements Serializable {
                     System.out.println("Crossover failed for pair: " + i + " and " + (i + 1));
                 }
             }
+            System.out.println("+++++++++++ Parents +++++++++++");
+            System.out.println(firstParent);
+            System.out.println(secondParent);
+            System.out.println("+++++++++++ Parents +++++++++++");
+            System.out.println("-------------------------------");
         }
         pool = new ArrayList<>();
         System.out.println("Mating done..");
@@ -275,6 +328,7 @@ public class EvaluationFunctionWorld implements Serializable {
         printPopulation();
         System.out.println("-------------firstScarcitySeason -------------");
     }
+
 
     public void fullFamilySelection(int depth){
         int [][] familyResults;
@@ -317,43 +371,86 @@ public class EvaluationFunctionWorld implements Serializable {
     public void famine(){
         for (int i = this.generation; i < 20; i++){
             printGenerationNumber();
-            if (i < 8) explore();
-            else if (i == 8) normalMode();
-            else if (i > 16)exploit();
+            if (i == 3) explore();
+            else if (i == 8 || i == 18) normalMode();
+            else if (i == 16)exploit();
             firstScarcitySeason(6);
-            printPopulation();
             generation++;
-
+            saveCheckpoint("world_checkpoint_" + generation + ".ser");
+            printPopulation();
         }
-        normalMode();
-        for (int i = this.generation; i < 24; i++){
+        rankPopulation(6,8,0);
+
+        for (int i = this.generation; i < 40; i++){
             printGenerationNumber();
-            if (i < 22) exploit();
-            else if (i == 22)normalMode();
-            firstScarcitySeason(7);
-            printPopulation();
+            if (i == 24) explore();
+            else if (i == 28 || i == 38) normalMode();
+            else if (i == 36)exploit();
+            firstScarcitySeason(6);
             generation++;
-
+            saveCheckpoint("world_checkpoint_" + generation + ".ser");
+            printPopulation();
         }
-        for (int i = this.generation; i < 26; i++){
+        rankPopulation(6,6,0);
+
+        for (int i = this.generation; i < 60; i++){
+            printGenerationNumber();
+            if (i == 44) explore();
+            else if (i == 45 || i == 59) normalMode();
+            else if (i == 56)exploit();
+            firstScarcitySeason(6);
+            generation++;
+            saveCheckpoint("world_checkpoint_" + generation + ".ser");
+            printPopulation();
+        }
+        rankPopulation(6,4,0);
+
+        for (int i = this.generation; i < 80; i++){
+            printGenerationNumber();
+            if (i == 70)exploit();
+            else if (i == 74) normalMode();
+            firstScarcitySeason(6);
+            generation++;
+            saveCheckpoint("world_checkpoint_" + generation + ".ser");
+            printPopulation();
+        }
+        rankPopulation(6,2,0);
+
+        for (int i = this.generation; i < 100; i++){
+            printGenerationNumber();
+            if (i == 88 || i == 94)exploit();
+            else if (i == 92 || i == 98) normalMode();
+            firstScarcitySeason(6);
+            generation++;
+            saveCheckpoint("world_checkpoint_" + generation + ".ser");
+            printPopulation();
+        }
+
+        for (int i = this.generation; i < 102; i++){
+            printGenerationNumber();
+            exploit();
+            firstScarcitySeason(7);
+            generation++;
+            saveCheckpoint("world_checkpoint_" + generation + ".ser");
+            printPopulation();
+        }
+
+        for (int i = this.generation; i < 104; i++){
             printGenerationNumber();
             exploit();
             firstScarcitySeason(8);
-            printPopulation();
             generation++;
-
-        }
-        for (int i = 0; i < 28; i++){
-            printGenerationNumber();
-            exploit();
-            firstScarcitySeason(9);
+            saveCheckpoint("world_checkpoint_" + generation + ".ser");
             printPopulation();
-            generation++;
-
         }
         printGenerationNumber();
-        rankPopulation(10,1,0);
+        rankPopulation(9,1,0);
+        generation++;
+        saveCheckpoint("world_checkpoint_" + generation + ".ser");
         printPopulation();
+
+        printGenerationNumber();
+        normalMode();
         bestOfBest = population.get(0);
 
 
@@ -374,6 +471,8 @@ public class EvaluationFunctionWorld implements Serializable {
 
     public static void main (String[] args){
         EvaluationFunctionWorld evaluationFunctionWorld = new EvaluationFunctionWorld();
+        //EvaluationFunctionWorld evaluationFunctionWorld = loadCheckpoint("world_checkpoint_1.ser");
+
         evaluationFunctionWorld.fullOptimization();
     }
 

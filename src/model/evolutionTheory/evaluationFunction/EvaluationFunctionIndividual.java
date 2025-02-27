@@ -1,5 +1,6 @@
 package model.evolutionTheory.evaluationFunction;
 
+import model.evaluationFunction.EvaluationFunction;
 import model.evolutionTheory.chromosome.Chromosome;
 import model.evolutionTheory.individual.Individual;
 
@@ -21,6 +22,22 @@ public class EvaluationFunctionIndividual extends Individual  implements Seriali
         this.genomeLength = 9;
         this.genome = new Chromosome[genomeLength];
         this.mutationRate = mutationRate;
+    }
+
+    public EvaluationFunctionIndividual(EvaluationFunction evaluationFunction) {
+        this.genomeLength = 9;
+        this.genome = new Chromosome[genomeLength];
+        this.mutationRate = 0.1f;
+        produceChromosomes();
+        genome[0].value = Arrays.copyOf(evaluationFunction.getWallsDistancesFactor(), evaluationFunction.getWallsDistancesFactor().length);
+        genome[1].value = Arrays.copyOf(evaluationFunction.getWallsColumnsFactor(), evaluationFunction.getWallsColumnsFactor().length);
+        genome[2].value = Arrays.copyOf(evaluationFunction.getTowersDistancesFactor(), evaluationFunction.getTowersDistancesFactor().length);
+        genome[3].value = Arrays.copyOf(evaluationFunction.getTowersColumnsFactor(), evaluationFunction.getTowersColumnsFactor().length);
+        genome[4].value = Arrays.copyOf(evaluationFunction.getTowersRatioFactor(), evaluationFunction.getTowersRatioFactor().length);
+        genome[5].value = Arrays.copyOf(evaluationFunction.getGameStateFactor(), evaluationFunction.getGameStateFactor().length);
+        genome[6].value[0] = evaluationFunction.getMobilityFactor();
+        genome[7].value[0] = evaluationFunction.getIsolatedTowersFactor();
+        genome[8].value[0] = evaluationFunction.getIsolatedWallsFactor();
     }
 
     @Override

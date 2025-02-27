@@ -30,13 +30,10 @@ public class EvaluationFunctionHabitat implements Serializable {
     MoveType[] moveTypes = {MoveType.FRIEND_ON_BOTH, MoveType.FRIEND_ON_NEAR, MoveType.FRIEND_ON_FAR, MoveType.QUIET, MoveType.SACRIFICE};
     int [] directions = {1, 8, 2, 3, 7, 6, 4, 5};
     int generation = 0;
-    int index;
     public Individual best;
-
 
     public void saveCheckpoint(String filename) {
         try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(filename))) {
-            //out.writeObject(this);
             out.writeObject(pool);
             out.writeObject(families);
             out.writeObject(family);
@@ -44,7 +41,7 @@ public class EvaluationFunctionHabitat implements Serializable {
             out.writeObject(population);
             out.writeObject(populationNew);
             out.writeObject(best);
-            out.writeInt(generation);    // Save generation count
+            out.writeInt(generation);
             out.flush();
         } catch (IOException e) {
             e.printStackTrace();
@@ -857,9 +854,10 @@ public class EvaluationFunctionHabitat implements Serializable {
     }
 
     public static void main (String[] args){
-        //EvaluationFunctionHabitat evaluationFunctionHabitat = loadCheckpoint("checkpoint_8_1.ser");
-        EvaluationFunctionHabitat evaluationFunctionHabitat = new EvaluationFunctionHabitat();
-        evaluationFunctionHabitat.fullOptimization();
+        EvaluationFunctionHabitat evaluationFunctionHabitat = loadCheckpoint("checkpoint_9_194.ser");
+        //EvaluationFunctionHabitat evaluationFunctionHabitat = new EvaluationFunctionHabitat();
+        //evaluationFunctionHabitat.fullOptimization();
+        System.out.println(evaluationFunctionHabitat.best);
     }
 
 }
