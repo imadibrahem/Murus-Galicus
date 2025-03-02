@@ -329,7 +329,6 @@ public class EvaluationFunctionWorld implements Serializable {
         System.out.println("-------------firstScarcitySeason -------------");
     }
 
-
     public void fullFamilySelection(int depth){
         int [][] familyResults;
         int [][] pairResults;
@@ -369,29 +368,48 @@ public class EvaluationFunctionWorld implements Serializable {
     }
 
     public void famine(){
+        printPopulation();
         for (int i = this.generation; i < 20; i++){
             printGenerationNumber();
             if (i == 3) explore();
             else if (i == 8 || i == 18) normalMode();
             else if (i == 16)exploit();
-            firstScarcitySeason(6);
+            firstScarcitySeason(4);
             generation++;
             saveCheckpoint("world_checkpoint_" + generation + ".ser");
             printPopulation();
         }
-        rankPopulation(6,8,0);
+        System.out.println();
+        System.out.println("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+        System.out.println("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+        System.out.println("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+        System.out.println("||||||||||||||||||| Survival of the fittest 8 |||||||||||||||||||||");
+        System.out.println("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+        System.out.println("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+        System.out.println("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+        System.out.println();
+        if (this.generation < 20) rankPopulation(6,8,0);
 
         for (int i = this.generation; i < 40; i++){
             printGenerationNumber();
             if (i == 24) explore();
             else if (i == 28 || i == 38) normalMode();
             else if (i == 36)exploit();
-            firstScarcitySeason(6);
+            firstScarcitySeason(5);
             generation++;
             saveCheckpoint("world_checkpoint_" + generation + ".ser");
             printPopulation();
         }
-        rankPopulation(6,6,0);
+        System.out.println();
+        System.out.println("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+        System.out.println("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+        System.out.println("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+        System.out.println("||||||||||||||||||| Survival of the fittest 6 |||||||||||||||||||||");
+        System.out.println("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+        System.out.println("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+        System.out.println("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+        System.out.println();
+        if (this.generation < 40) rankPopulation(6,6,0);
 
         for (int i = this.generation; i < 60; i++){
             printGenerationNumber();
@@ -403,7 +421,16 @@ public class EvaluationFunctionWorld implements Serializable {
             saveCheckpoint("world_checkpoint_" + generation + ".ser");
             printPopulation();
         }
-        rankPopulation(6,4,0);
+        System.out.println();
+        System.out.println("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+        System.out.println("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+        System.out.println("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+        System.out.println("||||||||||||||||||| Survival of the fittest 4 |||||||||||||||||||||");
+        System.out.println("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+        System.out.println("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+        System.out.println("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+        System.out.println();
+        if (this.generation < 60) rankPopulation(6,4,0);
 
         for (int i = this.generation; i < 80; i++){
             printGenerationNumber();
@@ -414,7 +441,16 @@ public class EvaluationFunctionWorld implements Serializable {
             saveCheckpoint("world_checkpoint_" + generation + ".ser");
             printPopulation();
         }
-        rankPopulation(6,2,0);
+        System.out.println();
+        System.out.println("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+        System.out.println("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+        System.out.println("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+        System.out.println("||||||||||||||||||| Survival of the fittest 2 |||||||||||||||||||||");
+        System.out.println("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+        System.out.println("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+        System.out.println("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+        System.out.println();
+        if (this.generation < 80) rankPopulation(6,2,0);
 
         for (int i = this.generation; i < 100; i++){
             printGenerationNumber();
@@ -465,13 +501,13 @@ public class EvaluationFunctionWorld implements Serializable {
     }
 
     public void fullOptimization(){
-        doMigration();
+        if (this.generation < 1)doMigration();
         famine();
     }
 
     public static void main (String[] args){
-        EvaluationFunctionWorld evaluationFunctionWorld = new EvaluationFunctionWorld();
-        //EvaluationFunctionWorld evaluationFunctionWorld = loadCheckpoint("world_checkpoint_1.ser");
+        //EvaluationFunctionWorld evaluationFunctionWorld = new EvaluationFunctionWorld();
+        EvaluationFunctionWorld evaluationFunctionWorld = loadCheckpoint("world_checkpoint_37.ser");
 
         evaluationFunctionWorld.fullOptimization();
     }
