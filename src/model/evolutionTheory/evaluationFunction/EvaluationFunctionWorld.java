@@ -388,7 +388,7 @@ public class EvaluationFunctionWorld implements Serializable {
         System.out.println("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
         System.out.println("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
         System.out.println();
-        if (this.generation < 20) rankPopulation(6,8,0);
+        if (this.generation < 21) rankPopulation(6,8,0);
 
         for (int i = this.generation; i < 40; i++){
             printGenerationNumber();
@@ -409,7 +409,7 @@ public class EvaluationFunctionWorld implements Serializable {
         System.out.println("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
         System.out.println("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
         System.out.println();
-        if (this.generation < 40) rankPopulation(6,6,0);
+        if (this.generation < 41) rankPopulation(6,6,0);
 
         for (int i = this.generation; i < 60; i++){
             printGenerationNumber();
@@ -430,7 +430,7 @@ public class EvaluationFunctionWorld implements Serializable {
         System.out.println("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
         System.out.println("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
         System.out.println();
-        if (this.generation < 60) rankPopulation(6,4,0);
+        if (this.generation < 61) rankPopulation(6,4,0);
 
         for (int i = this.generation; i < 80; i++){
             printGenerationNumber();
@@ -450,7 +450,7 @@ public class EvaluationFunctionWorld implements Serializable {
         System.out.println("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
         System.out.println("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
         System.out.println();
-        if (this.generation < 80) rankPopulation(6,2,0);
+        if (this.generation < 81) rankPopulation(6,2,0);
 
         for (int i = this.generation; i < 100; i++){
             printGenerationNumber();
