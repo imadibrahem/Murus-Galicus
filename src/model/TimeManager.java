@@ -1,0 +1,67 @@
+package model;
+
+public class TimeManager {
+    private final double totalTime;
+    private final double[] moveTimes;
+    private final int peakMove;
+    private final int earlyGameMoves;
+    private final int midGameMoves;
+    private final double earlyFactor;
+    private final double midFactor;
+    private final double endFactor;
+    private double remainingTime;
+
+    public TimeManager(double totalTime, int peakMove, int midGameMoves, double earlyFactor, double midFactor, double endFactor) {
+        this.totalTime = totalTime;
+        this.peakMove = peakMove;
+        this.earlyGameMoves = peakMove * 2;
+        this.midGameMoves = midGameMoves;
+        this.earlyFactor = earlyFactor;
+        this.midFactor = midFactor;
+        this.endFactor = endFactor;
+        this.moveTimes = new double[midGameMoves + earlyGameMoves];
+        distributeTime();
+    }
+
+    private void distributeTime() {
+        double earlyTime = totalTime * earlyFactor;
+        double[] tempEarlyTimes = new double[earlyGameMoves];
+        double sumEarly = 0;
+        for (int i = 0; i < earlyGameMoves; i++) {
+            if (i < peakMove) {
+                tempEarlyTimes[i] = i + 1; // Increasing phase
+            } else {
+                tempEarlyTimes[i] = earlyGameMoves - i; // Decreasing phase
+            }
+            sumEarly += tempEarlyTimes[i];
+        }
+        // Normalize early move times to exactly earlyFactor of total time
+        double scaleFactor = earlyTime / sumEarly;
+        for (int i = 0; i < earlyGameMoves; i++) {
+            moveTimes[i] = tempEarlyTimes[i] * scaleFactor;
+        }
+        // Allocate 20% for moves 18-30 (equal distribution)
+        double midGameTime = totalTime * midFactor;
+        double midMoveTime = midGameTime / midGameMoves;
+        for (int i = earlyGameMoves; i < midGameMoves; i++) {
+            moveTimes[i] = midMoveTime;
+        }
+    }
+
+    public double getTimeForMove(int moveNumber) {
+        double usedTime;
+        if (moveNumber < moveTimes.length && moveTimes[moveNumber] > 0) {
+            usedTime = Math.min(moveTimes[moveNumber], remainingTime);
+            updateRemainingTime(usedTime + 0.05);
+            return usedTime;
+        }
+        usedTime = remainingTime * endFactor; // Panic mode: endFactor of remaining time
+        updateRemainingTime(usedTime + 0.05);
+        return usedTime;
+    }
+
+    public void updateRemainingTime(double usedTime) {
+        remainingTime -= usedTime;
+        if (remainingTime < 0) remainingTime = 0;
+    }
+}
