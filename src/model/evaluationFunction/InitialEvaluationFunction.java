@@ -1,6 +1,7 @@
 package model.evaluationFunction;
 
 import model.Board;
+import model.bit.BitBoard;
 
 public class InitialEvaluationFunction extends EvaluationFunction{
     /*
@@ -18,6 +19,11 @@ public class InitialEvaluationFunction extends EvaluationFunction{
 
     public InitialEvaluationFunction(Board board) {
         super(board, new int[]{1, 2, 3, 4, 6, 4, 1}, new int[]{0, 1, 2, 3}, new int[]{2, 4, 6, 8, 12, 8, 1},
+                new int[]{0, 1, 4, 6}, new int[]{1, 2, 3, 3, 3, 4, 6, 7}, new int[]{-50, -30, 0, -20, 0, 20, 30, 50},
+                6, 4, 10);
+    }
+    public InitialEvaluationFunction( ) {
+        super(new BitBoard("tttttttt/8/8/8/8/8/TTTTTTTT,b"), new int[]{1, 2, 3, 4, 6, 4, 1}, new int[]{0, 1, 2, 3}, new int[]{2, 4, 6, 8, 12, 8, 1},
                 new int[]{0, 1, 4, 6}, new int[]{1, 2, 3, 3, 3, 4, 6, 7}, new int[]{-50, -30, 0, -20, 0, 20, 30, 50},
                 6, 4, 10);
     }
