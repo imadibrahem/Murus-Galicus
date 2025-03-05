@@ -509,7 +509,7 @@ public class EvaluationFunctionWorld implements Serializable {
 
     public static void main (String[] args){
         //EvaluationFunctionWorld evaluationFunctionWorld = new EvaluationFunctionWorld();
-        EvaluationFunctionWorld evaluationFunctionWorld = loadCheckpoint("world_checkpoint_39.ser");
+        EvaluationFunctionWorld evaluationFunctionWorld = loadCheckpoint("world_checkpoint_49.ser");
 
         evaluationFunctionWorld.fullOptimization();
     }
