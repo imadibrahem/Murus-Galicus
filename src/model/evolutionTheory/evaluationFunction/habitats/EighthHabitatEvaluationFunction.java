@@ -1,4 +1,4 @@
-package model.evolutionTheory.habitats;
+package model.evolutionTheory.evaluationFunction.habitats;
 
 import model.Board;
 import model.bit.BitBoard;
