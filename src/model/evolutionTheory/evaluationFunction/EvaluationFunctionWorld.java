@@ -59,7 +59,7 @@ public class EvaluationFunctionWorld implements Serializable {
         population.add(new EvaluationFunctionIndividual(new NinthHabitatEvaluationFunction()));
         population.add(new EvaluationFunctionIndividual(new TenthHabitatEvaluationFunction()));
         population.add(new EvaluationFunctionIndividual(new InitialEvaluationFunction()));
-        population.add(new EvaluationFunctionIndividual(new OptimumEvaluationFunction()));
+        population.add(new EvaluationFunctionIndividual(new WorldEvaluationFunction()));
         printPopulation();
 
     }

@@ -3,7 +3,7 @@ package model;
 import model.bit.BitBoard;
 import model.evaluationFunction.EvaluationFunction;
 import model.evaluationFunction.InitialEvaluationFunction;
-import model.evolutionTheory.evaluationFunction.OptimumEvaluationFunction;
+import model.evolutionTheory.evaluationFunction.WorldEvaluationFunction;
 import model.evolutionTheory.evaluationFunction.habitats.SeventhHabitatEvaluationFunction;
 import model.move.MoveGeneratorEvolutionTheory;
 import model.move.Move;
@@ -424,7 +424,7 @@ public class Game {
 
         Board blueBoard2 = new BitBoard(FenTrimmer(FenInitial));
         MoveGenerator blueGenerator2 = new MoveGeneratorEvolutionTheory(blueBoard2, MoveGeneratingStyle.ALL_TYPE_MOVES_PIECE_BY_PIECE,moveTypes, directions, true );
-        EvaluationFunction blueEvaluationFunction2 = new OptimumEvaluationFunction(blueBoard2);
+        EvaluationFunction blueEvaluationFunction2 = new WorldEvaluationFunction(blueBoard2);
         //EvaluationFunction blueEvaluationFunction2 = new FirstHabitatEvaluationFunction(blueBoard2);
         Player blue2 = new User(true, blueBoard2,blueGenerator2, blueEvaluationFunction2,userInput2);
         //Player blue2 = new AlphaBeta(true, blueBoard2,blueGenerator2, blueEvaluationFunction2,4);
