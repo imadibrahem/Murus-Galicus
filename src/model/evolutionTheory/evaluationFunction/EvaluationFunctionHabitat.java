@@ -4,7 +4,7 @@ import model.Board;
 import model.Game;
 import model.bit.BitBoard;
 import model.evaluationFunction.EvaluationFunction;
-import model.evolutionTheory.individual.Individual;
+import model.evolutionTheory.evaluationFunction.individual.Individual;
 import model.move.MoveGeneratingStyle;
 import model.move.MoveGenerator;
 import model.move.MoveGeneratorEvolutionTheory;

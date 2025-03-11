@@ -1,4 +1,4 @@
-package model.evolutionTheory;
+package model.evolutionTheory.evaluationFunction;
 
 import model.Board;
 import model.bit.BitBoard;
