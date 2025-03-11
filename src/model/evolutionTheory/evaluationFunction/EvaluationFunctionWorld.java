@@ -660,29 +660,29 @@ public class EvaluationFunctionWorld implements Serializable {
     public void finalFour(){
         if (this.generation < 1)TopFourPopulation();
 
-        for (int i = this.generation; i < 80; i++){
+        for (int i = this.generation; i < 40; i++){
             printGenerationNumber();
-            if (i == 3||i == 23||i == 43||i == 63) explore();
-            else if (i == 8 || i == 18 || i == 28 || i == 48 || i == 58 || i == 68|| i == 78) normalMode();
-            else if (i == 16||i == 36||i == 56||i == 76)exploit();
+            if (i == 3||i == 23) explore();
+            else if (i == 8 || i == 18 || i == 28) normalMode();
+            else if (i == 16||i == 36)exploit();
             firstScarcitySeason(4);
             generation++;
             saveFinalCheckpoint("final_checkpoint_" + generation + ".ser");
             printPopulation();
         }
 
-        for (int i = this.generation; i < 120; i++){
+        for (int i = this.generation; i < 60; i++){
             printGenerationNumber();
-            if (i == 83||i == 103) explore();
-            else if (i == 88 || i == 98 || i == 108 || i == 118) normalMode();
-            else if (i == 96||i == 116)exploit();
+            if (i == 43||i == 53) explore();
+            else if (i == 44 || i == 48 || i == 54 || i == 58) normalMode();
+            else if (i == 46||i == 56)exploit();
             firstScarcitySeason(5);
             generation++;
             saveFinalCheckpoint("final_checkpoint_" + generation + ".ser");
             printPopulation();
         }
 
-        if (this.generation < 121) {
+        if (this.generation < 61) {
             System.out.println();
             System.out.println("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
             System.out.println("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
@@ -695,17 +695,17 @@ public class EvaluationFunctionWorld implements Serializable {
             rankPopulation(6,2,0);
         }
 
-        for (int i = this.generation; i < 126; i++){
+        for (int i = this.generation; i < 66; i++){
             printGenerationNumber();
-            if (i == 123) exploit();
-            else if (i == 124) normalMode();
+            if (i == 63 || i == 65) exploit();
+            else if (i == 64) normalMode();
             firstScarcitySeason(6);
             generation++;
             saveFinalCheckpoint("final_checkpoint_" + generation + ".ser");
             printPopulation();
         }
 
-        for (int i = this.generation; i < 128; i++){
+        for (int i = this.generation; i < 68; i++){
             printGenerationNumber();
             exploit();
             firstScarcitySeason(7);
@@ -713,7 +713,7 @@ public class EvaluationFunctionWorld implements Serializable {
             saveFinalCheckpoint("final_checkpoint_" + generation + ".ser");
             printPopulation();
         }
-        for (int i = this.generation; i < 129; i++){
+        for (int i = this.generation; i < 69; i++){
             printGenerationNumber();
             exploit();
             firstScarcitySeason(8);
@@ -741,9 +741,10 @@ public class EvaluationFunctionWorld implements Serializable {
 
 
     public static void main (String[] args){
-        EvaluationFunctionWorld evaluationFunctionWorld = new EvaluationFunctionWorld();
+        //EvaluationFunctionWorld evaluationFunctionWorld = new EvaluationFunctionWorld();
         //EvaluationFunctionWorld evaluationFunctionWorld = loadRanking("WorldRank.ser");
         //EvaluationFunctionWorld evaluationFunctionWorld = loadCheckpoint("world_checkpoint_49.ser");
+        EvaluationFunctionWorld evaluationFunctionWorld = loadFinalCheckpoint("final_checkpoint_8.ser");
         //evaluationFunctionWorld.fullOptimization();
         //evaluationFunctionWorld.worldRanking(2, 6);
         //evaluationFunctionWorld.printWorldRank();
