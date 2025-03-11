@@ -32,6 +32,7 @@ public class EvaluationFunctionWorld implements Serializable {
     int [] directions = {1, 8, 2, 3, 7, 6, 4, 5};
     int generation = 0;
     public Individual bestOfBest;
+    public Individual finalBest;
     public List<int [][]> worldRank = new ArrayList<>();
 
     public void doMigration(){
@@ -61,9 +62,15 @@ public class EvaluationFunctionWorld implements Serializable {
         population.add(new EvaluationFunctionIndividual(new InitialEvaluationFunction()));
         population.add(new EvaluationFunctionIndividual(new WorldEvaluationFunction()));
         printPopulation();
-
     }
 
+    public void TopFourPopulation(){
+        population.add(new EvaluationFunctionIndividual(new SecondHabitatEvaluationFunction()));
+        population.add(new EvaluationFunctionIndividual(new FifthHabitatEvaluationFunction()));
+        population.add(new EvaluationFunctionIndividual(new SeventhHabitatEvaluationFunction()));
+        population.add(new EvaluationFunctionIndividual(new WorldEvaluationFunction()));
+        printPopulation();
+    }
 
     public void saveCheckpoint(String filename) {
         try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(filename))) {
@@ -109,6 +116,37 @@ public class EvaluationFunctionWorld implements Serializable {
         EvaluationFunctionWorld evaluationFunctionWorld = new EvaluationFunctionWorld();
         try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(filename))) {
             evaluationFunctionWorld.worldRank = (List<int [][]>) in.readObject();
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return evaluationFunctionWorld;
+    }
+
+    public void saveFinalCheckpoint(String filename) {
+        try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(filename))) {
+            out.writeObject(pool);
+            out.writeObject(families);
+            out.writeObject(family);
+            out.writeObject(population);
+            out.writeObject(populationNew);
+            out.writeObject(finalBest);
+            out.writeInt(generation);
+            out.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static EvaluationFunctionWorld loadFinalCheckpoint(String filename) {
+        EvaluationFunctionWorld evaluationFunctionWorld = new EvaluationFunctionWorld();
+        try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(filename))) {
+            evaluationFunctionWorld.pool = (List<Individual>) in.readObject();
+            evaluationFunctionWorld.families = (List<List<Individual>>) in.readObject();
+            evaluationFunctionWorld.family = (List<Individual>) in.readObject();
+            evaluationFunctionWorld.population = (List<Individual>) in.readObject();
+            evaluationFunctionWorld.populationNew = (List<Individual>) in.readObject();
+            evaluationFunctionWorld.finalBest = (Individual)in.readObject();
+            evaluationFunctionWorld.generation = in.readInt();
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         }
@@ -619,18 +657,97 @@ public class EvaluationFunctionWorld implements Serializable {
 
     }
 
+    public void finalFour(){
+        if (this.generation < 1)TopFourPopulation();
+
+        for (int i = this.generation; i < 80; i++){
+            printGenerationNumber();
+            if (i == 3||i == 23||i == 43||i == 63) explore();
+            else if (i == 8 || i == 18 || i == 28 || i == 48 || i == 58 || i == 68|| i == 78) normalMode();
+            else if (i == 16||i == 36||i == 56||i == 76)exploit();
+            firstScarcitySeason(4);
+            generation++;
+            saveFinalCheckpoint("final_checkpoint_" + generation + ".ser");
+            printPopulation();
+        }
+
+        for (int i = this.generation; i < 120; i++){
+            printGenerationNumber();
+            if (i == 83||i == 103) explore();
+            else if (i == 88 || i == 98 || i == 108 || i == 118) normalMode();
+            else if (i == 96||i == 116)exploit();
+            firstScarcitySeason(5);
+            generation++;
+            saveFinalCheckpoint("final_checkpoint_" + generation + ".ser");
+            printPopulation();
+        }
+
+        if (this.generation < 121) {
+            System.out.println();
+            System.out.println("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+            System.out.println("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+            System.out.println("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+            System.out.println("||||||||||||||||||| Survival of the fittest 2 |||||||||||||||||||||");
+            System.out.println("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+            System.out.println("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+            System.out.println("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+            System.out.println();
+            rankPopulation(6,2,0);
+        }
+
+        for (int i = this.generation; i < 126; i++){
+            printGenerationNumber();
+            if (i == 123) exploit();
+            else if (i == 124) normalMode();
+            firstScarcitySeason(6);
+            generation++;
+            saveFinalCheckpoint("final_checkpoint_" + generation + ".ser");
+            printPopulation();
+        }
+
+        for (int i = this.generation; i < 128; i++){
+            printGenerationNumber();
+            exploit();
+            firstScarcitySeason(7);
+            generation++;
+            saveFinalCheckpoint("final_checkpoint_" + generation + ".ser");
+            printPopulation();
+        }
+        for (int i = this.generation; i < 129; i++){
+            printGenerationNumber();
+            exploit();
+            firstScarcitySeason(8);
+            generation++;
+            saveFinalCheckpoint("final_checkpoint_" + generation + ".ser");
+            printPopulation();
+        }
+        printGenerationNumber();
+        rankPopulation(9,1,0);
+        generation++;
+        saveFinalCheckpoint("final_checkpoint_" + generation + ".ser");
+        printPopulation();
+
+        printGenerationNumber();
+        normalMode();
+        finalBest = population.get(0);
+
+    }
+
     public void fullOptimization(){
         if (this.generation < 1)doMigration();
         famine();
     }
 
+
+
     public static void main (String[] args){
-        //EvaluationFunctionWorld evaluationFunctionWorld = new EvaluationFunctionWorld();
-        EvaluationFunctionWorld evaluationFunctionWorld = loadRanking("WorldRank.ser");
+        EvaluationFunctionWorld evaluationFunctionWorld = new EvaluationFunctionWorld();
+        //EvaluationFunctionWorld evaluationFunctionWorld = loadRanking("WorldRank.ser");
         //EvaluationFunctionWorld evaluationFunctionWorld = loadCheckpoint("world_checkpoint_49.ser");
         //evaluationFunctionWorld.fullOptimization();
         //evaluationFunctionWorld.worldRanking(2, 6);
-        evaluationFunctionWorld.printWorldRank();
+        //evaluationFunctionWorld.printWorldRank();
+        evaluationFunctionWorld.finalFour();
     }
 
 }
