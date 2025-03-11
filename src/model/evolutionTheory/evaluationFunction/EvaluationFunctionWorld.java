@@ -370,6 +370,31 @@ public class EvaluationFunctionWorld implements Serializable {
         }
     }
 
+    public void printWorldRank(){
+        String sumString = "";
+        for (int i = 0; i < worldRank.size(); i++){
+            System.out.println("Depth Nr.("+ (i+2) + "): " + (Arrays.deepToString(worldRank.get(i))));
+        }
+        System.out.println("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+
+        for (int j = 0; j < 12; j++){
+            sumString += "Fun Nr.(" + (j+1) + "): [";
+            int []sumFunction = new int [5];
+            for (int i = 0; i < worldRank.size(); i++){
+                for (int k = 0; k < 5; k++){
+                    sumFunction[k] += worldRank.get(i)[j][k];
+                }
+
+            }
+            for (int k = 0; k < 5; k++){
+                sumString += (sumFunction[k]+ " | ");
+            }
+            sumString +="]\n";
+        }
+        System.out.println(sumString);
+        System.out.println("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+    }
+
     public void firstScarcitySeason(int depth){
         pool.addAll(population);
         families = new ArrayList<>();
@@ -601,10 +626,12 @@ public class EvaluationFunctionWorld implements Serializable {
     }
 
     public static void main (String[] args){
-        EvaluationFunctionWorld evaluationFunctionWorld = new EvaluationFunctionWorld();
+        //EvaluationFunctionWorld evaluationFunctionWorld = new EvaluationFunctionWorld();
+        EvaluationFunctionWorld evaluationFunctionWorld = loadRanking("WorldRank.ser");
         //EvaluationFunctionWorld evaluationFunctionWorld = loadCheckpoint("world_checkpoint_49.ser");
         //evaluationFunctionWorld.fullOptimization();
-        evaluationFunctionWorld.worldRanking(2, 8);
+        //evaluationFunctionWorld.worldRanking(2, 6);
+        evaluationFunctionWorld.printWorldRank();
     }
 
 }
