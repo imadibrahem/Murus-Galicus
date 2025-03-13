@@ -22,7 +22,7 @@ public class WindowMultiplierChromosome extends IntegerSingleValueChromosome imp
 
     @Override
     public void mutate() {
-        System.out.println("mutation for Chromosome #6 is being applied ");
+        System.out.println("mutation for Chromosome #05 is being applied ");
         System.out.println(this);
         float mutationType = random.nextFloat();
         float amountSign, highLevelMutationChance, rangeMutationChance;

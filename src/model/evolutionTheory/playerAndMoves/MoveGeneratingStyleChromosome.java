@@ -21,7 +21,7 @@ public class MoveGeneratingStyleChromosome extends IntegerSingleValueChromosome 
     }
     @Override
     public void mutate() {
-        System.out.println("mutation for Chromosome #?? is being applied ");
+        System.out.println("mutation for Chromosome #00 is being applied ");
         System.out.println(this);
         produceValue();
         System.out.println(this);

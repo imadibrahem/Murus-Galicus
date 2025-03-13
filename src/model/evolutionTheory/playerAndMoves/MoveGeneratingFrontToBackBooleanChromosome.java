@@ -20,7 +20,7 @@ public class MoveGeneratingFrontToBackBooleanChromosome extends BooleanValueChro
 
     @Override
     public void mutate() {
-        System.out.println("mutation for Chromosome #?? is being applied ");
+        System.out.println("mutation for Chromosome #03 is being applied ");
         System.out.println(this);
         produceValue();
         System.out.println(this);
