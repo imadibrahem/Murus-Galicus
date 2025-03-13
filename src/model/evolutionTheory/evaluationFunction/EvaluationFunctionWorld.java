@@ -34,6 +34,7 @@ public class EvaluationFunctionWorld implements Serializable {
     public Individual bestOfBest;
     public Individual finalBest;
     public List<int [][]> worldRank = new ArrayList<>();
+    public List<int [][]> finalRank = new ArrayList<>();
 
     public void doMigration(){
         population.add(new EvaluationFunctionIndividual(new FirstHabitatEvaluationFunction()));
@@ -69,6 +70,15 @@ public class EvaluationFunctionWorld implements Serializable {
         population.add(new EvaluationFunctionIndividual(new FifthHabitatEvaluationFunction()));
         population.add(new EvaluationFunctionIndividual(new SeventhHabitatEvaluationFunction()));
         population.add(new EvaluationFunctionIndividual(new WorldEvaluationFunction()));
+        printPopulation();
+    }
+
+    public void FinalRankPopulation(){
+        population.add(new EvaluationFunctionIndividual(new SecondHabitatEvaluationFunction()));
+        population.add(new EvaluationFunctionIndividual(new FifthHabitatEvaluationFunction()));
+        population.add(new EvaluationFunctionIndividual(new SeventhHabitatEvaluationFunction()));
+        population.add(new EvaluationFunctionIndividual(new WorldEvaluationFunction()));
+        population.add(new EvaluationFunctionIndividual(new FinalEvaluationFunction()));
         printPopulation();
     }
 
@@ -151,6 +161,14 @@ public class EvaluationFunctionWorld implements Serializable {
             e.printStackTrace();
         }
         return evaluationFunctionWorld;
+    }
+    public void saveFinalRanking(String filename) {
+        try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(filename))) {
+            out.writeObject(finalRank);
+            out.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public void explore(){
@@ -388,6 +406,41 @@ public class EvaluationFunctionWorld implements Serializable {
         System.out.println("////////////////////////");
         return results;
     }
+    public int [][] finalDepthRanking(int depth){
+        int [][] results = new int[population.size()][5];
+        int [][] pairResults;
+        int [][] populationResults= new int[population.size()][4];
+        for (int i = 0; i < (population.size() - 1); i++){
+            for (int j = (i + 1); j < population.size(); j++){
+                System.out.println("|||||||||||||||||||||||||||||||||||||||||||||||");
+                System.out.println("Ranking:{ game: " + (i+1) + " X " + (j+1) + " }");
+                System.out.println("|||||||||||||||||||||||||||||||||||||||||||||||");
+                pairResults = compete(population.get(i), population.get(j), depth);
+                for (int k = 0; k < 4; k++){
+                    populationResults[i][k] = populationResults[i][k] + pairResults[0][k];
+                    populationResults[j][k] = populationResults[j][k] + pairResults[1][k];
+                }
+            }
+        }
+        int[]populationBest = findTopIndices(populationResults,population.size());
+        for (int i = 0; i < population.size(); i++){
+            for (int j = 0; j < populationBest.length; j++){
+                results[populationBest[j]][0] = j + 1;
+            }
+            for (int k = 0; k < 4; k++){
+                results [i][k + 1]= populationResults[i][k];
+            }
+        }
+        for (int i = 0; i < population.size(); i++){
+            String s = "";
+            for (int k = 0; k < 5; k++){
+                s += results [i][k] + " | ";
+            }
+            System.out.println(s);
+        }
+        System.out.println("////////////////////////");
+        return results;
+    }
 
     public void worldRanking(int startDepth, int endDepth){
         worldRankPopulation();
@@ -407,6 +460,24 @@ public class EvaluationFunctionWorld implements Serializable {
         }
     }
 
+    public void finalRanking(int startDepth, int endDepth){
+        FinalRankPopulation();
+        for (int i = startDepth; i < (endDepth + 1); i++){
+            System.out.println();
+            System.out.println("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+            System.out.println("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+            System.out.println("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+            System.out.println("|||||||||||||||||||||| Ranking for depth " + i + " ||||||||||||||||||||||||");
+            System.out.println("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+            System.out.println("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+            System.out.println("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+            System.out.println();
+            int[][] rankDepth = finalDepthRanking(i);
+            worldRank.add(rankDepth);
+            saveFinalRanking("FinalRank.ser");
+        }
+    }
+
     public void printWorldRank(){
         String sumString = "";
         for (int i = 0; i < worldRank.size(); i++){
@@ -420,6 +491,31 @@ public class EvaluationFunctionWorld implements Serializable {
             for (int i = 0; i < worldRank.size(); i++){
                 for (int k = 0; k < 5; k++){
                     sumFunction[k] += worldRank.get(i)[j][k];
+                }
+
+            }
+            for (int k = 0; k < 5; k++){
+                sumString += (sumFunction[k]+ " | ");
+            }
+            sumString +="]\n";
+        }
+        System.out.println(sumString);
+        System.out.println("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+    }
+
+    public void printFinalRank(){
+        String sumString = "";
+        for (int i = 0; i < finalRank.size(); i++){
+            System.out.println("Depth Nr.("+ (i+2) + "): " + (Arrays.deepToString(finalRank.get(i))));
+        }
+        System.out.println("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+
+        for (int j = 0; j < 5; j++){
+            sumString += "Fun Nr.(" + (j+1) + "): [";
+            int []sumFunction = new int [5];
+            for (int i = 0; i < finalRank.size(); i++){
+                for (int k = 0; k < 5; k++){
+                    sumFunction[k] += finalRank.get(i)[j][k];
                 }
 
             }
@@ -741,14 +837,16 @@ public class EvaluationFunctionWorld implements Serializable {
 
 
     public static void main (String[] args){
-        //EvaluationFunctionWorld evaluationFunctionWorld = new EvaluationFunctionWorld();
+        EvaluationFunctionWorld evaluationFunctionWorld = new EvaluationFunctionWorld();
         //EvaluationFunctionWorld evaluationFunctionWorld = loadRanking("WorldRank.ser");
         //EvaluationFunctionWorld evaluationFunctionWorld = loadCheckpoint("world_checkpoint_49.ser");
-        EvaluationFunctionWorld evaluationFunctionWorld = loadFinalCheckpoint("final_checkpoint_8.ser");
+        //EvaluationFunctionWorld evaluationFunctionWorld = loadFinalCheckpoint("final_checkpoint_8.ser");
         //evaluationFunctionWorld.fullOptimization();
         //evaluationFunctionWorld.worldRanking(2, 6);
         //evaluationFunctionWorld.printWorldRank();
-        evaluationFunctionWorld.finalFour();
+        //evaluationFunctionWorld.finalFour();
+        evaluationFunctionWorld.finalRanking(2, 8);
+        evaluationFunctionWorld.printFinalRank();
     }
 
 }
