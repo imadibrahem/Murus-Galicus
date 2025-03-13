@@ -12,6 +12,7 @@ import model.move.MoveGenerator;
 import model.move.MoveType;
 import model.object.ObjectBoard;
 import model.player.*;
+import model.player.timedPlayers.TimedTranspositionTablePlayer;
 import view.DisplayBoard;
 import view.DisplayFrame;
 import view.UserInput;
@@ -391,7 +392,7 @@ public class Game {
         UserInput userInput3 = new UserInput();
 
         String FenInitial = "tttttttt/8/8/8/8/8/TTTTTTTT,b";
-        FenInitial = "t/8/8/5Tw1/8/8/T7,b";
+        //FenInitial = "t/8/8/5Tw1/8/8/T7,b";
         //FenInitial = "1tt4t/wwT/T6t/8/1W6/1WW5/1T1W3T,b";
         MoveType[] moveTypes = {MoveType.FRIEND_ON_BOTH, MoveType.FRIEND_ON_NEAR, MoveType.FRIEND_ON_FAR, MoveType.QUIET, MoveType.SACRIFICE};
         int [] directions = {1, 8, 2, 3, 7, 6, 4, 5};
@@ -426,7 +427,7 @@ public class Game {
         MoveGenerator blueGenerator2 = new MoveGeneratorEvolutionTheory(blueBoard2, MoveGeneratingStyle.ALL_TYPE_MOVES_PIECE_BY_PIECE,moveTypes, directions, true );
         EvaluationFunction blueEvaluationFunction2 = new WorldEvaluationFunction(blueBoard2);
         //EvaluationFunction blueEvaluationFunction2 = new FirstHabitatEvaluationFunction(blueBoard2);
-        Player blue2 = new User(true, blueBoard2,blueGenerator2, blueEvaluationFunction2,userInput2);
+        //Player blue2 = new User(true, blueBoard2,blueGenerator2, blueEvaluationFunction2,userInput2);
         //Player blue2 = new AlphaBeta(true, blueBoard2,blueGenerator2, blueEvaluationFunction2,4);
         //Player blue2 = new IterativeDeepeningFixedDepth(true, blueBoard2,blueGenerator2, blueEvaluationFunction2,5);
         //Player blue2 = new QuiescencePlayer(true, blueBoard2,blueGenerator2, blueEvaluationFunction2,5);
@@ -440,12 +441,13 @@ public class Game {
         //Player blue2 = new LateMoveReductionPlayer(true, blueBoard2,blueGenerator2, blueEvaluationFunction2,9);
         //Player blue2 = new TranspositionTablePlayer(true, blueBoard2,blueGenerator2, blueEvaluationFunction2, 8);
         //Player blue2 = new DoubleTabledPlayer(true, blueBoard2,blueGenerator2, blueEvaluationFunction2,9);
+        Player blue2 = new TimedTranspositionTablePlayer(true, blueBoard2,blueGenerator2, blueEvaluationFunction2, 120000);
 
         Board redBoard2 = new BitBoard(FenTrimmer(FenInitial));
         MoveGenerator redGenerator2 = new MoveGeneratorEvolutionTheory(redBoard2, MoveGeneratingStyle.ALL_TYPE_MOVES_PIECE_BY_PIECE,moveTypes, directions, true );
         //EvaluationFunction redEvaluationFunction2 = new InitialEvaluationFunction(redBoard2);
         EvaluationFunction redEvaluationFunction2 = new SeventhHabitatEvaluationFunction(redBoard2);
-        Player red2 = new User(false, redBoard2,redGenerator2, redEvaluationFunction2, userInput2);
+        //Player red2 = new User(false, redBoard2,redGenerator2, redEvaluationFunction2, userInput2);
         //Player red2 = new AlphaBeta(false, redBoard2,redGenerator2, redEvaluationFunction2, 4);
         //Player red2 = new IterativeDeepeningFixedDepth(false, redBoard2,redGenerator2, redEvaluationFunction2, 6);
         //Player red2 = new QuiescencePlayer(false, redBoard2,redGenerator2, redEvaluationFunction2, 4);
@@ -459,7 +461,7 @@ public class Game {
         //Player red2 = new LateMoveReductionPlayer(false, redBoard2,redGenerator2, redEvaluationFunction2,6);
         //Player red2 = new TranspositionTablePlayer(false, redBoard2,redGenerator2, redEvaluationFunction2,8);
         //Player red2 = new DoubleTabledPlayer(false, redBoard2,redGenerator2, redEvaluationFunction2,9);
-
+        Player red2 = new TimedTranspositionTablePlayer(false, redBoard2,redGenerator2, redEvaluationFunction2,120000);
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
         Board blueBoard3 = new BitBoard(FenTrimmer(FenInitial));
