@@ -40,7 +40,9 @@ public class PlayerAndMovesHabitat implements Serializable {
     public void initiatePopulation(){
         for (int i = 0; i < 10; i++) population.add(new PlayerAndMovesIndividual());
     }
+   /*
     public int [][] compete(Individual first, Individual second, int depth){
+
         int [] firstReports = new int[4];
         int [] secondReports = new int[4];
         int [][] result = new int[2][4];
@@ -115,5 +117,12 @@ public class PlayerAndMovesHabitat implements Serializable {
         result[0] = firstReports;
         result[1] = secondReports;
         return result;
+
+
     }
+    
+    */
+
+
+
 }
