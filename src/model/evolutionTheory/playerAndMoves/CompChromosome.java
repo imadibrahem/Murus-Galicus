@@ -6,6 +6,8 @@ import model.evolutionTheory.evaluationFunction.WallsDistancesFactorChromosome;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
 
 public class CompChromosome extends IntegerPermutationArrayValueChromosome implements Serializable {
     @Serial
@@ -21,7 +23,7 @@ public class CompChromosome extends IntegerPermutationArrayValueChromosome imple
 
     @Override
     public void mutate() {
-        System.out.println("mutation for Chromosome #?? is being applied ");
+        System.out.println("mutation for Chromosome #13 is being applied ");
         System.out.println(this);
         float mutationType = random.nextFloat();
         float highLevelMutationChance, swapMutationChance;
@@ -59,19 +61,61 @@ public class CompChromosome extends IntegerPermutationArrayValueChromosome imple
         float randomIndex;
         Chromosome firstChild = new CompChromosome(mutationRate);
         Chromosome secondChild = new CompChromosome(mutationRate);
-        for (int i = 0; i < length; i++){
-            randomIndex = random.nextFloat();
-            if (randomIndex < 0.5){
+
+        int mutationPoint = random.nextInt(length);
+        randomIndex = random.nextFloat();
+        Set<Integer> firstChildUsed = new HashSet<>();
+        Set<Integer> secondChildUsed = new HashSet<>();
+
+        for (int i = 0; i < mutationPoint; i++) {
+            if (randomIndex < 0.5) {
                 firstChild.value[i] = value[i];
                 secondChild.value[i] = partner.value[i];
-            }
-            else {
+            } else {
                 firstChild.value[i] = partner.value[i];
                 secondChild.value[i] = value[i];
             }
+            firstChildUsed.add(firstChild.value[i]);
+            secondChildUsed.add(secondChild.value[i]);
         }
+
+        // Step 2: Fill in remaining values from the other parent in order
+        int firstIndex = mutationPoint;
+        int secondIndex = mutationPoint;
+
+        for (int j = 0; j < length; j++) {
+            if (randomIndex < 0.5) {
+                if (!firstChildUsed.contains(partner.value[j]) && firstIndex < length) {
+                    firstChild.value[firstIndex] = partner.value[j];
+                    firstChildUsed.add(partner.value[j]);
+                    firstIndex++;
+                }
+                if (!secondChildUsed.contains(value[j]) && secondIndex < length) {
+                    secondChild.value[secondIndex] = value[j];
+                    secondChildUsed.add(value[j]);
+                    secondIndex++;
+                }
+            }
+            else{
+                if (!firstChildUsed.contains(value[j]) && firstIndex < length) {
+                    firstChild.value[firstIndex] = value[j];
+                    firstChildUsed.add(value[j]);
+                    firstIndex++;
+                }
+                if (!secondChildUsed.contains(partner.value[j]) && secondIndex < length) {
+                    secondChild.value[secondIndex] = partner.value[j];
+                    secondChildUsed.add(partner.value[j]);
+                    secondIndex++;
+                }
+            }
+            if (firstIndex >= length && secondIndex >= length) {
+                break;
+            }
+        }
+
         offspring[0] = firstChild;
         offspring[1] = secondChild;
+
         for (int i = 0; i < 2; i++){
             System.out.println("offspring #" + i + " mode..");
             randomIndex = random.nextFloat();

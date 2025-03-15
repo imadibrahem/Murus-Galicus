@@ -20,7 +20,7 @@ public class TowersFactorChromosome extends IntegerSingleValueChromosome impleme
 
     @Override
     public void mutate() {
-        System.out.println("mutation for Chromosome #?? is being applied ");
+        System.out.println("mutation for Chromosome #09 is being applied ");
         System.out.println(this);
         float mutationType = random.nextFloat();
         float amountSign, highLevelMutationChance, rangeMutationChance;

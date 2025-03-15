@@ -22,7 +22,7 @@ public class WindowChromosome extends IntegerSingleValueChromosome implements Se
 
     @Override
     public void mutate() {
-        System.out.println("mutation for Chromosome #?? is being applied ");
+        System.out.println("mutation for Chromosome #04 is being applied ");
         System.out.println(this);
         float mutationType = random.nextFloat();
         float amountSign, highLevelMutationChance, rangeMutationChance;

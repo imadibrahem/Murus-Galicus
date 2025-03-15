@@ -50,9 +50,9 @@ public class PlayerAndMovesIndividual extends Individual implements Serializable
         genome[0] = new MoveGeneratingStyleChromosome();
         genome[1] = new MoveGeneratingMoveTypesChromosome();
         genome[2] = new DirectionsChromosome();
-        genome[3] = new MoveGeneratingMoveTypesChromosome();
+        genome[3] = new MoveGeneratingFrontToBackBooleanChromosome();
         genome[4] = new WindowChromosome();
-        genome[5] = new WindowChromosome();
+        genome[5] = new WindowMultiplierChromosome();
         genome[6] = new InteractiveDepthRatioChromosome();
         genome[7] = new FullDepthMoveNumberChromosome();
         genome[8] = new RoundsFactorChromosome();
