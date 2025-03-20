@@ -5,6 +5,7 @@ import model.Game;
 import model.bit.BitBoard;
 import model.evaluationFunction.EvaluationFunction;
 import model.evolutionTheory.evaluationFunction.FinalEvaluationFunction;
+import model.evolutionTheory.evaluationFunction.SuperEvaluationFunction;
 import model.evolutionTheory.evaluationFunction.individual.Individual;
 import model.move.MoveGeneratingStyle;
 import model.move.MoveGenerator;
@@ -118,10 +119,10 @@ public class PlayerAndMovesHabitat implements Serializable {
         MoveGenerator redGenerator2 = new MoveGeneratorEvolutionTheory(redBoard2, moveGeneratingStyles[first.genome[0].value[0]],firstGeneratingTypes, first.genome[2].value, firstGeneratingFrontToBack);
         UserInput userInput2 = new UserInput();
 
-        EvaluationFunction firstEvaluationFunction = new FinalEvaluationFunction(blueBoard);
-        EvaluationFunction secondEvaluationFunction = new FinalEvaluationFunction(redBoard);
-        EvaluationFunction thirdEvaluationFunction = new FinalEvaluationFunction(redBoard2);
-        EvaluationFunction fourthEvaluationFunction = new FinalEvaluationFunction(blueBoard2);
+        EvaluationFunction firstEvaluationFunction = new SuperEvaluationFunction(blueBoard);
+        EvaluationFunction secondEvaluationFunction = new SuperEvaluationFunction(redBoard);
+        EvaluationFunction thirdEvaluationFunction = new SuperEvaluationFunction(redBoard2);
+        EvaluationFunction fourthEvaluationFunction = new SuperEvaluationFunction(blueBoard2);
 
         Player firstBlue = new TimedTranspositionTablePlayer(true, blueBoard,blueGenerator, firstEvaluationFunction,totalTime,first.genome[4].value[0],first.genome[5].value[0],first.genome[6].value[0],first.genome[7].value[0],
                 (((float)(first.genome[8].value[0]))/10),(((float)(first.genome[9].value[0]))/10),(((float)(first.genome[10].value[0]))/10), first.genome[11].value, first.genome[12].value,first.genome[13].value,
@@ -627,7 +628,7 @@ public class PlayerAndMovesHabitat implements Serializable {
             printGenerationNumber();
             firstScarcitySeason(totalTime);
             generation++;
-            savePlayerCheckpoint("checkpoint_1_" + generation + ".ser");
+            savePlayerCheckpoint("checkpoint_7_" + generation + ".ser");
         }
 
         if (this.generation % 4 == 1){
@@ -635,7 +636,7 @@ public class PlayerAndMovesHabitat implements Serializable {
             printGenerationNumber();
             firstAbundanceSeason(totalTime, elitismNum, poolNum);
             generation++;
-            savePlayerCheckpoint("checkpoint_1_" + generation + ".ser");
+            savePlayerCheckpoint("checkpoint_7_" + generation + ".ser");
         }
 
         if (this.generation % 4 == 2){
@@ -643,7 +644,7 @@ public class PlayerAndMovesHabitat implements Serializable {
             printGenerationNumber();
             secondScarcitySeason(totalTime);
             generation++;
-            savePlayerCheckpoint("checkpoint_1_" + generation + ".ser");
+            savePlayerCheckpoint("checkpoint_7_" + generation + ".ser");
         }
 
         if (this.generation % 4 == 3){
@@ -651,7 +652,7 @@ public class PlayerAndMovesHabitat implements Serializable {
             printGenerationNumber();
             secondAbundanceSeason(totalTime, elitismNum, poolNum);
             generation++;
-            savePlayerCheckpoint("checkpoint_1_" + generation + ".ser");
+            savePlayerCheckpoint("checkpoint_7_" + generation + ".ser");
         }
         printPopulation();
     }
@@ -700,7 +701,7 @@ public class PlayerAndMovesHabitat implements Serializable {
         System.out.println("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
         System.out.println();
         rankPopulation(10000,8,0);
-        savePlayerCheckpoint("checkpoint_1_" + generation + ".ser");
+        savePlayerCheckpoint("checkpoint_7_" + generation + ".ser");
     }
     public void secondThirtyTwo(){
         for (int i = this.generation; i < 96; i += 4){
@@ -725,7 +726,7 @@ public class PlayerAndMovesHabitat implements Serializable {
         System.out.println("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
         System.out.println();
         rankPopulation(16000,6,0);
-        savePlayerCheckpoint("checkpoint_1_" + generation + ".ser");
+        savePlayerCheckpoint("checkpoint_7_" + generation + ".ser");
     }
 
     public void thirdSixteen(){
@@ -738,7 +739,7 @@ public class PlayerAndMovesHabitat implements Serializable {
                 normalMode();
             }
             fullYear(24000,4,2);
-            savePlayerCheckpoint("checkpoint_1_" + generation + ".ser");
+            savePlayerCheckpoint("checkpoint_7_" + generation + ".ser");
 
         }
         System.out.println();
@@ -751,7 +752,7 @@ public class PlayerAndMovesHabitat implements Serializable {
         System.out.println("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
         System.out.println();
         rankPopulation(28000,4,0);
-        savePlayerCheckpoint("checkpoint_1_" + generation + ".ser");
+        savePlayerCheckpoint("checkpoint_7_" + generation + ".ser");
 
     }
 
@@ -776,7 +777,7 @@ public class PlayerAndMovesHabitat implements Serializable {
         System.out.println("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
         System.out.println();
         rankPopulation(36000,2,0);
-        savePlayerCheckpoint("checkpoint_1_" + generation + ".ser");
+        savePlayerCheckpoint("checkpoint_7_" + generation + ".ser");
     }
 
     public void famine(){
@@ -803,7 +804,7 @@ public class PlayerAndMovesHabitat implements Serializable {
             }
             firstScarcitySeason(48000);
             generation++;
-            savePlayerCheckpoint("checkpoint_1_" + generation + ".ser");
+            savePlayerCheckpoint("checkpoint_7_" + generation + ".ser");
             printPopulation();
         }
 
@@ -815,7 +816,7 @@ public class PlayerAndMovesHabitat implements Serializable {
             }
             firstScarcitySeason(60000);
             generation++ ;
-            savePlayerCheckpoint("checkpoint_1_" + generation + ".ser");
+            savePlayerCheckpoint("checkpoint_7_" + generation + ".ser");
             printPopulation();
         }
 
@@ -826,7 +827,7 @@ public class PlayerAndMovesHabitat implements Serializable {
             }
             firstScarcitySeason(90000);
             generation++;
-            savePlayerCheckpoint("checkpoint_1_" + generation + ".ser");
+            savePlayerCheckpoint("checkpoint_7_" + generation + ".ser");
             printPopulation();
         }
 
@@ -837,20 +838,20 @@ public class PlayerAndMovesHabitat implements Serializable {
             }
             firstScarcitySeason(120000);
             generation++;
-            savePlayerCheckpoint("checkpoint_1_" + generation + ".ser");
+            savePlayerCheckpoint("checkpoint_7_" + generation + ".ser");
             printPopulation();
         }
 
         printGenerationNumber();
         rankPopulation(120000,1,0);
         generation++;
-        savePlayerCheckpoint("checkpoint_1_" + generation + ".ser");
+        savePlayerCheckpoint("checkpoint_7_" + generation + ".ser");
         printPopulation();
 
         printGenerationNumber();
         normalMode();
         best = population.get(0);
-        savePlayerCheckpoint("checkpoint_1_" + generation + ".ser");
+        savePlayerCheckpoint("checkpoint_7_" + generation + ".ser");
 
         System.out.println("00000000000000000000000000000000000000000000000");
         System.out.println("0000000000000000000  BEST  00000000000000000000");
@@ -870,8 +871,8 @@ public class PlayerAndMovesHabitat implements Serializable {
         famine();
     }
     public static void main (String[] args){
-        //PlayerAndMovesHabitat playerAndMovesHabitat = new PlayerAndMovesHabitat();
-        PlayerAndMovesHabitat playerAndMovesHabitat = loadPlayerCheckpoint("checkpoint_1_16.ser");
+        PlayerAndMovesHabitat playerAndMovesHabitat = new PlayerAndMovesHabitat();
+        //PlayerAndMovesHabitat playerAndMovesHabitat = loadPlayerCheckpoint("checkpoint_7_1.ser");
         playerAndMovesHabitat.fullOptimization();
     }
 }
