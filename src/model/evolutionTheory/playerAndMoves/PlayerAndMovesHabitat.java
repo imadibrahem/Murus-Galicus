@@ -871,8 +871,8 @@ public class PlayerAndMovesHabitat implements Serializable {
         famine();
     }
     public static void main (String[] args){
-        PlayerAndMovesHabitat playerAndMovesHabitat = new PlayerAndMovesHabitat();
-        //PlayerAndMovesHabitat playerAndMovesHabitat = loadPlayerCheckpoint("checkpoint_7_1.ser");
+        //PlayerAndMovesHabitat playerAndMovesHabitat = new PlayerAndMovesHabitat();
+        PlayerAndMovesHabitat playerAndMovesHabitat = loadPlayerCheckpoint("checkpoint_7_41.ser");
         playerAndMovesHabitat.fullOptimization();
     }
 }
