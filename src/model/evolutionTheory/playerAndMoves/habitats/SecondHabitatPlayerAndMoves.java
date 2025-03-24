@@ -12,7 +12,8 @@ import model.move.MoveType;
 import model.player.timedPlayers.TimedTranspositionTablePlayer;
 
 public class SecondHabitatPlayerAndMoves {
-    //Individual{exploration=false, exploitation=false, mutationRate=0.1, genome=[[1], [3, 0, 2, 1, 4], [4, 8, 2, 5, 3, 1, 6, 7], [1], [9], [4], [7], [8], [8], [-11], [-4], [1, 3, 0, 2, 5, 4], [3, 1, 0, 2, 4], [1, 0, 2], [1], [4], [9], [40],16],[8]]}
+    //Individual{exploration=false, exploitation=false, mutationRate=0.1, genome=[[1], [3, 0, 2, 1, 4], [4, 8, 2, 5, 3, 1, 6, 7], [1], [9], [4], [7], [8],
+    // [8], [-11], [-4], [1, 3, 0, 2, 5, 4], [3, 1, 0, 2, 4], [1, 0, 2], [1], [4], [9], [40],16],[8]]}
     //MoveGeneratingStyle[] moveGeneratingStyles = {MoveGeneratingStyle.ALL_TYPE_MOVES_PIECE_BY_PIECE, MoveGeneratingStyle.TYPE_BY_TYPE_MOVES_PIECE_BY_PIECE, MoveGeneratingStyle.DIRECTION_BY_DIRECTION_MOVES_PIECE_BY_PIECE, MoveGeneratingStyle.ALL_TYPE_MOVES_DIRECTION_BY_DIRECTION, MoveGeneratingStyle.TYPE_BY_TYPE_MOVES_DIRECTION_BY_DIRECTION,MoveGeneratingStyle.DIRECTION_BY_DIRECTION_MOVES_TYPE_BY_TYPE};
     //MoveType[] initialMoveTypes = {MoveType.FRIEND_ON_BOTH, MoveType.FRIEND_ON_NEAR, MoveType.FRIEND_ON_FAR, MoveType.QUIET, MoveType.SACRIFICE};
     String FenInitial = "tttttttt/8/8/8/8/8/TTTTTTTT";

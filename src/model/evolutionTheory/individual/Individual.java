@@ -1,4 +1,4 @@
-package model.evolutionTheory.evaluationFunction.individual;
+package model.evolutionTheory.individual;
 
 import model.evolutionTheory.chromosome.Chromosome;
 

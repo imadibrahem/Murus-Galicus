@@ -1,8 +1,7 @@
 package model.evolutionTheory.playerAndMoves;
 
 import model.evolutionTheory.chromosome.Chromosome;
-import model.evolutionTheory.evaluationFunction.EvaluationFunctionIndividual;
-import model.evolutionTheory.evaluationFunction.individual.Individual;
+import model.evolutionTheory.individual.Individual;
 
 import java.io.Serial;
 import java.io.Serializable;

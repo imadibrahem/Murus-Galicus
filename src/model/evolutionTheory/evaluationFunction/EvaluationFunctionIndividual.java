@@ -2,7 +2,7 @@ package model.evolutionTheory.evaluationFunction;
 
 import model.evaluationFunction.EvaluationFunction;
 import model.evolutionTheory.chromosome.Chromosome;
-import model.evolutionTheory.evaluationFunction.individual.Individual;
+import model.evolutionTheory.individual.Individual;
 
 import java.io.Serial;
 import java.io.Serializable;
