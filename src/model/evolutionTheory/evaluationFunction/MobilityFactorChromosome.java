@@ -6,7 +6,7 @@ import model.evolutionTheory.chromosome.IntegerSingleValueChromosome;
 import java.io.Serial;
 import java.io.Serializable;
 
-public class MobilityFactorChromosome extends IntegerSingleValueChromosome implements Serializable {
+    public class MobilityFactorChromosome extends IntegerSingleValueChromosome implements Serializable {
     @Serial
     protected static final long serialVersionUID = 1L;
 

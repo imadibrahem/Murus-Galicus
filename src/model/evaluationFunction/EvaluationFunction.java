@@ -63,8 +63,8 @@ public class EvaluationFunction {
         if (towerDifference == 0) return 0;
         if (towerDifference > 8 || towerDifference < -8){
             System.out.println("towerDifference: " + towerDifference);
-            String Fen = board.generateFEN();
-            DisplayFrame displayFrame = new DisplayFrame(Fen);
+            //String Fen = board.generateFEN();
+            //DisplayFrame displayFrame = new DisplayFrame(Fen);
         }
 
         return towerDifference > 0 ? towersRatioFactor[towerDifference - 1] : - (towersRatioFactor[(-towerDifference) - 1]);
