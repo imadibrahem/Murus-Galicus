@@ -90,6 +90,25 @@ public class PlayerAndMovesWorld implements Serializable {
         return playerAndMovesWorld;
     }
 
+    public void saveProtoRanking(String filename) {
+        try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(filename))) {
+            out.writeObject(protoRank);
+            out.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static PlayerAndMovesWorld loadProtoRanking(String filename) {
+        PlayerAndMovesWorld playerAndMovesWorld = new PlayerAndMovesWorld();
+        try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(filename))) {
+            playerAndMovesWorld.protoRank = (List<int [][]>) in.readObject();
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return playerAndMovesWorld;
+    }
+
     public void savePlayerFinalCheckpoint(String filename) {
         try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(filename))) {
             out.writeObject(pool);
@@ -232,7 +251,7 @@ public class PlayerAndMovesWorld implements Serializable {
         population.add(new NinthHabitatPlayerAndMoves().habitatIndividual());
         population.add(new TenthHabitatPlayerAndMoves().habitatIndividual());
         population.add(new InitialPlayerAndMoves().habitatIndividual());
-        population.add(new ProtoWorldPlayerAndMoves().habitatIndividual());
+        population.add(new FinalPlayerAndMoves().habitatIndividual());
         printPopulation();
     }
 
@@ -260,6 +279,8 @@ public class PlayerAndMovesWorld implements Serializable {
     }
 
     public void superRankPopulation(){
+        population.add(new SeventhHabitatPlayerAndMoves().habitatIndividual());
+        population.add(new FinalPlayerAndMoves().habitatIndividual());
         // TODO: 4/2/2025 here!!
         printPopulation();
     }
@@ -611,6 +632,7 @@ public class PlayerAndMovesWorld implements Serializable {
             System.out.println(s);
         }
         protoRank.add(results);
+        saveProtoRanking("ProtoFinalPlayerAndMovesRank.ser");
     }
 
     public void printRanking(List<int [][]> rankingList){
