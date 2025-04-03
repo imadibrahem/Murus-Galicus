@@ -30,7 +30,7 @@ public class TimedTranspositionTablePlayer extends Player {
     private final float towersFactor;
     private final float distancesFactor;
     private final TranspositionTable transpositionTable;
-    private TimeManager timeManager;
+    private final TimeManager timeManager;
     String fen = "";
     List<Move> moves;
     boolean timeOut = false;

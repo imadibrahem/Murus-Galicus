@@ -4,7 +4,6 @@ import model.Board;
 import model.Game;
 import model.bit.BitBoard;
 import model.evaluationFunction.EvaluationFunction;
-import model.evolutionTheory.evaluationFunction.EvaluationFunctionWorld;
 import model.evolutionTheory.evaluationFunction.SuperEvaluationFunction;
 import model.evolutionTheory.individual.Individual;
 import model.evolutionTheory.playerAndMoves.habitats.*;
@@ -34,9 +33,12 @@ public class PlayerAndMovesWorld implements Serializable {
     int generation = 0;
     public Individual bestOfBest;
     public Individual finalBest;
+    public Individual superBest;
+
     public List<int [][]> worldRank = new ArrayList<>();
     public List<int [][]> protoRank = new ArrayList<>();
     public List<int [][]> finalRank = new ArrayList<>();
+    public List<int [][]> superRank = new ArrayList<>();
 
     public void savePlayerCheckpoint(String filename) {
         try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(filename))) {
@@ -87,6 +89,7 @@ public class PlayerAndMovesWorld implements Serializable {
         }
         return playerAndMovesWorld;
     }
+
     public void savePlayerFinalCheckpoint(String filename) {
         try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(filename))) {
             out.writeObject(pool);
@@ -112,6 +115,75 @@ public class PlayerAndMovesWorld implements Serializable {
             playerAndMovesWorld.populationNew = (List<Individual>) in.readObject();
             playerAndMovesWorld.finalBest = (Individual)in.readObject();
             playerAndMovesWorld.generation = in.readInt();
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return playerAndMovesWorld;
+    }
+
+    public void saveFinalRanking(String filename) {
+        try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(filename))) {
+            out.writeObject(finalRank);
+            out.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static PlayerAndMovesWorld loadFinalRanking(String filename) {
+        PlayerAndMovesWorld playerAndMovesWorld = new PlayerAndMovesWorld();
+        try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(filename))) {
+            playerAndMovesWorld.finalRank = (List<int [][]>) in.readObject();
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return playerAndMovesWorld;
+    }
+
+    public void savePlayerSuperCheckpoint(String filename) {
+        try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(filename))) {
+            out.writeObject(pool);
+            out.writeObject(families);
+            out.writeObject(family);
+            out.writeObject(population);
+            out.writeObject(populationNew);
+            out.writeObject(superBest);
+            out.writeInt(generation);
+            out.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static PlayerAndMovesWorld loadPlayerSuperCheckpoint(String filename) {
+        PlayerAndMovesWorld playerAndMovesWorld = new PlayerAndMovesWorld();
+        try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(filename))) {
+            playerAndMovesWorld.pool = (List<Individual>) in.readObject();
+            playerAndMovesWorld.families = (List<List<Individual>>) in.readObject();
+            playerAndMovesWorld.family = (List<Individual>) in.readObject();
+            playerAndMovesWorld.population = (List<Individual>) in.readObject();
+            playerAndMovesWorld.populationNew = (List<Individual>) in.readObject();
+            playerAndMovesWorld.superBest = (Individual)in.readObject();
+            playerAndMovesWorld.generation = in.readInt();
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return playerAndMovesWorld;
+    }
+
+    public void saveSuperRanking(String filename) {
+        try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(filename))) {
+            out.writeObject(superRank);
+            out.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static PlayerAndMovesWorld loadSuperRanking(String filename) {
+        PlayerAndMovesWorld playerAndMovesWorld = new PlayerAndMovesWorld();
+        try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(filename))) {
+            playerAndMovesWorld.superRank = (List<int [][]>) in.readObject();
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         }
@@ -163,13 +235,35 @@ public class PlayerAndMovesWorld implements Serializable {
         population.add(new ProtoWorldPlayerAndMoves().habitatIndividual());
         printPopulation();
     }
-    public void TopFourPopulation(){
+
+    public void topFourPopulation(){
         population.add(new SecondHabitatPlayerAndMoves().habitatIndividual());
         population.add(new SeventhHabitatPlayerAndMoves().habitatIndividual());
         population.add(new TenthHabitatPlayerAndMoves().habitatIndividual());
         population.add(new WorldPlayerAndMoves().habitatIndividual());
         printPopulation();
     }
+
+    public void finalRankPopulation(){
+        population.add(new SecondHabitatPlayerAndMoves().habitatIndividual());
+        population.add(new SeventhHabitatPlayerAndMoves().habitatIndividual());
+        population.add(new TenthHabitatPlayerAndMoves().habitatIndividual());
+        population.add(new WorldPlayerAndMoves().habitatIndividual());
+        population.add(new FinalPlayerAndMoves().habitatIndividual());
+        printPopulation();
+    }
+
+    public void topTwoPopulation(){
+        population.add(new SeventhHabitatPlayerAndMoves().habitatIndividual());
+        population.add(new FinalPlayerAndMoves().habitatIndividual());
+        printPopulation();
+    }
+
+    public void superRankPopulation(){
+        // TODO: 4/2/2025 here!!
+        printPopulation();
+    }
+
     public void explore(){
         System.out.println("Explore Mode on..");
         for (Individual individual : population){
@@ -327,7 +421,6 @@ public class PlayerAndMovesWorld implements Serializable {
         return topIndices;
     }
 
-
     public void printGenerationNumber(){
         System.out.println();
         System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++");
@@ -409,7 +502,81 @@ public class PlayerAndMovesWorld implements Serializable {
             System.out.println(s);
         }
         worldRank.add(results);
-        saveWorldRanking("PlayerAndMovesWorldRank_1.ser");
+        saveWorldRanking("PlayerAndMovesWorldRank.ser");
+    }
+
+    public void rankFinal(double totalTime){
+        finalRankPopulation();
+        int [][] results = new int[population.size()][5];
+        int [][] pairResults;
+        int [][] populationResults= new int[population.size()][4];
+        for (int i = 0; i < (population.size() - 1); i++){
+            for (int j = (i + 1); j < population.size(); j++){
+                System.out.println("|||||||||||||||||||||||||||||||||||||||||||||||");
+                System.out.println("Ranking:{ game: " + (i+1) + " X " + (j+1) + " }");
+                System.out.println("|||||||||||||||||||||||||||||||||||||||||||||||");
+                pairResults = compete(population.get(i), population.get(j), totalTime);
+                for (int k = 0; k < 4; k++){
+                    populationResults[i][k] = populationResults[i][k] + pairResults[0][k];
+                    populationResults[j][k] = populationResults[j][k] + pairResults[1][k];
+                }
+            }
+        }
+        int[]populationBest = findTopIndices(populationResults, population.size());
+        for (int j = 0; j < populationBest.length; j++){
+            results[populationBest[j]][0] = j + 1;
+        }
+        for (int i = 0; i < population.size(); i++){
+            for (int k = 0; k < 4; k++){
+                results [i][k + 1]= populationResults[i][k];
+            }
+        }
+        for (int i = 0; i < population.size(); i++){
+            String s = "";
+            for (int k = 0; k < 5; k++){
+                s += results [i][k] + " | ";
+            }
+            System.out.println(s);
+        }
+        finalRank.add(results);
+        saveFinalRanking("PlayerAndMovesFinalRank.ser");
+    }
+
+    public void rankSuper(double totalTime){
+        superRankPopulation();
+        int [][] results = new int[population.size()][5];
+        int [][] pairResults;
+        int [][] populationResults= new int[population.size()][4];
+        for (int i = 0; i < (population.size() - 1); i++){
+            for (int j = (i + 1); j < population.size(); j++){
+                System.out.println("|||||||||||||||||||||||||||||||||||||||||||||||");
+                System.out.println("Ranking:{ game: " + (i+1) + " X " + (j+1) + " }");
+                System.out.println("|||||||||||||||||||||||||||||||||||||||||||||||");
+                pairResults = compete(population.get(i), population.get(j), totalTime);
+                for (int k = 0; k < 4; k++){
+                    populationResults[i][k] = populationResults[i][k] + pairResults[0][k];
+                    populationResults[j][k] = populationResults[j][k] + pairResults[1][k];
+                }
+            }
+        }
+        int[]populationBest = findTopIndices(populationResults, population.size());
+        for (int j = 0; j < populationBest.length; j++){
+            results[populationBest[j]][0] = j + 1;
+        }
+        for (int i = 0; i < population.size(); i++){
+            for (int k = 0; k < 4; k++){
+                results [i][k + 1]= populationResults[i][k];
+            }
+        }
+        for (int i = 0; i < population.size(); i++){
+            String s = "";
+            for (int k = 0; k < 5; k++){
+                s += results [i][k] + " | ";
+            }
+            System.out.println(s);
+        }
+        superRank.add(results);
+        saveSuperRanking("PlayerAndMovesSuperRank.ser");
     }
 
     public void rankProto(double totalTime){
@@ -646,7 +813,7 @@ public class PlayerAndMovesWorld implements Serializable {
     }
 
     public void finalFour(){
-        if (this.generation < 1)TopFourPopulation();
+        if (this.generation < 1) topFourPopulation();
 
         for (int i = this.generation; i < 6; i++){
             printGenerationNumber();
@@ -658,13 +825,76 @@ public class PlayerAndMovesWorld implements Serializable {
             savePlayerFinalCheckpoint("PlayerFinal_checkpoint_" + generation + ".ser");
             printPopulation();
         }
+        if (this.generation > 5 && this.population.size() > 2){
+            System.out.println("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+            System.out.println("||||||||||||||||||| Survival of the fittest 2 |||||||||||||||||||||");
+            System.out.println("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+            rankPopulation(120000,2,0);
+            savePlayerFinalCheckpoint("PlayerFinal_checkpoint_" + generation + ".ser");
+        }
+        for (int i = this.generation; i < 15; i++){
+            printGenerationNumber();
+            if (i == 7) explore();
+            else if (i == 8 || i == 11) normalMode();
+            else if (i == 9 || i > 12)exploit();
+            firstScarcitySeason(120000);
+            generation++;
+            savePlayerFinalCheckpoint("PlayerFinal_checkpoint_" + generation + ".ser");
+            printPopulation();
+        }
+        printGenerationNumber();
+        rankPopulation(120000,1,0);
+        generation++;
+        printPopulation();
+        printGenerationNumber();
+        normalMode();
+        finalBest = population.get(0);
+        System.out.println("00000000000000000000000000000000000000000000000");
+        System.out.println("000000000000000  BEST OF Final 0000000000000000");
+        System.out.println("00000000000000000000000000000000000000000000000");
+        System.out.println(finalBest);
+        System.out.println("00000000000000000000000000000000000000000000000");
+        System.out.println("000000000000000  BEST OF Final 0000000000000000");
+        System.out.println("00000000000000000000000000000000000000000000000");
+        savePlayerFinalCheckpoint("PlayerFinal_checkpoint_" + generation + ".ser");
 
+    }
+
+    public void finalTwo(){
+        if (this.generation < 1) topTwoPopulation();
+        for (int i = this.generation; i < 15; i++){
+            printGenerationNumber();
+            if (i == 1 ||i == 2 || i == 6) explore();
+            else if (i == 3 || i == 5 || i == 7 || i == 11) normalMode();
+            else if (i == 4 || i == 9 || i > 12)exploit();
+            firstScarcitySeason(120000);
+            generation++;
+            savePlayerSuperCheckpoint("PlayerSuper_checkpoint_" + generation + ".ser");
+            printPopulation();
+        }
+        printGenerationNumber();
+        rankPopulation(120000,1,0);
+        generation++;
+        printPopulation();
+        printGenerationNumber();
+        normalMode();
+        finalBest = population.get(0);
+        System.out.println("00000000000000000000000000000000000000000000000");
+        System.out.println("0000000000000000  SUPER BEST 000000000000000000");
+        System.out.println("00000000000000000000000000000000000000000000000");
+        System.out.println(superBest);
+        System.out.println("00000000000000000000000000000000000000000000000");
+        System.out.println("0000000000000000  SUPER BEST 000000000000000000");
+        System.out.println("00000000000000000000000000000000000000000000000");
+        savePlayerSuperCheckpoint("PlayerSuper_checkpoint_" + generation + ".ser");
     }
     public static void main (String[] args){
         PlayerAndMovesWorld playerAndMovesWorld = new PlayerAndMovesWorld();
+        playerAndMovesWorld.finalTwo();
 
-        //PlayerAndMovesWorld playerAndMovesWorld = loadPlayerFinalCheckpoint("PlayerFinal_checkpoint_1.ser");
-        playerAndMovesWorld.finalFour();
+        //playerAndMovesWorld.rankFinal(120000);
+        //PlayerAndMovesWorld playerAndMovesWorld = loadPlayerFinalCheckpoint("PlayerFinal_checkpoint_13.ser");
+        //playerAndMovesWorld.finalFour();
 
         //PlayerAndMovesWorld playerAndMovesWorld = loadPlayerCheckpoint("world_checkpoint_35.ser");
         //playerAndMovesWorld.fullOptimization();
