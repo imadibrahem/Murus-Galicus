@@ -281,7 +281,7 @@ public class PlayerAndMovesWorld implements Serializable {
     public void superRankPopulation(){
         population.add(new SeventhHabitatPlayerAndMoves().habitatIndividual());
         population.add(new FinalPlayerAndMoves().habitatIndividual());
-        // TODO: 4/2/2025 here!!
+        population.add(new SuperPlayerAndMoves().habitatIndividual());
         printPopulation();
     }
 
@@ -900,7 +900,7 @@ public class PlayerAndMovesWorld implements Serializable {
         printPopulation();
         printGenerationNumber();
         normalMode();
-        finalBest = population.get(0);
+        superBest = population.get(0);
         System.out.println("00000000000000000000000000000000000000000000000");
         System.out.println("0000000000000000  SUPER BEST 000000000000000000");
         System.out.println("00000000000000000000000000000000000000000000000");
